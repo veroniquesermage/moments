@@ -11,4 +11,5 @@ import {AuthService} from 'src/security/service/auth.service';
 export class AppComponent {
   constructor(public auth: AuthService) {
   }
+
 }
