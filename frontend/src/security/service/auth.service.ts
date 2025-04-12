@@ -55,12 +55,14 @@ export class AuthService {
   }
 
   private sendCodeToBackend(code: string): void {
+    const codeVerifier = sessionStorage.getItem('pkce_code_verifier'); // clé par défaut utilisée par angular-oauth2-oidc
+
     fetch(environment.backendUrl + environment.backendAuth, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({code})
+      body: JSON.stringify({code, codeVerifier})
     })
       .then(res => res.json())
       .then(data => {
@@ -74,6 +76,7 @@ export class AuthService {
       })
       .catch(err => console.error('[Backend] Erreur:', err));
   }
+
 
   private generateCodeVerifier(): string {
     const array = new Uint8Array(32);
