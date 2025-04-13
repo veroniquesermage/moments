@@ -2,6 +2,6 @@
   <button (click)="auth.login()">Se connecter avec Google</button>
 </div>
 <div *ngIf="auth.isLoggedIn()">
-  <p>Connecté en tant que : {{ auth.identityClaims()?.email }}</p>
+  <p>Connecté en tant que : {{ auth.profile()?.email }}</p>
   <button (click)="auth.logout()">Se déconnecter</button>
 </div>
