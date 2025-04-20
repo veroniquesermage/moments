@@ -1,13 +1,27 @@
 import {Routes} from '@angular/router';
+import {DashboardComponent} from 'src/pages/dashboard/dashboard.component';
+import {OnboardingComponent} from 'src/pages/groupe/onboarding/onboarding.component';
 
-export const routes: Routes = [{
-  path: 'account',
-  loadChildren: () =>
-    import('./features/account/account.routes').then((m) => m.ACCOUNT_ROUTES),
-},
+export const routes: Routes = [
   {
-    path: 'app',
-    loadComponent: () => import('./features/app/pages/app-home/app-home.component').then(m => m.AppHomeComponent),
-  }];
+    path: 'groupes/onboarding',
+    component: OnboardingComponent,
+  },
+  {
+    path: 'groupes/dashboard',
+    component: DashboardComponent,
+  },
+  {
+    path: '',
+    redirectTo: 'groupes/onboarding',
+    pathMatch: 'full',
+  },
+  {
+    path: '**',
+    redirectTo: 'groupes/onboarding',
+  },
+];
+
+
 
 
