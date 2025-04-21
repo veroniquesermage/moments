@@ -26,9 +26,9 @@ export class AppComponent {
       if (this.auth.isLoggedIn()) {
         this.groupService.fetchGroups().then(groupList => {
           if (groupList.length === 1) {
-            this.router.navigate(['group', 'dashboard']);
+            this.router.navigate(['groupe', 'dashboard']);
           } else {
-            this.router.navigate(['group', 'onboarding']);
+            this.router.navigate(['groupe', 'onboarding']);
           }
         });
       }

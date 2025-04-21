@@ -19,7 +19,8 @@ export class GroupService {
       const groupes = await firstValueFrom(this.http.get<GroupeResume[]>(this.apiUrl, {
         headers: new HttpHeaders({
           'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-        })
+        }),
+        withCredentials: true
       }));
       this.groupes.set(groupes);
       return groupes;
