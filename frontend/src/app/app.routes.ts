@@ -4,21 +4,21 @@ import {OnboardingComponent} from 'src/pages/groupe/onboarding/onboarding.compon
 
 export const routes: Routes = [
   {
-    path: 'groupes/onboarding',
+    path: 'groupe/onboarding',
     component: OnboardingComponent,
   },
   {
-    path: 'groupes/dashboard',
+    path: 'groupe/dashboard',
     component: DashboardComponent,
   },
   {
     path: '',
-    redirectTo: 'groupes/onboarding',
+    redirectTo: 'groupe/onboarding',
     pathMatch: 'full',
   },
   {
     path: '**',
-    redirectTo: 'groupes/onboarding',
+    redirectTo: 'groupe/onboarding',
   },
 ];
 
