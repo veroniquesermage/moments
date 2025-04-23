@@ -8,5 +8,6 @@ export const environment = {
   api: {
     auth: '/api/auth/google',
     groupes: '/groupe',
+    rejoindre: '/rejoindre'
   }
 };

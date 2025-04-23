@@ -1,7 +1,7 @@
 export interface GroupeResume {
   id: number;
-  nomGroupe: string;
+  nom: string;
   description: string;
   role: string;
-  dateAjout: string; // ou Date si tu fais un parse() plus tard
+  dateAjout: string;
 }

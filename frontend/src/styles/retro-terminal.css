@@ -1,0 +1,78 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Fira Code', monospace;
+}
+
+.terminal {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 2px solid #fff;
+  background-color: #111;
+}
+
+.command {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #fff;
+  margin: 1rem 0;
+}
+
+button {
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.options {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap; /* si jamais y’en a beaucoup */
+  justify-content: flex-start;
+  margin-top: 2rem;
+}
+
+.error {
+  color: #ff4d4d;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+
+@media (max-width: 768px) {
+  .terminal {
+    padding: 1rem;
+    margin: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .options button {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+  }
+}
+
