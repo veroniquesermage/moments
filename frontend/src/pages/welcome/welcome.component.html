@@ -1,0 +1,15 @@
+<div class="terminal">
+  <h1>> Bienvenue sur List2Wish</h1>
+
+  <app-loading *ngIf="groupeService.isLoading()"/>
+  <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
+    <p class="command">> Veuillez vous connecter :</p>
+    <button (click)="auth.login()">Se connecter avec Google</button>
+  </div>
+
+  <div *ngIf="auth.isLoggedIn() && !groupeService.isLoading()">
+    <p>Connecté en tant que : {{ auth.profile()?.email }}</p>
+    <button (click)="auth.logout()">Se déconnecter</button>
+  </div>
+</div>
+

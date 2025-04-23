@@ -32,7 +32,9 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles/retro-terminal.css",
+              "src/styles/form-styles.css",
+              "src/styles/styles.scss"
             ],
             "scripts": []
           },

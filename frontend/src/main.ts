@@ -5,6 +5,8 @@ import {importProvidersFrom} from '@angular/core';
 import {provideHttpClient} from '@angular/common/http';
 import {provideRouter} from '@angular/router';
 import {routes} from 'src/app/app.routes';
+import './styles/retro-terminal.css';
+
 
 bootstrapApplication(AppComponent, {
   providers: [
