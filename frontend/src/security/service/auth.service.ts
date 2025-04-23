@@ -57,7 +57,7 @@ export class AuthService {
   private sendCodeToBackend(code: string): void {
     const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
 
-    fetch(`${environment.backendUrl}${environment.backendAuth}`, {
+    fetch(`${environment.backendBaseUrl}${environment.api.auth}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({code, codeVerifier})

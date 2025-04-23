@@ -1,0 +1,21 @@
+<div class="form-container">
+
+  <h1>> Création de groupe </h1>
+  <p class="command">> pour créer un nouveau groupe merci de remplir ce formulaire.</p>
+
+  <form [formGroup]="groupeForm" (ngSubmit)="onSubmit()">
+    <label>Nom du groupe</label>
+    <input formControlName="nomGroupe" type="text"/>
+
+    <label>Description</label>
+    <textarea formControlName="description"></textarea>
+
+    <button type="submit">Créer le groupe</button>
+
+  </form>
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+</div>
