@@ -1,0 +1,22 @@
+<div class="terminal">
+  <h1>> Onboarding - Bienvenue !</h1>
+
+  <p class="command">> Que souhaitez-vous faire ?</p>
+
+  <div class="options">
+    <button (click)="router.navigate(['/groupe/onboarding/creer'])">Créer un groupe</button>
+    <button (click)="router.navigate(['/groupe/onboarding/rejoindre'])">Rejoindre un groupe</button>
+  </div>
+
+  <div *ngIf="groupService.groupes().length > 0" class="existing-groups">
+    <h2>> Groupes existants</h2>
+    <ul>
+      <li *ngFor="let groupe of groupService.groupes()">
+        <strong>{{ groupe.nom }}</strong> -
+        <button (click)="choisirGroupe(groupe)">Sélectionner</button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+</div>
