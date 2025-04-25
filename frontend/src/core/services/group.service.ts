@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {GroupeResume} from 'src/core/models/group-resume.model';
 import {firstValueFrom} from 'rxjs';
@@ -51,11 +51,11 @@ export class GroupService {
 
   async joinGroup(code: string) {
     try {
-      const url = this.apiUrl + environment.api.rejoindre;
-      const params = new HttpParams().append('code', code);
+      const codeEnc = encodeURIComponent(code);
+      const url = `${this.apiUrl}/environment.api.rejoindre/${codeEnc}`;
+
       const groupeJoined = await firstValueFrom(this.http.post<GroupeResume>(url, {}, {
         headers: this.getAuthHeaders(),
-        params: params,
         withCredentials: true
       }));
       this.groupStateService.setSelectedGroup(groupeJoined);
