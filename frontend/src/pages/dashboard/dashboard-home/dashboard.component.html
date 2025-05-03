@@ -1,0 +1,23 @@
+<div class="terminal">
+  <h1>> Bienvenue dans le groupe : {{ selectedGroup()?.nom }}</h1>
+  <p>> Que souhaitez-vous faire ?</p>
+
+  <ul class="command-list">
+    <li>
+      <button (click)="goToMesCadeaux()">[1] Gérer mes cadeaux</button>
+    </li>
+    <li>
+      <button (click)="goToListesMembres()">[2] Voir les listes des autres membres</button>
+    </li>
+    <li>
+      <button (click)="goToChangerGroupe()">[3] Changer de groupe</button>
+    </li>
+    <li *ngIf="estAdmin">
+      <button (click)="goToGestionGroupe()">[4] Gérer le groupe</button>
+    </li>
+    <li>
+      <button (click)="envoyerFeedback()">[5] Envoyer un feedback</button>
+    </li>
+  </ul>
+</div>
+

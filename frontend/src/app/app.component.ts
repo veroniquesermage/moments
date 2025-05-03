@@ -47,9 +47,9 @@ export class AppComponent {
     if (result.success) {
       if (result.data.length === 1) {
         this.groupStateService.setSelectedGroup(result.data.at(0)!);
-        this.router.navigate(['groupe', 'dashboard']);
+        this.router.navigate(['/dashboard']);
       } else {
-        this.router.navigate(['groupe', 'onboarding']);
+        this.router.navigate(['/groupe/onboarding']);
       }
     } else {
       console.warn('⚠️ Impossible de charger les groupes :', result.message);

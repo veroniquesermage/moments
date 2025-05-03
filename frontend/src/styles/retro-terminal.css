@@ -54,6 +54,30 @@ button:hover {
   font-weight: bold;
 }
 
+.command-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.command-list li {
+  margin: 0.5rem 0;
+}
+
+.command-list button {
+  background: none;
+  color: white;
+  border: 1px solid white;
+  padding: 0.5rem 1rem;
+  font-family: monospace;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.command-list button:hover {
+  background: white;
+  color: black;
+}
+
 
 @media (max-width: 768px) {
   .terminal {
