@@ -1,0 +1,16 @@
+<div>
+  <table class="gift-table">
+    <thead>
+    <tr>
+      <th *ngFor="let column of displayedColumns">{{ column | titlecase }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let gift of gifts">
+      <td *ngFor="let column of displayedColumns">
+        {{ gift[column as keyof Gift] }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

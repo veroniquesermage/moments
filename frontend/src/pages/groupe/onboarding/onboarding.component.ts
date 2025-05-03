@@ -36,7 +36,7 @@ export class OnboardingComponent implements OnInit {
 
   choisirGroupe(groupe: GroupeResume): void {
     this.groupState.setSelectedGroup(groupe);
-    this.router.navigate(['groupe', 'dashboard']);
+    this.router.navigate(['/dashboard']);
   }
 
 }
