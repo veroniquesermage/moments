@@ -1,0 +1,28 @@
+<div class="form-container">
+
+  <h1>> Ajout d'un cadeau </h1>
+  <p class="command">> Pour ajouter un nouveau cadeau à votre liste, merci de remplir ce formulaire.</p>
+
+  <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
+    <label>Nom</label>
+    <input formControlName="nom" type="text"/>
+    <label>Description</label>
+    <textarea formControlName="description"></textarea>
+    <label>Url du cadeau</label>
+    <input formControlName="url" type="text"/>
+    <label>Quantité</label>
+    <input formControlName="quantite" type="text"/>
+    <label>Prix à l'unité</label>
+    <input formControlName="prix" type="text"/>
+    <label>Commentaire</label>
+    <textarea formControlName="commentaire"></textarea>
+
+    <button type="submit">Ajouter le cadeau</button>
+
+  </form>
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+</div>

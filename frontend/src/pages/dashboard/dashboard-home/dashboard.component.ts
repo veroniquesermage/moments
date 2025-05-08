@@ -24,8 +24,9 @@ export class DashboardComponent {
   }
 
   goToMesCadeaux() {
-    this.router.navigate(['groupe', 'dashboard']);
+    this.router.navigate(['dashboard', 'mes-cadeaux']);
   }
+
 
   goToListesMembres() {
 
