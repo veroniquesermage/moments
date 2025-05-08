@@ -39,7 +39,7 @@ export class GroupCreateComponent {
 
       if (result.success) {
         console.log('✅ Groupe créé avec succès');
-        this.router.navigate(['/groupe/dashboard']);
+        this.router.navigate(['/dashboard']);
       } else {
         this.errorMessage = result.message!;
       }

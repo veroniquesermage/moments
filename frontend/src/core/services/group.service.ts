@@ -14,15 +14,17 @@ export class GroupService {
   groupes = signal<GroupeResume[]>([]);
   selectedGroup = signal<GroupeResume | null>(null);
   errorMessage: string | null = null;
-
-  readonly isLoading = signal<boolean>(false);
+  isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
               private groupStateService: GroupStateService) {
   }
 
   async fetchGroups(): Promise<Result<GroupeResume[]>> {
+    this.isLoading.set(true);
+
     try {
+      this.isLoading.set(true);
       const groupes = await firstValueFrom(this.http.get<GroupeResume[]>(this.apiUrl, {
         headers: this.getAuthHeaders(),
         withCredentials: true
@@ -32,6 +34,8 @@ export class GroupService {
     } catch (error) {
       console.error('[GroupService] Erreur lors de la récupération des groupes', error);
       return {success: false, message: "❌ Aucun groupe trouvé."};
+    } finally {
+      this.isLoading.set(false);
     }
   }
 

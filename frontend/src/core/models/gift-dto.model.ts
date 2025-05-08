@@ -1,7 +1,7 @@
 import {GiftStatus} from 'src/core/enum/gift-status-.enum';
 
 export interface GiftDTO {
-  id: number;
+  id?: number;
   nom: string;
   description?: string;
   url?: string;
