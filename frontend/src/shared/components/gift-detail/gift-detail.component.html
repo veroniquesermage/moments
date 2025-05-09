@@ -1,4 +1,4 @@
-<div class="terminal">
+<div class="terminal" style="position: relative;">
   <h2>> Détail du cadeau</h2>
 
   <div *ngIf="gift">
@@ -11,9 +11,27 @@
     <p>> <strong>Prix :</strong> {{ gift.prix }} €</p>
     <p>> <strong>Commentaire :</strong> {{ gift.commentaire }}</p>
     <p>> <strong>Priorité :</strong> {{ gift.priorite }}</p>
+
+    <!-- Champs spécifiques si ce n'est PAS notre cadeau -->
+    <ng-container *ngIf="context === 'other'">
+      <p>> <strong>Statut :</strong> {{ gift.statut }}</p>
+      <p *ngIf="gift.reserveParId">> <strong>Réservé par :</strong> {{ gift.reserveParId }}</p>
+    </ng-container>
   </div>
 
   <div class="options">
     <button (click)="retour()">↩ Retour à la liste</button>
+
+    <button *ngIf="context === 'own'" (click)="modifier()">✏ Modifier</button>
+
+    <!-- Premier clic -->
+    <button *ngIf="context === 'own' && !showDeleteConfirm" (click)="requestDelete()">🗑 Supprimer</button>
   </div>
+  <!-- Confirmation -->
+  <app-terminal-confirm-modal
+    *ngIf="showDeleteConfirm"
+    [message]="'Êtes-vous sûr(e) de vouloir supprimer ce cadeau ?'"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  />
 </div>

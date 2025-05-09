@@ -1,0 +1,17 @@
+<div class="form-container">
+
+  <h1>> Modification d'un cadeau </h1>
+  <p class="command">> Pour modifier un cadeau à votre liste, merci d'utiliser ce formulaire.</p>
+
+  <app-gift-form
+    [gift]=gift
+    (formSubmitted)="onSubmit($event)"
+    (cancel)="router.navigate(['/dashboard/mes-cadeaux'])"
+  ></app-gift-form>
+
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+</div>

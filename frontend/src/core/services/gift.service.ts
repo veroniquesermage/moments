@@ -89,6 +89,41 @@ export class GiftService {
 
   }
 
+  async deleteGift(id: number) {
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}`;
+
+    try {
+      await firstValueFrom(
+        this.http.delete<GiftDTO>(url, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la suppression du cadeau', error);
+      this.errorMessage.set("❌ Impossible de supprimer le cadeau.");
+    }
+
+  }
+
+  async updateGift(gift: Gift) {
+
+    const giftDTO = GiftMapper.toDTO(gift);
+    const url = `${this.apiUrl}/${gift.id}`;
+    try {
+      const giftCreated = await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      await this.fetchGifts();
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la création du cadeau', error);
+      this.errorMessage.set("❌ Impossible de créer le cadeau.");
+    }
+  }
+
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({

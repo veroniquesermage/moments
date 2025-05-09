@@ -6,6 +6,7 @@
   <app-gift-form
   [gift]=undefined
   (formSubmitted)="onSubmit($event)"
+  (cancel)="router.navigate(['/dashboard/mes-cadeaux'])"
   ></app-gift-form>
 
 
