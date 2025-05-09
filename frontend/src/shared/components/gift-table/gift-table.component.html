@@ -5,7 +5,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let gift of gifts">
+  <tr *ngFor="let gift of gifts" (click)="onRowClick(gift)">
     <td *ngFor="let column of displayedColumns">
       {{ getGiftValue(gift, column) }}
     </td>

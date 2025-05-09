@@ -1,0 +1,19 @@
+<div class="terminal">
+  <h2>> Détail du cadeau</h2>
+
+  <div *ngIf="gift">
+    <p>> <strong>Nom :</strong> {{ gift.nom }}</p>
+    <p>> <strong>Description :</strong> {{ gift.description }}</p>
+    <p *ngIf="gift.url">> <strong>URL : </strong>
+      <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
+    </p>
+    <p>> <strong>Quantité :</strong> {{ gift.quantite }}</p>
+    <p>> <strong>Prix :</strong> {{ gift.prix }} €</p>
+    <p>> <strong>Commentaire :</strong> {{ gift.commentaire }}</p>
+    <p>> <strong>Priorité :</strong> {{ gift.priorite }}</p>
+  </div>
+
+  <div class="options">
+    <button (click)="retour()">↩ Retour à la liste</button>
+  </div>
+</div>

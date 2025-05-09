@@ -1,33 +1,29 @@
-import {Component, signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {Gift} from 'src/core/models/gift.model';
-import {User} from 'src/security/model/user.model';
 import {GiftStatus} from 'src/core/enum/gift-status-.enum';
 import {AuthService} from 'src/security/service/auth.service';
+import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
 
 @Component({
   selector: 'app-gift-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, GiftFormComponent],
   templateUrl: './gift-create.component.html',
   styleUrl: './gift-create.component.scss'
 })
 export class GiftCreateComponent {
-  giftForm: FormGroup;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder,
-              private giftService: GiftService,
+  constructor(private giftService: GiftService,
               public router: Router,
               private authService: AuthService,) {
-    this.giftForm = this.createGiftForm();
   }
 
-  async onSubmit() {
-
+  async onSubmit(giftFormData: Gift): Promise<void> {
     const giftslist = this.giftService.gifts();
     const utilisateur = this.authService.profile();
     const newPriority = Math.max(1, giftslist.length + 1);
@@ -37,45 +33,16 @@ export class GiftCreateComponent {
       return;
     }
 
-    if (this.giftForm.valid) {
-      const formData = this.giftForm.value;
-      console.log('🧾 Données du formulaire :', formData);
+    const gift: Gift = {
+      ...giftFormData,
+      utilisateurId: utilisateur.id,
+      statut: GiftStatus.DISPONIBLE,
+      recu: false,
+      priorite: newPriority,
+    };
 
-      let prix = formData.prix;
-      if (typeof prix === 'string') {
-        prix = Number(prix.replace(',', '.'));
-      }
-
-
-      const gift: Gift = {
-        nom: formData.nom,
-        description: formData.description,
-        url: formData.url,
-        quantite: formData.quantite,
-        prix: prix,
-        commentaire: formData.commentaire,
-        utilisateurId: utilisateur.id,
-        statut: GiftStatus.DISPONIBLE,
-        recu: false,
-        priorite: newPriority
-      };
-
-      await this.giftService.createGift(gift);
-      await this.router.navigate(['/dashboard/mes-cadeaux']);
-
-    }
+    await this.giftService.createGift(gift);
+    await this.router.navigate(['/dashboard/mes-cadeaux']);
   }
-
-  private createGiftForm(): FormGroup {
-    return new FormGroup({
-      nom: new FormControl('', Validators.required),
-      description: new FormControl(''),
-      url: new FormControl(''),
-      quantite: new FormControl('', Validators.required),
-      prix: new FormControl(''),
-      commentaire: new FormControl('')
-    });
-  }
-
 
 }
