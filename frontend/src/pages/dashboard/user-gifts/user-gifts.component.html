@@ -1,7 +1,14 @@
 <div class="terminal">
   <h2>> Mes cadeaux</h2>
-  <app-gift-table [gifts]="giftService.gifts()" [displayedColumns]="displayedColumns"></app-gift-table>
+  <p>> Cliquez sur un cadeau pour obtenir son détail</p>
+  <app-gift-table
+    [gifts]="giftService.gifts()"
+    [displayedColumns]="displayedColumns"
+    (rowClicked)="onGiftClicked($event)">
+  </app-gift-table>
   <div class="options">
     <button (click)="goToAjout()">[+] Ajouter un cadeau</button>
+    <button (click)="retour()">↩ Retour au Menu</button>
   </div>
+
 </div>

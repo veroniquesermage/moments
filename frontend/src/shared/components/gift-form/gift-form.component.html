@@ -1,0 +1,27 @@
+<div class="form-container">
+
+  <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
+    <label>Nom</label>
+    <input formControlName="nom" type="text"/>
+    <label>Description</label>
+    <textarea formControlName="description"></textarea>
+    <label>Url du cadeau</label>
+    <input formControlName="url" type="text"/>
+    <label>Quantité</label>
+    <input formControlName="quantite" type="text"/>
+    <label>Prix à l'unité</label>
+    <input
+      type="text"
+      formControlName="prix"
+      (input)="sanitizeDecimal($event)"/>
+
+    <label>Commentaire</label>
+    <textarea formControlName="commentaire"></textarea>
+
+    <button type="submit">
+      {{ gift?.id ? 'Modifier le cadeau' : 'Créer le cadeau' }}
+    </button>
+  </form>
+
+
+</div>

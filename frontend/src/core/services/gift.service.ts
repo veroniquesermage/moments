@@ -65,6 +65,30 @@ export class GiftService {
     }
   }
 
+  async getGift(id: number) {
+
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}`;
+    try {
+      const giftDto = await firstValueFrom(
+        this.http.get<GiftDTO>(url, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      const gift = GiftMapper.fromDTO(giftDto);
+
+      return {success: true, data: gift};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la récupération du cadeau', error);
+      this.errorMessage.set("❌ Impossible de récupérer le cadeau.");
+      return {success: false, message: "❌ Impossible de récupérer le cadeau."};
+    }
+
+  }
+
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
