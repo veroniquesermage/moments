@@ -1,7 +1,8 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Gift} from 'src/core/models/gift.model';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-gift-form',
@@ -10,16 +11,23 @@ import {Gift} from 'src/core/models/gift.model';
   templateUrl: './gift-form.component.html',
   styleUrl: './gift-form.component.scss'
 })
-export class GiftFormComponent {
+export class GiftFormComponent implements OnChanges{
 
   giftForm: FormGroup;
   @Input() gift: Gift | undefined = undefined;
-
   @Output() formSubmitted = new EventEmitter<Gift>();
+  @Output() cancel = new EventEmitter<void>();
 
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+              public router: Router,) {
     this.giftForm = this.createGiftForm(this.gift);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['gift'] && this.gift) {
+      this.giftForm.patchValue(this.gift);
+    }
   }
 
   onSubmit(): void {
