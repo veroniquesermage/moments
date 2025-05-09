@@ -1,6 +1,7 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Gift} from 'src/core/models/gift.model';
+import {GiftTableColumn} from 'src/core/models/gift-table-column.model';
 
 @Component({
   selector: 'app-gift-table',
@@ -11,5 +12,16 @@ import {Gift} from 'src/core/models/gift.model';
 })
 export class GiftTableComponent {
   @Input() gifts: Gift[] = [];
-  @Input() displayedColumns: string[] = []; // Liste des colonnes dynamiques
+  @Input() displayedColumns: GiftTableColumn[] = [];
+  @Output() rowClicked = new EventEmitter<Gift>();
+
+  getGiftValue(gift: Gift, column: GiftTableColumn): any {
+    const rawValue = (gift as any)[column.key];
+    return column.formatFn ? column.formatFn(rawValue, gift) : rawValue;
+  }
+
+  onRowClick(gift: Gift) {
+    this.rowClicked.emit(gift);
+  }
+
 }

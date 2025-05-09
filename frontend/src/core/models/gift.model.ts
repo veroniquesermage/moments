@@ -1,7 +1,7 @@
 import {GiftStatus} from 'src/core/enum/gift-status-.enum';
 
 export interface Gift {
-  id: number;
+  id?: number;
   nom: string;
   description?: string;
   url?: string;

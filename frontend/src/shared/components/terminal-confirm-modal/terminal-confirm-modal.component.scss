@@ -1,0 +1,31 @@
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.75); // Si tu veux un fond sombre temporaire
+  z-index: 10;
+}
+
+
+.modal-box {
+  background-color: #111;
+  border: 2px solid #fff;
+  padding: 2rem;
+  min-width: 250px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}

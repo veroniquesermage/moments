@@ -1,0 +1,17 @@
+<div class="form-container">
+
+  <h1>> Ajout d'un cadeau </h1>
+  <p class="command">> Pour ajouter un nouveau cadeau à votre liste, merci de remplir ce formulaire.</p>
+
+  <app-gift-form
+  [gift]=undefined
+  (formSubmitted)="onSubmit($event)"
+  (cancel)="router.navigate(['/dashboard/mes-cadeaux'])"
+  ></app-gift-form>
+
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+</div>
