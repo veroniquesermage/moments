@@ -9,6 +9,7 @@ export const environment = {
     auth: '/api/auth/google',
     groupes: '/groupe',
     rejoindre: '/rejoindre',
-    cadeaux: '/cadeaux'
+    cadeaux: '/cadeaux',
+    utilisateur: '/utilisateurs'
   }
 };

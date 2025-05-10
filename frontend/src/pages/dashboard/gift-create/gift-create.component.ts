@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {Gift} from 'src/core/models/gift.model';

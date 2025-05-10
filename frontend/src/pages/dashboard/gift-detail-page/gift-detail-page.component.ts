@@ -1,7 +1,6 @@
 import {Component, inject} from '@angular/core';
-import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
 import {GiftDetailComponent} from 'src/shared/components/gift-detail/gift-detail.component';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 
 @Component({
@@ -20,10 +19,20 @@ export class GiftDetailPageComponent {
   giftId: number | undefined = undefined;
   context: "own" | "other";
 
-  constructor() {
+  constructor(
+    public router: Router) {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.context = this.route.snapshot.data['context'] as 'own' | 'other';
 
     this.giftId = idParam ? +idParam : undefined;
+  }
+
+  handleBack() {
+
+    if(this.context === "own"){
+      this.router.navigate(['/dashboard/mes-cadeaux']);
+    } else if(this.context === "other"){
+      this.router.navigate(['/dashboard/leurs-cadeaux']);
+    }
   }
 }

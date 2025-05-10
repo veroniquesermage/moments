@@ -31,7 +31,7 @@ export class GroupJoinComponent {
       const result = await this.groupeService.joinGroup(value.code);
 
       if (result.success) {
-        this.router.navigate(['groupe', 'dashboard']);
+        this.router.navigate(['/dashboard']);
       } else {
         this.errorMessage = result.message!;
       }

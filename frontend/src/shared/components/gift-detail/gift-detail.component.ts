@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Gift} from 'src/core/models/gift.model';
 import {GiftService} from 'src/core/services/gift.service';
@@ -18,6 +18,7 @@ export class GiftDetailComponent implements OnInit{
 
   @Input() id!: number;
   @Input() context: 'own' | 'other' = 'own';
+  @Output() back = new EventEmitter<void>();
   gift: Gift | undefined = undefined;
   showDeleteConfirm = false;
 
@@ -31,10 +32,6 @@ export class GiftDetailComponent implements OnInit{
     if (result.success) {
       this.gift = result.data;
     }
-  }
-
-  retour() {
-    this.router.navigate(['/dashboard/mes-cadeaux']);
   }
 
   modifier() {

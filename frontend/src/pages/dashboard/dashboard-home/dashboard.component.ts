@@ -29,6 +29,7 @@ export class DashboardComponent {
 
 
   goToListesMembres() {
+    this.router.navigate(['dashboard', 'leurs-cadeaux']);
 
   }
 

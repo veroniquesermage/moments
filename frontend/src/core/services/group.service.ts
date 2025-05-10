@@ -56,7 +56,7 @@ export class GroupService {
   async joinGroup(code: string) {
     try {
       const codeEnc = encodeURIComponent(code);
-      const url = `${this.apiUrl}/environment.api.rejoindre/${codeEnc}`;
+      const url = `${this.apiUrl + environment.api.rejoindre}/${codeEnc}`;
 
       const groupeJoined = await firstValueFrom(this.http.post<GroupeResume>(url, {}, {
         headers: this.getAuthHeaders(),

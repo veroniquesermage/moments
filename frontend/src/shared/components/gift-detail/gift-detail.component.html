@@ -20,7 +20,7 @@
   </div>
 
   <div class="options">
-    <button (click)="retour()">↩ Retour à la liste</button>
+    <button (click)="back.emit()">↩ Retour à la liste</button>
 
     <button *ngIf="context === 'own'" (click)="modifier()">✏ Modifier</button>
 
