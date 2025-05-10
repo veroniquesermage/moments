@@ -15,7 +15,7 @@
     <!-- Champs spécifiques si ce n'est PAS notre cadeau -->
     <ng-container *ngIf="context === 'other'">
       <p>> <strong>Statut :</strong> {{ gift.statut }}</p>
-      <p *ngIf="gift.reserveParId">> <strong>Réservé par :</strong> {{ gift.reserveParId }}</p>
+      <p *ngIf="gift.reservePar">> <strong>{{ gift.statut === 'RESERVE' ? 'Réservé' : 'Pris' }} par :</strong> {{ gift.reservePar.name }}</p>
     </ng-container>
   </div>
 

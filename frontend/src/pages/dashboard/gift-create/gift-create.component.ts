@@ -34,7 +34,7 @@ export class GiftCreateComponent {
 
     const gift: Gift = {
       ...giftFormData,
-      utilisateurId: utilisateur.id,
+      utilisateur: utilisateur,
       statut: GiftStatus.DISPONIBLE,
       recu: false,
       priorite: newPriority,
