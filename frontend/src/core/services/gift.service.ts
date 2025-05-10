@@ -5,7 +5,6 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {Gift} from 'src/core/models/gift.model';
 import {GiftMapper} from 'src/core/mapper/gift.mapper';
-import {GroupeResume} from 'src/core/models/group-resume.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -54,7 +53,7 @@ export class GiftService {
     const giftDTO = GiftMapper.toDTO(gift);
 
     try {
-      const giftCreated = await firstValueFrom(this.http.post<GiftDTO>(this.apiUrl, giftDTO, {
+      await firstValueFrom(this.http.post<GiftDTO>(this.apiUrl, giftDTO, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -113,7 +112,7 @@ export class GiftService {
     const giftDTO = GiftMapper.toDTO(gift);
     const url = `${this.apiUrl}/${gift.id}`;
     try {
-      const giftCreated = await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
+      await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -123,6 +122,11 @@ export class GiftService {
       this.errorMessage.set("❌ Impossible de créer le cadeau.");
     }
   }
+
+  clearGifts() {
+    this.gifts.set([]);
+  }
+
 
 
   private getAuthHeaders(): HttpHeaders {
