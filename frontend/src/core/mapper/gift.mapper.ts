@@ -12,9 +12,9 @@ export class GiftMapper {
       prix: dto.prix,
       commentaire: dto.commentaire,
       priorite: dto.priorite,
-      utilisateurId: dto.utilisateur.id,
+      utilisateur: dto.utilisateur,
       statut: dto.statut,
-      reserveParId: dto.reservePar?.id,
+      reservePar: dto.reservePar,
       lieuLivraison: dto.lieuLivraison,
       dateLivraison: dto.dateLivraison,
       recu: dto.recu
@@ -37,8 +37,8 @@ export class GiftMapper {
       recu: gift.recu,
 
       // Champs imbriqués → attention à reconstruire la bonne forme attendue côté backend
-      utilisateur: { id: gift.utilisateurId },
-      reservePar: gift.reserveParId ? { id: gift.reserveParId } : undefined
+      utilisateur: gift.utilisateur,
+      reservePar: gift.reservePar || undefined
     };
   }
 

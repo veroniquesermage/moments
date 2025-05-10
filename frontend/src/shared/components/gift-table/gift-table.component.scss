@@ -32,3 +32,9 @@
     }
   }
 }
+
+.gift-table tr.pris {
+  opacity: 0.4;
+  //pointer-events: none;
+  filter: grayscale(100%);
+}
