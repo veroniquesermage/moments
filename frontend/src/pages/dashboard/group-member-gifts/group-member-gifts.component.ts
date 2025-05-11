@@ -38,6 +38,7 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   async ngOnInit() {
     console.log('📦 Groupe courant :', this.groupStateService.getSelectedGroup());
+    this.giftService.clearGifts();
 
     const idGroup = this.groupStateService.getSelectedGroup()?.id;
     const result = await this.userGroupService.fetchUserGroup(idGroup!);

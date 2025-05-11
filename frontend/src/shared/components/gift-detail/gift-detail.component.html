@@ -23,15 +23,26 @@
     <button (click)="back.emit()">↩ Retour à la liste</button>
 
     <button *ngIf="context === 'own'" (click)="modifier()">✏ Modifier</button>
+    <button *ngIf="context === 'own' && !showModal" (click)="requestDelete()">🗑 Supprimer</button>
 
-    <!-- Premier clic -->
-    <button *ngIf="context === 'own' && !showDeleteConfirm" (click)="requestDelete()">🗑 Supprimer</button>
+
+    <button *ngIf="context === 'other' && gift?.statut === 'DISPONIBLE'" (click)="reserver()">⏳ Réserver</button>
+    <button *ngIf="context === 'other' && (gift?.statut === 'DISPONIBLE' || estReserveParMoi(gift!))" (click)="prendre()">🛒 Prendre</button>
+
   </div>
+
   <!-- Confirmation -->
-  <app-terminal-confirm-modal
-    *ngIf="showDeleteConfirm"
-    [message]="'Êtes-vous sûr(e) de vouloir supprimer ce cadeau ?'"
-    (confirm)="confirmDelete()"
-    (cancel)="cancelDelete()"
+  <app-terminal-modal
+    *ngIf="showModal"
+    [message]="message"
+    [mode]="mode"
+    (confirm)="handleConfirm()"
+    (cancel)="handleCancel()"
+    (close)="handleClose()"
   />
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
 </div>
