@@ -1,5 +1,7 @@
 <div class="terminal">
-  <h1>> Bienvenue sur List2Wish</h1>
+  <h1>
+  <span class="bounce">🎁</span> Bienvenue sur List2Wish <span class="bounce">🎁</span>
+  </h1>
 
   <app-loading *ngIf="groupeService.isLoading()"/>
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">

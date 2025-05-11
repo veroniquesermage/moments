@@ -5,6 +5,8 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {Gift} from 'src/core/models/gift.model';
 import {GiftMapper} from 'src/core/mapper/gift.mapper';
+import {GiftAction} from 'src/core/enum/gift-action.enum';
+import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -121,6 +123,54 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
       this.errorMessage.set("❌ Impossible de créer le cadeau.");
     }
+  }
+
+  async getEligibilityForGift(id: number, action: GiftAction) {
+
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}/eligibilite?action=${action}`;
+    try {
+      const eligibilityResponseDto = await firstValueFrom(
+        this.http.get<EligibilityResponseDto>(url, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+      return {success: true, data: eligibilityResponseDto};
+
+    } catch (error) {
+      console.error('Erreur pendant la vérification d’éligibilité', error);
+      const response: EligibilityResponseDto = {
+        ok: false,
+        message: "Erreur de communication avec le serveur"
+      };
+      return  {success: false, data: response };
+    }
+
+  }
+
+  async reserveGift(id: number) {
+
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}/reserver`;
+    try {
+      const giftDto = await firstValueFrom(
+        this.http.put<GiftDTO>(url, null, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      const gift = GiftMapper.fromDTO(giftDto);
+
+      return {success: true, data: gift};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la réservation du cadeau', error);
+      this.errorMessage.set("❌ Impossible de réserver le cadeau.");
+      return {success: false, message: "❌ Impossible de réserver le cadeau."};
+    }
+
   }
 
   clearGifts() {
