@@ -2,14 +2,15 @@
   <div class="modal-box terminal">
     <p>> {{ message }}</p>
     <div class="modal-actions">
-      <ng-container *ngIf="mode === 'confirm'">
-      <button (click)="confirm.emit()">Oui</button>
-      <button (click)="cancel.emit()">Non</button>
-      </ng-container>
-      <ng-container *ngIf="mode === 'error'">
-        <button (click)="close.emit()">Ok</button>
-      </ng-container>
+      <button
+        *ngFor="let action of actions"
+        (click)="actionClicked.emit(action.eventName)"
+        [ngClass]="action.style || 'primary'"
+      >
+        {{ action.label }}
+      </button>
     </div>
   </div>
 </div>
+
 

@@ -7,6 +7,8 @@ import {Gift} from 'src/core/models/gift.model';
 import {GiftMapper} from 'src/core/mapper/gift.mapper';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
+import {GiftStatus} from 'src/core/enum/gift-status.enum';
+import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -149,13 +151,13 @@ export class GiftService {
 
   }
 
-  async reserveGift(id: number) {
+  async changerStatutGift(id: number, status: GiftStatutDTO) {
 
     const idEnc = encodeURIComponent(id);
-    const url = `${this.apiUrl}/${idEnc}/reserver`;
+    const url = `${this.apiUrl}/${idEnc}/changer-statut`;
     try {
       const giftDto = await firstValueFrom(
-        this.http.put<GiftDTO>(url, null, {
+        this.http.put<GiftDTO>(url, status, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })

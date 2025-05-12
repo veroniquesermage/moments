@@ -35,10 +35,8 @@
   <app-terminal-modal
     *ngIf="showModal"
     [message]="message"
-    [mode]="mode"
-    (confirm)="handleConfirm()"
-    (cancel)="handleCancel()"
-    (close)="handleClose()"
+    [actions]="modalActions"
+    (actionClicked)="handleClicked($event)"
   />
 
   <div *ngIf="errorMessage" class="error">
