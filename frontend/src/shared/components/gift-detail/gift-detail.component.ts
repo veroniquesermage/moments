@@ -6,6 +6,9 @@ import {Router} from '@angular/router';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {AuthService} from 'src/security/service/auth.service';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
+import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
+import {GiftStatus} from 'src/core/enum/gift-status.enum';
+import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 
 @Component({
   selector: 'app-gift-detail',
@@ -21,10 +24,10 @@ export class GiftDetailComponent implements OnInit {
   @Output() back = new EventEmitter<void>();
   gift: Gift | undefined = undefined;
   showModal = false;
-  mode: 'confirm' | 'error' = 'confirm';
   pendingAction: 'RESERVER' | 'PRENDRE' | 'SUPPRIMER' | null = null;
-  message: string = 'Êtes-vous sûr(e) de vouloir supprimer ce cadeau ?';
   errorMessage: string | null = null;
+  message = '';
+  modalActions:  TerminalModalAction[] = [];
 
 
   constructor(public giftService: GiftService,
@@ -44,6 +47,11 @@ export class GiftDetailComponent implements OnInit {
   }
 
   requestDelete() {
+    this.message = 'Etes-vous sûr de vouloir supprimer ce cadeau ?';
+    this.modalActions = [
+      { label: 'Oui', eventName: 'DELETE', style: 'primary' },
+      { label: 'Non', eventName: 'CANCEL', style: 'secondary' }
+    ] as TerminalModalAction[];
     this.showModal = true;
   }
 
@@ -58,76 +66,66 @@ export class GiftDetailComponent implements OnInit {
       && gift.reservePar?.id === this.authService.profile()?.id;
   }
 
-  handleConfirm() {
-    if (this.pendingAction === 'RESERVER') {
-      this.confirmerReservation();
-    } else if (this.pendingAction === 'PRENDRE') {
-      this.confirmerPrise();
-    } else if (this.pendingAction === 'SUPPRIMER') {
-      this.confirmDelete();
-    }
-
-    this.pendingAction = null;
-    this.showModal = false;
-  }
-
-  handleClose() {
-    this.showModal = false;
-  }
-
-  handleCancel() {
-    this.pendingAction = null;
-    this.showModal = false;
-  }
-
-
   async reserver() {
-    const result = await this.giftService.getEligibilityForGift(this.id, GiftAction.RESERVER);
-    if (!result.success) {
-      this.mode = 'error';
-      this.message = 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
-    } else if (!result.data.ok) {
-      this.mode = 'error';
-      this.message = 'Aïe ! Il semble que quelqu\'un ait été plus rapide que vous.\nCe cadeau n\'est plus disponible à la réservation';
-    } else {
-      this.mode = 'confirm';
-      this.message = 'Êtes-vous sûr de vouloir réserver ce cadeau pour 3 jours ?';
-      this.pendingAction = 'RESERVER';
-    }
-
-    this.showModal = true;
+    await this.verifierEtAfficherModal(GiftAction.RESERVER, 'Êtes-vous sûr de vouloir réserver ce cadeau pour 3 jours ?', 'RESERVER')
   }
 
   async prendre() {
-    const result = await this.giftService.getEligibilityForGift(this.id, GiftAction.PRENDRE);
-    if (!result.success) {
-      this.mode = 'error';
-      this.message = 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
-    } else if (!result.data.ok) {
-      this.mode = 'error';
-      this.message = 'Aïe ! Il semble que quelqu\'un ait été plus rapide que vous.\nCe cadeau n\'est plus disponible.';
-    } else {
-      this.mode = 'confirm';
-      this.message = 'Êtes-vous sûr de vouloir prendre ce cadeau ?';
-      this.pendingAction = 'PRENDRE';
-    }
-
-    this.showModal = true;
+    await this.verifierEtAfficherModal(GiftAction.PRENDRE, 'Êtes-vous sûr de vouloir prendre ce cadeau ?', 'PRENDRE')
   }
 
-  async confirmerReservation() {
-    const result = await this.giftService.reserveGift(this.id);
+  private async verifierEtAfficherModal(action: GiftAction, messageConfirmation: string, eventName: string) {
+
+    const result = await this.giftService.getEligibilityForGift(this.id, action);
+
+    if (!result.success) {
+      this.message = 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
+    } else if (!result.data.ok) {
+      this.message = 'Aïe ! Il semble que quelqu\'un ait été plus rapide que vous.\nCe cadeau n\'est plus disponible';
+    }
+
+    if (!result.success || !result.data.ok) {
+      this.modalActions= [
+        { label: 'Ok', eventName: 'CANCEL', style: 'danger' }
+      ] as TerminalModalAction[];
+    } else {
+      this.message = messageConfirmation;
+      this.modalActions = [
+        { label: 'Oui', eventName: eventName, style: 'primary' },
+        { label: 'Non', eventName: 'CANCEL', style: 'secondary' }
+      ] as TerminalModalAction[];
+      this.pendingAction = action;
+    }
+    this.showModal = true;
+
+  }
+
+  async confirmerStatut(status: GiftStatus) {
+    const statut: GiftStatutDTO = {
+      status: status
+    };
+
+    const result = await this.giftService.changerStatutGift(this.id, statut);
 
     if (result.success) {
       // Redirige vers la liste des cadeaux
       this.router.navigate(['/dashboard/leurs-cadeaux']);
     } else {
       console.log('Oups comething went wrong', result.data);
-      // this.errorMessage = result.message;
+      this.errorMessage = result.message!;
     }
   }
 
-  private confirmerPrise() {
-    this.router.navigate([`/dashboard/leurs-cadeaux/${this.id}/prendre`]);
+  handleClicked(eventName: string) {
+    if(eventName === 'PRENDRE'){
+      this.confirmerStatut(GiftStatus.PRIS);
+    } else if (eventName === 'RESERVER'){
+      this.confirmerStatut(GiftStatus.RESERVE);
+    } else if(eventName === 'CANCEL'){
+      this.pendingAction = null;
+    } else if(eventName === 'DELETE'){
+      this.confirmDelete();
+    }
+    this.showModal = false;
   }
 }
