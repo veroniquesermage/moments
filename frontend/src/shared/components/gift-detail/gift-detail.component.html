@@ -4,11 +4,14 @@
   <div *ngIf="gift">
     <p>> <strong>Nom :</strong> {{ gift.nom }}</p>
     <p>> <strong>Description :</strong> {{ gift.description }}</p>
+    <p>> <strong>Marque :</strong> {{ gift.marque }}</p>
+    <p>> <strong>Magasin :</strong> {{ gift.magasin }}</p>
     <p *ngIf="gift.url">> <strong>URL : </strong>
       <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
     </p>
     <p>> <strong>Quantité :</strong> {{ gift.quantite }}</p>
     <p>> <strong>Prix :</strong> {{ gift.prix }} €</p>
+    <p>> <strong>Frais de port :</strong> {{ gift.fraisPort }} €</p>
     <p>> <strong>Commentaire :</strong> {{ gift.commentaire }}</p>
     <p>> <strong>Priorité :</strong> {{ gift.priorite }}</p>
 
@@ -38,9 +41,5 @@
     [actions]="modalActions"
     (actionClicked)="handleClicked($event)"
   />
-
-  <div *ngIf="errorMessage" class="error">
-    {{ errorMessage }}
-  </div>
 
 </div>

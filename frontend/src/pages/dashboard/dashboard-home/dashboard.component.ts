@@ -33,7 +33,7 @@ export class DashboardComponent {
 
   }
 
-  goToChangerGroupe() {
+  goToSuiviCadeaux() {
 
   }
 
@@ -41,7 +41,7 @@ export class DashboardComponent {
 
   }
 
-  envoyerFeedback() {
+  goToChangerGroupe() {
 
   }
 }
