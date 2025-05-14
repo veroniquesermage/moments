@@ -4,25 +4,28 @@ import {Gift} from 'src/core/models/gift.model';
 import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
 import {NgIf} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-gift-update',
   imports: [
     GiftFormComponent,
-    NgIf
+    NgIf,
+    TerminalModalComponent
   ],
   templateUrl: './gift-update.component.html',
   styleUrl: './gift-update.component.scss'
 })
 export class GiftUpdateComponent implements OnInit{
 
-  errorMessage: string | null = null;
   private route = inject(ActivatedRoute);
   id: number | undefined = undefined;
   gift: Gift | undefined = undefined;
 
   constructor(private giftService: GiftService,
-              public router: Router,) {
+              public router: Router,
+              public errorService: ErrorService) {
   }
 
   async ngOnInit() {
@@ -30,12 +33,14 @@ export class GiftUpdateComponent implements OnInit{
     this.id = idParam ? +idParam : undefined;
 
     if(!this.id){
-      this.giftService.errorMessage.set("❌ Impossible de modifier le cadeau.");
+      this.errorService.showError("❌ Impossible de modifier le cadeau.");
       return;
     }
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
       this.gift = result.data;
+    } else {
+      this.errorService.showError("❌ Impossible de modifier le cadeau.");
     }
   }
 
@@ -45,8 +50,13 @@ export class GiftUpdateComponent implements OnInit{
       ...giftFormData
     };
 
-    await this.giftService.updateGift(gift);
-    await this.router.navigate(['/dashboard/mes-cadeaux']);
+    const result = await this.giftService.updateGift(gift);
+    if (result.success) {
+      await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
+      await this.router.navigate(['/dashboard/mes-cadeaux']);
+    } else {
+      this.errorService.showError(result.message);
+    }
 
   }
 

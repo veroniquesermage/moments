@@ -20,6 +20,11 @@ a[href] {
   justify-content: flex-start;
 }
 
+.modal-box p {
+  white-space: pre-line;
+}
+
+
 @media (max-width: 768px) {
   .options {
     flex-direction: column;

@@ -1,2 +1,8 @@
 <router-outlet/>
 
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>

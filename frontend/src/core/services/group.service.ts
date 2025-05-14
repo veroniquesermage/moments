@@ -6,21 +6,20 @@ import {firstValueFrom} from 'rxjs';
 import {GroupStateService} from 'src/core/services/groupState.service';
 import {GroupeDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
+import {ApiResponse} from 'src/core/models/api-response.model';
 
 @Injectable({providedIn: 'root'})
 export class GroupService {
   private apiUrl = environment.backendBaseUrl + environment.api.groupes;
 
   groupes = signal<GroupeResume[]>([]);
-  selectedGroup = signal<GroupeResume | null>(null);
-  errorMessage: string | null = null;
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
               private groupStateService: GroupStateService) {
   }
 
-  async fetchGroups(): Promise<Result<GroupeResume[]>> {
+  async fetchGroups(): Promise<ApiResponse<GroupeResume[]>> {
     this.isLoading.set(true);
 
     try {
@@ -39,7 +38,7 @@ export class GroupService {
     }
   }
 
-  async createGroup(groupDTO: GroupeDTO) {
+  async createGroup(groupDTO: GroupeDTO): Promise<ApiResponse<GroupeResume>> {
     try {
       const groupeCreated = await firstValueFrom(this.http.post<GroupeResume>(this.apiUrl, groupDTO, {
         headers: this.getAuthHeaders(),
@@ -53,7 +52,7 @@ export class GroupService {
     }
   }
 
-  async joinGroup(code: string) {
+  async joinGroup(code: string): Promise<ApiResponse<GroupeResume>> {
     try {
       const codeEnc = encodeURIComponent(code);
       const url = `${this.apiUrl + environment.api.rejoindre}/${codeEnc}`;
@@ -83,16 +82,4 @@ export class GroupService {
     });
   }
 
-  setSelectedGroup(group: GroupeResume): void {
-    this.selectedGroup.set(group);
-  }
-
-  getSelectedGroup(): GroupeResume | null {
-    return this.selectedGroup();
-  }
-
-  clear(): void {
-    this.groupes.set([]);
-    this.selectedGroup.set(null);
-  }
 }
