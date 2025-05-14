@@ -17,4 +17,8 @@ export interface GiftDTO {
   lieuLivraison?: string;
   dateLivraison?: string;
   recu: boolean;
+  marque: string;
+  magasin: string;
+  prixReel: number;
+  fraisPort: number;
 }

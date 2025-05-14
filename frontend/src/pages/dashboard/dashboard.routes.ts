@@ -1,11 +1,13 @@
 import {Routes} from '@angular/router';
 import {DashboardComponent} from './dashboard-home/dashboard.component';
-import {UserGiftsComponent} from 'src/pages/dashboard/user-gifts/user-gifts.component';
-import {GiftCreateComponent} from 'src/pages/dashboard/gift-create/gift-create.component';
-import {GiftDetailPageComponent} from 'src/pages/dashboard/gift-detail-page/gift-detail-page.component';
-import {GiftUpdateComponent} from 'src/pages/dashboard/gift-update/gift-update.component';
-import {GroupMemberGiftsComponent} from 'src/pages/dashboard/group-member-gifts/group-member-gifts.component';
-import {TakeGiftComponent} from 'src/pages/dashboard/take-gift/take-gift.component';
+import {UserGiftsComponent} from 'src/pages/dashboard/mes-cadeaux/user-gifts/user-gifts.component';
+import {GiftCreateComponent} from 'src/pages/dashboard/mes-cadeaux/gift-create/gift-create.component';
+import {GiftDetailPageComponent} from 'src/pages/dashboard/shared/gift-detail-page/gift-detail-page.component';
+import {GiftUpdateComponent} from 'src/pages/dashboard/mes-cadeaux/gift-update/gift-update.component';
+import {
+  GroupMemberGiftsComponent
+} from 'src/pages/dashboard/cadeaux-membres/group-member-gifts/group-member-gifts.component';
+import {TakeGiftComponent} from 'src/pages/dashboard/cadeaux-membres/take-gift/take-gift.component';
 
 export const dashboardRoutes: Routes = [
   {path: '', component: DashboardComponent},

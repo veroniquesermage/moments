@@ -17,4 +17,8 @@ export interface Gift {
   lieuLivraison?: string;
   dateLivraison?: string; // format ISO (string)
   recu: boolean;
+  marque: string;
+  magasin: string;
+  prixReel: number;
+  fraisPort: number;
 }

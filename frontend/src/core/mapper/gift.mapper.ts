@@ -18,7 +18,11 @@ export class GiftMapper {
       dateReservation: dto.dateReservation,
       lieuLivraison: dto.lieuLivraison,
       dateLivraison: dto.dateLivraison,
-      recu: dto.recu
+      recu: dto.recu,
+      marque: dto.marque,
+      magasin: dto.magasin,
+      prixReel: dto.prixReel,
+      fraisPort: dto.fraisPort
     };
   }
 
@@ -37,6 +41,10 @@ export class GiftMapper {
       dateLivraison: gift.dateLivraison,
       recu: gift.recu,
       dateReservation: gift.dateReservation,
+      marque: gift.marque,
+      magasin: gift.magasin,
+      prixReel: gift.prixReel,
+      fraisPort: gift.fraisPort,
 
       // Champs imbriqués → attention à reconstruire la bonne forme attendue côté backend
       utilisateur: gift.utilisateur,
