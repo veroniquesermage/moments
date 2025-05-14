@@ -9,8 +9,11 @@
     <button type="submit">Rejoindre</button>
   </form>
 
-  <div *ngIf="errorMessage" class="error">
-    {{ errorMessage }}
-  </div>
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
 
 </div>

@@ -1,6 +1,6 @@
 <div class="modal-overlay">
   <div class="modal-box terminal">
-    <p>> {{ message }}</p>
+    <p [innerHTML]="message"></p>
     <div class="modal-actions">
       <button
         *ngFor="let action of actions"

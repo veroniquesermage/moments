@@ -9,6 +9,7 @@ import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
+import {ErrorService} from 'src/core/services/error.service';
 
 @Component({
   selector: 'app-gift-detail',
@@ -25,14 +26,14 @@ export class GiftDetailComponent implements OnInit {
   gift: Gift | undefined = undefined;
   showModal = false;
   pendingAction: 'RESERVER' | 'PRENDRE' | 'SUPPRIMER' | null = null;
-  errorMessage: string | null = null;
   message = '';
   modalActions:  TerminalModalAction[] = [];
 
 
   constructor(public giftService: GiftService,
               public router: Router,
-              public authService: AuthService) {
+              public authService: AuthService,
+              public errorService: ErrorService) {
   }
 
   async ngOnInit(): Promise<void> {
@@ -57,8 +58,14 @@ export class GiftDetailComponent implements OnInit {
 
   async confirmDelete() {
     if (!this.gift) return;
-    await this.giftService.deleteGift(this.gift.id!);
-    await this.router.navigate(['/dashboard/mes-cadeaux']);
+
+    const result = await this.giftService.deleteGift(this.gift.id!);
+    if (result.success) {
+      await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
+      await this.router.navigate(['/dashboard/mes-cadeaux']);
+    } else {
+      this.errorService.showError(result.message);
+    }
   }
 
   estReserveParMoi(gift: Gift): boolean {
@@ -75,29 +82,30 @@ export class GiftDetailComponent implements OnInit {
   }
 
   private async verifierEtAfficherModal(action: GiftAction, messageConfirmation: string, eventName: string) {
-
     const result = await this.giftService.getEligibilityForGift(this.id, action);
 
     if (!result.success) {
-      this.message = 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
-    } else if (!result.data.ok) {
-      this.message = 'Aïe ! Il semble que quelqu\'un ait été plus rapide que vous.\nCe cadeau n\'est plus disponible';
-    }
-
-    if (!result.success || !result.data.ok) {
-      this.modalActions= [
+      // Erreur réseau ou technique
+      this.message = result.message ?? 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
+      this.modalActions = [
         { label: 'Ok', eventName: 'CANCEL', style: 'danger' }
-      ] as TerminalModalAction[];
+      ];
+    } else if (!result.data.ok) {
+      // Cas métier : pas éligible
+      this.message = result.data.message ?? 'Ce cadeau n\'est plus disponible.';
+      this.modalActions = [
+        { label: 'Ok', eventName: 'CANCEL', style: 'danger' }
+      ];
     } else {
+      // Tout est ok : confirmation classique
       this.message = messageConfirmation;
       this.modalActions = [
         { label: 'Oui', eventName: eventName, style: 'primary' },
         { label: 'Non', eventName: 'CANCEL', style: 'secondary' }
-      ] as TerminalModalAction[];
+      ];
       this.pendingAction = action;
     }
     this.showModal = true;
-
   }
 
   async confirmerStatut(status: GiftStatus) {
@@ -108,12 +116,28 @@ export class GiftDetailComponent implements OnInit {
     const result = await this.giftService.changerStatutGift(this.id, statut);
 
     if (result.success) {
-      // Redirige vers la liste des cadeaux
-      this.router.navigate(['/dashboard/leurs-cadeaux']);
+      if(status === GiftStatus.RESERVE){
+        this.message = 'Félicitation vous avez réservé le cadeau. Vous avez 3 jours pour confirmer l\'avoir pris. '
+        this.modalActions= [
+          { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' }
+        ] as TerminalModalAction[];
+      } else{
+        this.message = 'Votre action est confirmée. <br>Vous pourrez <strong>ajouter date et lieu de livraison<\strong> et <strong>assurer le suivi<\strong> ou <strong>annuler<\strong> ce cadeau depuis le Suivi des cadeaux réservés/pris.'
+
+        this.modalActions= [
+          { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' },
+          { label: 'Allez au suivi des cadeaux', eventName: 'SUIVI', style: 'primary' }
+        ] as TerminalModalAction[];
+      }
+      this.showModal = true;
     } else {
-      console.log('Oups comething went wrong', result.data);
-      this.errorMessage = result.message!;
+      console.log('Oups comething went wrong', result.message);
+      this.message = result.message ?? 'Désolé, une erreur est survenue, veuillez réessayer plus tard.';
+      this.modalActions = [
+        { label: 'Ok', eventName: 'CANCEL', style: 'danger' }
+      ];
     }
+
   }
 
   handleClicked(eventName: string) {
@@ -125,6 +149,10 @@ export class GiftDetailComponent implements OnInit {
       this.pendingAction = null;
     } else if(eventName === 'DELETE'){
       this.confirmDelete();
+    } else if(eventName=== 'SUIVI'){
+      this.router.navigate(['/suivi']);
+    } else if(eventName === 'BACK_TO_LIST'){
+      this.router.navigate(['/dashboard/leurs-cadeaux']);
     }
     this.showModal = false;
   }

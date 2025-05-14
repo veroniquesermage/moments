@@ -7,8 +7,8 @@ import {Gift} from 'src/core/models/gift.model';
 import {GiftMapper} from 'src/core/mapper/gift.mapper';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
-import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
+import {ApiResponse} from 'src/core/models/api-response.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -16,15 +16,13 @@ export class GiftService {
   private apiUrl = environment.backendBaseUrl + environment.api.cadeaux;
   gifts = signal<Gift[]>([])
   isLoading = signal<boolean>(false);
-  errorMessage = signal<string | null>(null);
 
   constructor(private http: HttpClient,) {
   }
 
-  async fetchGifts(userId?: number): Promise<void> {
+  async fetchGifts(userId?: number): Promise<ApiResponse<Gift[]>> {
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
 
     let params = new HttpParams();
     if (userId != null) {
@@ -43,32 +41,39 @@ export class GiftService {
       const result: Gift[] = giftsDto.map(dto => GiftMapper.fromDTO(dto));
       this.gifts.set(result);
 
+      return {success: true, data: result};
+
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux', error);
-      this.errorMessage.set("❌ Impossible de récupérer les cadeaux.");
+
+      return {success: false, message: "Impossible de récupérer les cadeaux."};
     } finally {
       this.isLoading.set(false);
     }
 
   }
 
-  async createGift(gift: Gift) {
+  async createGift(gift: Gift): Promise<ApiResponse<Gift>> {
 
     const giftDTO = GiftMapper.toDTO(gift);
 
     try {
-      await firstValueFrom(this.http.post<GiftDTO>(this.apiUrl, giftDTO, {
+      const giftDto = await firstValueFrom(this.http.post<GiftDTO>(this.apiUrl, giftDTO, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
       await this.fetchGifts();
+
+      const result: Gift = GiftMapper.fromDTO(giftDto);
+      return {success: true, data: result};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
-      this.errorMessage.set("❌ Impossible de créer le cadeau.");
+
+      return {success: false, message: "❌ Impossible de créer le cadeau."};
     }
   }
 
-  async getGift(id: number) {
+  async getGift(id: number): Promise<ApiResponse<Gift>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}`;
@@ -81,18 +86,16 @@ export class GiftService {
       );
 
       const gift = GiftMapper.fromDTO(giftDto);
-
       return {success: true, data: gift};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération du cadeau', error);
-      this.errorMessage.set("❌ Impossible de récupérer le cadeau.");
       return {success: false, message: "❌ Impossible de récupérer le cadeau."};
     }
 
   }
 
-  async deleteGift(id: number) {
+  async deleteGift(id: number): Promise<ApiResponse<void>> {
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}`;
 
@@ -103,31 +106,35 @@ export class GiftService {
           withCredentials: true
         })
       );
-
+      return {success: true, data: undefined};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la suppression du cadeau', error);
-      this.errorMessage.set("❌ Impossible de supprimer le cadeau.");
+      return {success: false, message: "❌ Impossible de supprimer le cadeau."};
     }
 
   }
 
-  async updateGift(gift: Gift) {
+  async updateGift(gift: Gift): Promise<ApiResponse<Gift>> {
 
     const giftDTO = GiftMapper.toDTO(gift);
     const url = `${this.apiUrl}/${gift.id}`;
     try {
-      await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
+      const result = await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      await this.fetchGifts();
+
+
+      const gift = GiftMapper.fromDTO(result);
+
+      return {success: true, data: gift};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
-      this.errorMessage.set("❌ Impossible de créer le cadeau.");
+      return {success: false, message: "❌ Impossible de créer le cadeau."};
     }
   }
 
-  async getEligibilityForGift(id: number, action: GiftAction) {
+  async getEligibilityForGift(id: number, action: GiftAction): Promise<ApiResponse<EligibilityResponseDto>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}/eligibilite?action=${action}`;
@@ -142,16 +149,12 @@ export class GiftService {
 
     } catch (error) {
       console.error('Erreur pendant la vérification d’éligibilité', error);
-      const response: EligibilityResponseDto = {
-        ok: false,
-        message: "Erreur de communication avec le serveur"
-      };
-      return  {success: false, data: response };
+      return {success: false, message: "Erreur de communication avec le serveur"};
     }
 
   }
 
-  async changerStatutGift(id: number, status: GiftStatutDTO) {
+  async changerStatutGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}/changer-statut`;
@@ -162,24 +165,17 @@ export class GiftService {
           withCredentials: true
         })
       );
-
       const gift = GiftMapper.fromDTO(giftDto);
-
       return {success: true, data: gift};
-
     } catch (error) {
       console.error('[GiftService] Erreur lors de la réservation du cadeau', error);
-      this.errorMessage.set("❌ Impossible de réserver le cadeau.");
       return {success: false, message: "❌ Impossible de réserver le cadeau."};
     }
-
   }
 
   clearGifts() {
     this.gifts.set([]);
   }
-
-
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({

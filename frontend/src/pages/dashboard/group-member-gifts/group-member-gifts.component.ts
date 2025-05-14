@@ -5,15 +5,19 @@ import {Router} from '@angular/router';
 import {Gift} from 'src/core/models/gift.model';
 import {UserGroupService} from 'src/core/services/userGroup.service';
 import {User} from 'src/security/model/user.model';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {GroupStateService} from 'src/core/services/groupState.service';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-group-member-gifts',
   standalone: true,
   imports: [
     GiftTableComponent,
-    NgForOf
+    NgForOf,
+    NgIf,
+    TerminalModalComponent
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
@@ -33,7 +37,8 @@ export class GroupMemberGiftsComponent implements OnInit {
   constructor(public giftService: GiftService,
               public userGroupService: UserGroupService,
               public router: Router,
-              private groupStateService: GroupStateService) {
+              private groupStateService: GroupStateService,
+              public errorService: ErrorService) {
   }
 
   async ngOnInit() {
@@ -52,6 +57,8 @@ export class GroupMemberGiftsComponent implements OnInit {
           this.selectMember(found);
         }
       }
+    } else {
+      this.errorService.showError(result.message);
     }
   }
 
@@ -66,9 +73,14 @@ export class GroupMemberGiftsComponent implements OnInit {
     this.router.navigate(['/dashboard']);
   }
 
-  selectMember(user: User | undefined) {
+  async selectMember(user: User | undefined) {
     this.selectedMember = user;
     this.userGroupService.setSelectedMemberId(user ? user.id : null);
-    this.giftService.fetchGifts(user?.id);
+
+    const result = await this.giftService.fetchGifts(user?.id);
+
+    if(!result.success){
+      this.errorService.showError("❌ Impossible d\'afficher la liste de ce membre. Veuillez réessayer plus tard.");
+    }
   }
 }
