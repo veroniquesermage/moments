@@ -64,4 +64,31 @@ export class GiftFollowUpDetailComponent implements OnInit{
   addDeliver(){
     this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftId]);
   }
+
+  async confirmReception() {
+    const gift = await this.giftService.getGift(this.giftId!);
+    let updatedGift: Gift | undefined = undefined;
+    if (gift.success) {
+      updatedGift = {
+        ...gift.data,
+        recu: true
+      };
+    } else {
+      this.errorService.showError("❌ Impossible de confirmer la réception.");
+    }
+
+
+    const result = await this.giftService.updateGift(updatedGift!);
+    if (result.success) {
+      await this.giftService.recupererCadeauxSuivis();
+      this.cancel();
+    } else {
+      this.errorService.showError(result.message);
+    }
+  }
+
+
+  cancel(){
+    this.router.navigate(['/dashboard/cadeaux-suivis']);
+  }
 }

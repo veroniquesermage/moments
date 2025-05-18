@@ -1,6 +1,6 @@
 <div class="terminal">
   <h2>> Les listes des cadeaux réservés ou pris</h2>
-  <p>> Cliquez sur un cadeau pour obtenir son détail ou le gérer</p>
+  <p>> Cliquez sur un cadeau pour obtenir son détail et le gérer</p>
   <p *ngIf="isPortrait" class="orientation-hint">
     > 📱 Pour plus de fonctionnalités, passez en mode paysage.
   </p>
@@ -8,9 +8,11 @@
   <p class="total">> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
     }} €</p>
 
+  <p class="table-legend">> Les lignes vertes indiquent les cadeaux que vous avez notés comme reçus. </p>
   <app-gift-table
     [gifts]="giftService.gifts()"
     [griserLignes]="false"
+    [isRecu]="true"
     [displayedColumns]="displayedColumns"
     (rowClicked)="onGiftClicked($event)">
   </app-gift-table>
