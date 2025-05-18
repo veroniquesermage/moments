@@ -30,7 +30,6 @@ export class GiftCreateComponent {
     const newPriority = Math.max(1, giftslist.length + 1);
 
     if (!utilisateur) {
-
       this.errorService.showError("❌ Impossible de créer un cadeau sans utilisateur connecté.");
       return;
     }

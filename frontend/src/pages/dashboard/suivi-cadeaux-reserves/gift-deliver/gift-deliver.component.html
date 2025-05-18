@@ -1,0 +1,30 @@
+<div class="form-container">
+
+  <h1>> Gestion du suivi de livraison</h1>
+  <p class="command">> Pour ajouter le suivi de livraison et le prix réel du cadeau, merci d'utiliser ce formulaire.</p>
+
+
+    <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
+      <label>Lieu de livraison</label>
+      <input name="lieuLivraison" formControlName="lieuLivraison" type="text" />
+
+      <label>Date de livraison</label>
+      <input name="dateLivraison" formControlName="dateLivraison" type="date" />
+
+      <label>Prix réel (frais de port compris)</label>
+      <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')" />
+
+      <button type="submit">Valider le suivi</button>
+    </form>
+
+    <div class="options">
+      <button (click)="cancel()">↩ Retour</button>
+    </div>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>

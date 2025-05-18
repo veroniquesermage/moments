@@ -40,6 +40,8 @@ export class GiftDetailComponent implements OnInit {
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
       this.gift = result.data;
+    } else {
+      this.errorService.showError(result.message);
     }
   }
 
@@ -150,7 +152,7 @@ export class GiftDetailComponent implements OnInit {
     } else if(eventName === 'DELETE'){
       this.confirmDelete();
     } else if(eventName=== 'SUIVI'){
-      this.router.navigate(['/suivi']);
+      this.router.navigate(['/dashboard/cadeaux-suivis']);
     } else if(eventName === 'BACK_TO_LIST'){
       this.router.navigate(['/dashboard/leurs-cadeaux']);
     }

@@ -8,6 +8,13 @@ import {
   GroupMemberGiftsComponent
 } from 'src/pages/dashboard/cadeaux-membres/group-member-gifts/group-member-gifts.component';
 import {TakeGiftComponent} from 'src/pages/dashboard/cadeaux-membres/take-gift/take-gift.component';
+import {
+  MyGiftsFollowUpComponent
+} from 'src/pages/dashboard/suivi-cadeaux-reserves/my-gifts-follow-up/my-gifts-follow-up.component';
+import {
+  GiftFollowUpDetailComponent
+} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-follow-up-detail/gift-follow-up-detail.component';
+import {GiftDeliverComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-deliver/gift-deliver.component';
 
 export const dashboardRoutes: Routes = [
   {path: '', component: DashboardComponent},
@@ -19,5 +26,8 @@ export const dashboardRoutes: Routes = [
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
   { path: 'leurs-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'other' } },
   { path: 'leurs-cadeaux/:id/prendre', component: TakeGiftComponent},
+  { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
+  { path: 'cadeaux-suivis/detail/:id', component: GiftFollowUpDetailComponent},
+  { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},
 
 ];
