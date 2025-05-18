@@ -1,0 +1,22 @@
+# ▶️ Environnement Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+
+# ▶️ Éditeur / OS
+*.swp
+.DS_Store
+.vscode/
+.idea/
+
+# ▶️ Venv
+.venv/
+env/
+
+# ▶️ Bases de données temporaires
+*.sqlite3
+*.db
+
+# ▶️ Variables d'environnement
+.env
