@@ -1,0 +1,30 @@
+<div class="terminal" style="position: relative;">
+  <h2>> Détail du cadeau</h2>
+
+  <div *ngIf="gift">
+    <p>> <strong>Destinataire :</strong> {{ gift.utilisateur.name }}</p>
+    <p>> <strong>Nom :</strong> {{ gift.nom }}</p>
+    <p>> <strong>Description :</strong> {{ gift.description }}</p>
+    <p>> <strong>Marque :</strong> {{ gift.marque }}</p>
+    <p>> <strong>Magasin :</strong> {{ gift.magasin }}</p>
+    <p *ngIf="gift.url">> <strong>URL : </strong>
+      <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
+    </p>
+    <p>> <strong>Commentaire :</strong> {{ gift.commentaire }}</p>
+    <p>> <strong>Quantité :</strong> {{ gift.quantite }}</p>
+    <p>> <strong>Prix réel :</strong> {{ gift.prixReel }} €</p>
+    <p>> <strong>Statut :</strong> {{ gift.statut }}</p>
+  </div>
+  <div class="options">
+    <button (click)="back()">↩ Retour à la liste</button>
+    <button (click)="addDeliver()">🚚 Suivi livraison & prix réel</button>
+    <button *ngIf="gift?.statut === 'RESERVE'" (click)="changeStatus(GiftStatus.RESERVE)">⏎ Annuler la réservation</button>
+    <button *ngIf="gift?.statut === 'PRIS'" (click)="changeStatus(GiftStatus.PRIS)">🚫 Retirer de mes cadeaux</button>
+  </div>
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>

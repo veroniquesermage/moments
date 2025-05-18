@@ -124,7 +124,6 @@ export class GiftService {
         withCredentials: true
       }));
 
-
       const gift = GiftMapper.fromDTO(result);
 
       return {success: true, data: gift};
@@ -181,5 +180,25 @@ export class GiftService {
     return new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`
     });
+  }
+
+  async recupererCadeauxSuivis(): Promise<ApiResponse<Gift[]>> {
+    const url = `${this.apiUrl}/suivis`;
+    try {
+      const giftsDto = await firstValueFrom(
+        this.http.get<GiftDTO[]>(url, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      const result: Gift[] = giftsDto.map(dto => GiftMapper.fromDTO(dto));
+      this.gifts.set(result);
+      return {success: true, data: result};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la récupération des cadeaux suivis', error);
+      return {success: false, message: "❌ Impossible de récupérer les cadeaux suivis."};
+    }
   }
 }

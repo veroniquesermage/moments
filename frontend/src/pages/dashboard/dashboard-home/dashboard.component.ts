@@ -34,7 +34,7 @@ export class DashboardComponent {
   }
 
   goToSuiviCadeaux() {
-
+    this.router.navigate(['dashboard', 'cadeaux-suivis']);
   }
 
   goToGestionGroupe() {
