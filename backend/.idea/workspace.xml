@@ -5,39 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/liste2Wish-back.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/google_jwt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/jwt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/dependencies/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/dependencies/current_user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/router.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/auth_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/user_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/auth_jwt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/base_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/auth/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/auth/auth_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/auth/google_auth_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/auth/user_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/gift_status_enum.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/logger.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/gift.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/group.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/user_group.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/gift_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/group_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/auth/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/group/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_create.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_response.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_resume.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/services/gift_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/services/group_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/utils/code_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/liste2Wish-back.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/liste2Wish-back.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/38ce12078027_create_utilisateur_table.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/dependencies/current_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/dependencies/current_user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/auth_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth_route.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/auth_jwt.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth_jwt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/auth/auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/auth/auth_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,11 +55,28 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;veroniquesermage&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:veroniquesermage/list2wish-back.git&quot;,
+    &quot;accountId&quot;: &quot;22e711d2-bf59-4197-b8fd-16e6b50da6b0&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2xGZnTRzzvBAaca3SZSvuvKv6MC" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -65,30 +85,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Run FastAPI.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Run FastAPI.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;groupes&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Dev/projects/list2wish-back&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Dev\projects\list2wish-back\app\schemas\auth" />
       <recent name="C:\Dev\projects\liste2Wish-back\app\services\auth" />
     </key>
   </component>
@@ -102,8 +125,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (liste2Wish-back)" />
-      <option name="WORKING_DIRECTORY" value="C:\Dev\projects\liste2Wish-back" />
+      <option name="SDK_NAME" value="Python 3.13 (list2wish-back)" />
+      <option name="WORKING_DIRECTORY" value="C:\Dev\projects\list2wish-back" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -134,13 +157,30 @@
       <option name="presentableId" value="Default" />
       <updated>1747566537694</updated>
       <workItem from="1747566538674" duration="11439000" />
+      <workItem from="1747581397203" duration="14844000" />
+      <workItem from="1747599019589" duration="105000" />
+      <workItem from="1747599147348" duration="632000" />
+      <workItem from="1747599819566" duration="1344000" />
+      <workItem from="1747632099377" duration="14589000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/liste2Wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747579428908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\liste2Wish-back" />
+    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747681843124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
   </component>
 </project>
