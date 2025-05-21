@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-from sqlalchemy import select, Sequence
+from sqlalchemy import select, Sequence, false
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -22,6 +22,10 @@ class GiftService:
         logger.info(f"Récupération des cadeaux de l'utilisateur {effective_user_id}")
         result = (await db.execute(
             select(Gift).where(Gift.utilisateur_id == effective_user_id)
+            .options(
+                selectinload(Gift.utilisateur),  # charge eager le créateur du cadeau
+                selectinload(Gift.reservePar)  # charge eager l’utilisateur qui réserve
+            )
         )).scalars().all()
         return [GiftResponse.model_validate(g) for g in result]
 
@@ -32,15 +36,10 @@ class GiftService:
 
         logger.info(f"Récupération du cadeau à l'id {giftId}")
 
-        result: Gift | None = (await db.execute(
-            select(Gift).where(Gift.id == giftId)
-        )).scalars().first()
-
-        if result is None:
-            # On lève une 404 si aucun cadeau trouvé
-            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+        result = await GiftService.get_gift_or_raise(db, giftId)
 
         return GiftResponse.model_validate(result)
+
 
     @staticmethod
     async def verify_eligibility(db: AsyncSession,
@@ -85,6 +84,10 @@ class GiftService:
         # 2. Récupérer l’entité existante
         existing: Gift | None = (await db.execute(
             select(Gift).where(Gift.id == gift_id)
+            .options(
+                selectinload(Gift.utilisateur),  # charge eager le créateur du cadeau
+                selectinload(Gift.reservePar)  # charge eager l’utilisateur qui réserve
+            )
         )).scalars().first()
         if not existing:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
@@ -103,8 +106,8 @@ class GiftService:
 
     @staticmethod
     async def delete_gift(db: AsyncSession,
-                       giftId: int,
-                       current_user: User):
+                          giftId: int,
+                          current_user: User):
 
         logger.info(f"Suppression du cadeau à l'id {giftId}")
 
@@ -116,7 +119,8 @@ class GiftService:
             logger.info(f"Cadeau avec l'id {giftId} introuvable.")
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
         elif result.utilisateur_id != current_user.id:
-            logger.info(f"Lutilisateur {current_user.id} tente de supprimer un cadeau qui appartien à l'utilisateur {result.utilisateur_id}")
+            logger.info(
+                f"Lutilisateur {current_user.id} tente de supprimer un cadeau qui appartien à l'utilisateur {result.utilisateur_id}")
             raise HTTPException(status_code=403, detail="Vous ne pouvez supprimer que vos propres cadeaux.")
 
         await db.delete(result)
@@ -126,19 +130,26 @@ class GiftService:
     async def change_status(db: AsyncSession,
                             current_user: User,
                             giftId: int,
-                            gift_status : GiftStatus) -> GiftResponse:
+                            gift_status: GiftStatus) -> GiftResponse:
 
-        result: Gift | None = (await db.execute(
-            select(Gift).where(Gift.id == giftId)
-        )).scalars().first()
-
-        if result is None:
-            logger.info(f"Cadeau avec l'id {giftId} introuvable.")
-            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+        result = await GiftService.get_gift_or_raise(db, giftId)
 
         result.statut = gift_status.status
-        result.reservePar = current_user
-        result.dateReservation = datetime.now()
+
+        if gift_status.status == GiftStatusEnum.DISPONIBLE:
+            logger.debug(f"Le statut du cadeau est {gift_status.status}")
+            result.lieuLivraison = None
+            result.dateLivraison = None
+            result.prixReel = None
+            result.reserve_par_id = None
+            result.reservePar = None
+            result.dateReservation = None
+            result.recu = False
+        else:
+            result.reservePar = current_user
+            result.dateReservation = datetime.now()
+
+        logger.debug("Attributs de gift : %s", vars(result))
 
         db.add(result)
         await db.commit()
@@ -185,6 +196,21 @@ class GiftService:
         )
 
         return gift_followeds
+
+    @staticmethod
+    async def get_gift_or_raise(db: AsyncSession,
+                                giftId: int) -> Gift:
+        result: Gift | None = (await db.execute(
+            select(Gift).where(Gift.id == giftId)
+            .options(
+                selectinload(Gift.utilisateur),  # charge eager le créateur du cadeau
+                selectinload(Gift.reservePar)  # charge eager l’utilisateur qui réserve
+            )
+        )).scalars().first()
+        if result is None:
+            logger.error(f"Cadeau {giftId} introuvable.")
+            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+        return result
 
     @staticmethod
     def _apply_updates_to_entity(
