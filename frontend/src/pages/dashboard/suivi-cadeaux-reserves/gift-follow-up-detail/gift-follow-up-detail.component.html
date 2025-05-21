@@ -19,8 +19,8 @@
     <button (click)="back()">↩ Retour à la liste</button>
     <button (click)="confirmReception()">🎁 Cadeau reçu</button>
     <button (click)="addDeliver()">🚚 Suivi livraison & prix réel</button>
-    <button *ngIf="gift?.statut === 'RESERVE'" (click)="changeStatus(GiftStatus.RESERVE)">⏎ Annuler la réservation</button>
-    <button *ngIf="gift?.statut === 'PRIS'" (click)="changeStatus(GiftStatus.PRIS)">🚫 Retirer de mes cadeaux</button>
+    <button *ngIf="gift?.statut === 'RESERVE'" (click)="changeStatus()">⏎ Annuler la réservation</button>
+    <button *ngIf="gift?.statut === 'PRIS'" (click)="changeStatus()">🚫 Retirer de mes cadeaux</button>
   </div>
   <app-terminal-modal
     *ngIf="errorService.errorMessage()"

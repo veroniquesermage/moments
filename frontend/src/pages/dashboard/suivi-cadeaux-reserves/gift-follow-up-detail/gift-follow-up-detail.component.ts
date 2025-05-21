@@ -52,7 +52,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
     this.router.navigate(['/dashboard/cadeaux-suivis']);
   }
 
-  async changeStatus(status : GiftStatus){
+  async changeStatus(){
     const statut: GiftStatutDTO = {status: GiftStatus.DISPONIBLE};
     const result = await this.giftService.changerStatutGift(this.giftId!, statut);
     if(!result.success){
