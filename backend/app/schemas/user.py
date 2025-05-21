@@ -7,5 +7,3 @@ class UserSchema(CamelModel):
     email: str
     google_id: str
 
-    class Config:
-        from_attributes = True

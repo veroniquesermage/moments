@@ -1,3 +1,5 @@
+from pydantic import ConfigDict
+
 from app.schemas import CamelModel
 
 

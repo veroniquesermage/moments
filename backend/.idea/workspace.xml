@@ -4,43 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/core/gift_status_enum.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/logger.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/gift.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/group.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/user_group.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/gift_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/group_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/auth/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/group/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_create.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_response.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/group/group_resume.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/gift_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/group_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/code_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/liste2Wish-back.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/liste2Wish-back.iml" afterDir="false" />
+    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="feat(migration backend) : ajout group et premiere requete gift">
+      <change afterPath="$PROJECT_DIR$/app/core/enum/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/enum/gift_action_enum.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/enum/role_enum.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/message.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/middleware/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/middleware/db_session.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/eligibility_response.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_followed.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_status.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_update.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/services/user_group_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/versions/38ce12078027_create_utilisateur_table.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/dependencies/current_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/dependencies/current_user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/gift_status_enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/enum/gift_status_enum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/gift.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/gift.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/group.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/group.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/auth_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/auth_jwt.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth_jwt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/gift_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/gift_route.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/group_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/group_route.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/user_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/user_route.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/auth/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/base_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/base_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/gift/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_response.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_resume.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_resume.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/user.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/auth/auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/auth/auth_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/gift_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/gift_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/group_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/group_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,37 +83,63 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Run FastAPI.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;groupes&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Dev/projects/list2wish-back&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Run FastAPI debug.executor": "Run",
+    "Python.Run FastAPI.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "groupes",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Dev/projects/list2wish-back",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Dev\projects\list2wish-back\app\core\enum" />
       <recent name="C:\Dev\projects\list2wish-back\app\schemas\auth" />
       <recent name="C:\Dev\projects\liste2Wish-back\app\services\auth" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.Run FastAPI debug">
+    <configuration name="Run FastAPI debug" type="PythonConfigurationType" factoryName="Python">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.13 (list2wish-back)" />
+      <option name="WORKING_DIRECTORY" value="C:\Dev\projects\list2wish-back" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="uvicorn" />
+      <option name="PARAMETERS" value="app.main:app --reload" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Run FastAPI" type="PythonConfigurationType" factoryName="Python">
       <module name="liste2Wish-back" />
       <option name="ENV_FILES" value="" />
@@ -140,6 +164,10 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Run FastAPI" />
+      <item itemvalue="Python.Run FastAPI debug" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -161,8 +189,28 @@
       <workItem from="1747599019589" duration="105000" />
       <workItem from="1747599147348" duration="632000" />
       <workItem from="1747599819566" duration="1344000" />
-      <workItem from="1747632099377" duration="14589000" />
+      <workItem from="1747632099377" duration="17263000" />
+      <workItem from="1747717794962" duration="8587000" />
+      <workItem from="1747736398424" duration="17611000" />
+      <workItem from="1747812564196" duration="4462000" />
     </task>
+    <task id="LOCAL-00001" summary="feat(migration backend) : ajout group et premiere requete gift">
+      <option name="closed" value="true" />
+      <created>1747682261576</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747682261576</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat(migration backend) : ajout group et premiere requete gift">
+      <option name="closed" value="true" />
+      <created>1747682285541</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1747682285541</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,8 +227,36 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat(migration backend) : ajout group et premiere requete gift" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(migration backend) : ajout group et premiere requete gift" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/routes/gift_route.py</url>
+          <line>78</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/main.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/liste2Wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747579428908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\liste2Wish-back" />
-    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747681843124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
+    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747730273145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
+    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI_debug.coverage" NAME="Run FastAPI debug Coverage Results" MODIFIED="1747817207750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
   </component>
 </project>

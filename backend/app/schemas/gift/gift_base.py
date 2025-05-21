@@ -1,7 +1,9 @@
 from decimal import Decimal
 from typing import Optional
 
-from app.core import GiftStatusEnum
+from pydantic import ConfigDict
+
+from app.core.enum import GiftStatusEnum
 from app.schemas import CamelModel
 
 
@@ -18,3 +20,5 @@ class GiftBase(CamelModel):
     magasin: Optional[str] = None
     prixReel: Optional[Decimal] = None
     fraisPort: Optional[Decimal] = None
+
+
