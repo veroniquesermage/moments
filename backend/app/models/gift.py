@@ -1,7 +1,7 @@
-from sqlalchemy import Column, String, Integer, Boolean, Numeric, Date, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, Boolean, Numeric, Date, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 
-from app.core import GiftStatusEnum
+from app.core.enum import GiftStatusEnum
 from app.database import Base
 
 
@@ -24,9 +24,9 @@ class Gift(Base):
     reserve_par_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=True)
     reservePar = relationship("User", foreign_keys=[reserve_par_id], back_populates="cadeaux_reserves")
 
-    dateReservation = Column(Date, nullable=True)
+    dateReservation = Column(DateTime, nullable=True)
     lieuLivraison = Column(String, nullable=True)
-    dateLivraison = Column(Date, nullable=True)
+    dateLivraison = Column(DateTime, nullable=True)
     recu = Column(Boolean, default=False)
 
     marque = Column(String, nullable=True)
@@ -34,6 +34,4 @@ class Gift(Base):
     prixReel = Column(Numeric(10, 2), nullable=True)
     fraisPort = Column(Numeric(10, 2), nullable=True)
 
-    groupe_id = Column(Integer, ForeignKey("groupe.id"), nullable=False)
-    groupe = relationship("Group", foreign_keys=[groupe_id], back_populates="cadeaux")
 

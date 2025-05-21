@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import Optional
 
+from app.schemas import UserSchema
 from app.schemas.gift import GiftBase
 
 
-class GiftResponse(GiftBase):
+class GiftFollowed(GiftBase):
     id: int
-    utilisateur_id: int
-    reserve_par_id: Optional[int] = None
+    utilisateur: UserSchema
     dateReservation: Optional[datetime] = None
     lieuLivraison: Optional[str] = None
     dateLivraison: Optional[datetime] = None

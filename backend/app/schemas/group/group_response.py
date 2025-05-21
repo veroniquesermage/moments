@@ -4,5 +4,3 @@ class GroupResponse(GroupBase):
     id: int
     code: str
 
-    class Config:
-        orm_mode = True

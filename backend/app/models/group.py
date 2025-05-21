@@ -12,4 +12,3 @@ class Group(Base):
     code = Column(String(10), unique=True, nullable=False)
 
     utilisateurs = relationship("UserGroup", back_populates="groupe")
-    cadeaux = relationship("Gift", back_populates="groupe")
