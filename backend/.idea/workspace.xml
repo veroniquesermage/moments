@@ -4,41 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="feat(migration backend) : ajout group et premiere requete gift">
-      <change afterPath="$PROJECT_DIR$/app/core/enum/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/enum/gift_action_enum.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/enum/role_enum.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/core/message.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/middleware/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/middleware/db_session.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/eligibility_response.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_followed.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_status.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/schemas/gift/gift_update.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/user_group_service.py" afterDir="false" />
+    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="feat(migration backend) : ajout des requêtes gift">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/gift_status_enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/enum/gift_status_enum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/logger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/gift.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/gift.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/group.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/group.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/gift_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/gift_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/group_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/group_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/user_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/user_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/auth/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/auth/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/base_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/base_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/gift/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_create.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/gift/gift_response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/group/group_resume.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/group/group_resume.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/gift_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/gift_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/group_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/group_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,31 +56,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Run FastAPI debug.executor": "Run",
-    "Python.Run FastAPI.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "groupes",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Dev/projects/list2wish-back",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python tests.Python tests for test_main.test_app_exists.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_router.test_router_exists.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_user.test_user_model_fields.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Run FastAPI debug.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Run FastAPI.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;groupes&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Dev/projects/list2wish-back&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Dev\projects\list2wish-back\app\core\enum" />
@@ -164,10 +140,68 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_main.test_app_exists" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_main.test_app_exists&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_router.test_router_exists" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_router.test_router_exists&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_user.test_user_model_fields" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/models" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_user.test_user_model_fields&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <list>
-      <item itemvalue="Python.Run FastAPI" />
       <item itemvalue="Python.Run FastAPI debug" />
+      <item itemvalue="Python.Run FastAPI" />
+      <item itemvalue="Python tests.Python tests for test_main.test_app_exists" />
+      <item itemvalue="Python tests.Python tests for test_router.test_router_exists" />
+      <item itemvalue="Python tests.Python tests for test_user.test_user_model_fields" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests for test_user.test_user_model_fields" />
+        <item itemvalue="Python tests.Python tests for test_router.test_router_exists" />
+        <item itemvalue="Python tests.Python tests for test_main.test_app_exists" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -192,7 +226,11 @@
       <workItem from="1747632099377" duration="17263000" />
       <workItem from="1747717794962" duration="8587000" />
       <workItem from="1747736398424" duration="17611000" />
-      <workItem from="1747812564196" duration="4462000" />
+      <workItem from="1747812564196" duration="4838000" />
+      <workItem from="1747817612501" duration="716000" />
+      <workItem from="1747822183844" duration="60000" />
+      <workItem from="1747822256804" duration="4369000" />
+      <workItem from="1747827232426" duration="4115000" />
     </task>
     <task id="LOCAL-00001" summary="feat(migration backend) : ajout group et premiere requete gift">
       <option name="closed" value="true" />
@@ -210,7 +248,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747682285541</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="feat(migration backend) : ajout des requêtes gift">
+      <option name="closed" value="true" />
+      <created>1747817445107</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1747817445107</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,7 +275,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat(migration backend) : ajout group et premiere requete gift" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(migration backend) : ajout group et premiere requete gift" />
+    <MESSAGE value="feat(migration backend) : ajout des requêtes gift" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(migration backend) : ajout des requêtes gift" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -241,7 +288,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/main.py</url>
-          <line>51</line>
+          <line>53</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
@@ -257,6 +304,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/liste2Wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747579428908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\liste2Wish-back" />
     <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747730273145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
-    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI_debug.coverage" NAME="Run FastAPI debug Coverage Results" MODIFIED="1747817207750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
+    <SUITE FILE_PATH="coverage/list2wish_back$.coverage" NAME=" Coverage Results" MODIFIED="1747822661535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/models" />
+    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI_debug.coverage" NAME="Run FastAPI debug Coverage Results" MODIFIED="1747834055635" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
   </component>
 </project>
