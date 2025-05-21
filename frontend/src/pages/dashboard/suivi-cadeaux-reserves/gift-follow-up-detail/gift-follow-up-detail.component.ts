@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {GiftService} from 'src/core/services/gift.service';
 import {Gift} from 'src/core/models/gift.model';
