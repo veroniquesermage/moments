@@ -1,26 +1,27 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {Gift} from 'src/core/models/gift.model';
-import {GiftStatus} from 'src/core/enum/gift-status-.enum';
+import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {AuthService} from 'src/security/service/auth.service';
 import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-gift-create',
   standalone: true,
-  imports: [CommonModule, GiftFormComponent],
+  imports: [CommonModule, GiftFormComponent, TerminalModalComponent],
   templateUrl: './gift-create.component.html',
   styleUrl: './gift-create.component.scss'
 })
 export class GiftCreateComponent {
-  errorMessage: string | null = null;
 
   constructor(private giftService: GiftService,
               public router: Router,
-              private authService: AuthService,) {
+              private authService: AuthService,
+              public errorService: ErrorService) {
   }
 
   async onSubmit(giftFormData: Gift): Promise<void> {
@@ -29,20 +30,25 @@ export class GiftCreateComponent {
     const newPriority = Math.max(1, giftslist.length + 1);
 
     if (!utilisateur) {
-      this.giftService.errorMessage.set("❌ Impossible de créer un cadeau sans utilisateur connecté.");
+      this.errorService.showError("❌ Impossible de créer un cadeau sans utilisateur connecté.");
       return;
     }
 
     const gift: Gift = {
       ...giftFormData,
-      utilisateurId: utilisateur.id,
+      utilisateur: utilisateur,
       statut: GiftStatus.DISPONIBLE,
       recu: false,
       priorite: newPriority,
     };
 
-    await this.giftService.createGift(gift);
-    await this.router.navigate(['/dashboard/mes-cadeaux']);
+    const result = await  this.giftService.createGift(gift);
+    if (result.success) {
+      await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
+      await this.router.navigate(['/dashboard/mes-cadeaux']);
+    } else {
+      this.errorService.showError(result.message);
+    }
   }
 
 }

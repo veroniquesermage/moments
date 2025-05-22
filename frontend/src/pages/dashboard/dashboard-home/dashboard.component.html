@@ -9,14 +9,14 @@
     <li>
       <button (click)="goToListesMembres()">[2] Voir les listes des autres membres</button>
     </li>
+    <li *ngIf="estAdmin">
+      <button (click)="goToSuiviCadeaux()">[3] Suivi des cadeaux réservés/pris</button>
+    </li>
     <li>
-      <button (click)="goToChangerGroupe()">[3] Changer de groupe</button>
+      <button (click)="goToChangerGroupe()">[4] Changer de groupe</button>
     </li>
     <li *ngIf="estAdmin">
-      <button (click)="goToGestionGroupe()">[4] Gérer le groupe</button>
-    </li>
-    <li>
-      <button (click)="envoyerFeedback()">[5] Envoyer un feedback</button>
+      <button (click)="goToGestionGroupe()">[5] Gérer le groupe</button>
     </li>
   </ul>
 </div>

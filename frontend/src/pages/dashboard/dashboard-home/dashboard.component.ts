@@ -29,18 +29,19 @@ export class DashboardComponent {
 
 
   goToListesMembres() {
+    this.router.navigate(['dashboard', 'leurs-cadeaux']);
 
   }
 
-  goToChangerGroupe() {
-
+  goToSuiviCadeaux() {
+    this.router.navigate(['dashboard', 'cadeaux-suivis']);
   }
 
   goToGestionGroupe() {
 
   }
 
-  envoyerFeedback() {
+  goToChangerGroupe() {
 
   }
 }

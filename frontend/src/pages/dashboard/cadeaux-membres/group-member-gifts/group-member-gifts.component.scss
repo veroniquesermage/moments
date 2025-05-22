@@ -1,0 +1,22 @@
+.user-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  button {
+    width: calc((100% - 2rem) / 5); // 5 par ligne, ajustable
+    min-width: 100px;
+    padding: 0.5rem;
+    border: 1px solid white;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+
+    &.selected {
+      background-color: white;
+      color: black ;
+      font-weight: bold;
+      border: 1px solid white;
+    }
+  }
+}

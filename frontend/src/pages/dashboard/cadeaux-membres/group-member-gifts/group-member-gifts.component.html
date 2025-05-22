@@ -1,0 +1,32 @@
+<div class="terminal">
+  <h2>> Les listes des autres membres</h2>
+
+  <p>> Cliquez sur un membre pour obtenir sa liste de cadeaux</p>
+  <div class="user-buttons">
+    <button
+      *ngFor="let user of users"
+      (click)="selectMember(user)"
+      [class.selected]="user.id === selectedMember?.id"
+    >
+      {{ user.name }}
+    </button>
+  </div>
+
+  <p>> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
+  <app-gift-table
+    [gifts]="giftService.gifts()"
+    [displayedColumns]="displayedColumns"
+    (rowClicked)="onGiftClicked($event)">
+  </app-gift-table>
+  <div class="options">
+    <button (click)="retour()">↩ Retour au Menu</button>
+  </div>
+
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>

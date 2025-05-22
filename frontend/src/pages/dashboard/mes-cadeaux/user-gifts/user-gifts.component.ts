@@ -16,7 +16,7 @@ export class UserGiftsComponent implements OnInit{
 
   displayedColumns = [
     { key: 'nom', label: 'Nom' },
-    { key: 'prix', label: 'Prix (€)', formatFn: (v: number) => `${v} €` },
+    { key: 'prix', label: 'Prix (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     { key: 'priorite', label: 'Priorité' }
   ];
 
