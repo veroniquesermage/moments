@@ -4,22 +4,23 @@ import {AuthService} from 'src/security/service/auth.service';
 import {GroupService} from 'src/core/services/group.service';
 import {Router, RouterOutlet} from '@angular/router';
 import {GroupStateService} from 'src/core/services/groupState.service';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, TerminalModalComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-
-  errorMessage: string | null = null;
 
   constructor(
     public auth: AuthService,
     private groupService: GroupService,
     private router: Router,
-    private groupStateService: GroupStateService
+    private groupStateService: GroupStateService,
+    public errorService: ErrorService
   ) {
     const injector = inject(Injector);
     runInInjectionContext(injector, () => this.initEffects());
@@ -47,13 +48,13 @@ export class AppComponent {
     if (result.success) {
       if (result.data.length === 1) {
         this.groupStateService.setSelectedGroup(result.data.at(0)!);
-        this.router.navigate(['/dashboard']);
+        await this.router.navigate(['/dashboard']);
       } else {
-        this.router.navigate(['/groupe/onboarding']);
+        await this.router.navigate(['/groupe/onboarding']);
       }
     } else {
       console.warn('⚠️ Impossible de charger les groupes :', result.message);
-      this.errorMessage = result.message!;
+      this.errorService.showError('⚠️ Impossible de charger les groupes, veuillez essayer plus tard');
     }
 
     this.groupService.isLoading.set(false);

@@ -12,12 +12,17 @@ export class GiftMapper {
       prix: dto.prix,
       commentaire: dto.commentaire,
       priorite: dto.priorite,
-      utilisateurId: dto.utilisateur.id,
+      utilisateur: dto.utilisateur,
       statut: dto.statut,
-      reserveParId: dto.reservePar?.id,
+      reservePar: dto.reservePar,
+      dateReservation: dto.dateReservation,
       lieuLivraison: dto.lieuLivraison,
       dateLivraison: dto.dateLivraison,
-      recu: dto.recu
+      recu: dto.recu,
+      marque: dto.marque,
+      magasin: dto.magasin,
+      prixReel: dto.prixReel,
+      fraisPort: dto.fraisPort
     };
   }
 
@@ -35,10 +40,15 @@ export class GiftMapper {
       lieuLivraison: gift.lieuLivraison,
       dateLivraison: gift.dateLivraison,
       recu: gift.recu,
+      dateReservation: gift.dateReservation,
+      marque: gift.marque,
+      magasin: gift.magasin,
+      prixReel: gift.prixReel,
+      fraisPort: gift.fraisPort,
 
       // Champs imbriqués → attention à reconstruire la bonne forme attendue côté backend
-      utilisateur: { id: gift.utilisateurId },
-      reservePar: gift.reserveParId ? { id: gift.reserveParId } : undefined
+      utilisateur: gift.utilisateur,
+      reservePar: gift.reservePar || undefined
     };
   }
 

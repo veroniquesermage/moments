@@ -13,6 +13,8 @@ import {GiftTableColumn} from 'src/core/models/gift-table-column.model';
 export class GiftTableComponent {
   @Input() gifts: Gift[] = [];
   @Input() displayedColumns: GiftTableColumn[] = [];
+  @Input() griserLignes: boolean = true;
+  @Input() isRecu: boolean = false;
   @Output() rowClicked = new EventEmitter<Gift>();
 
   getGiftValue(gift: Gift, column: GiftTableColumn): any {

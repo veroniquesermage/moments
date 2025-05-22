@@ -1,0 +1,16 @@
+<div class="modal-overlay">
+  <div class="modal-box terminal">
+    <p [innerHTML]="message"></p>
+    <div class="modal-actions">
+      <button
+        *ngFor="let action of actions"
+        (click)="actionClicked.emit(action.eventName)"
+        [ngClass]="action.style || 'primary'"
+      >
+        {{ action.label }}
+      </button>
+    </div>
+  </div>
+</div>
+
+

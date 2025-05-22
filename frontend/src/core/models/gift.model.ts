@@ -1,4 +1,5 @@
-import {GiftStatus} from 'src/core/enum/gift-status-.enum';
+import {GiftStatus} from 'src/core/enum/gift-status.enum';
+import {User} from 'src/security/model/user.model';
 
 export interface Gift {
   id?: number;
@@ -9,10 +10,15 @@ export interface Gift {
   prix?: number;
   commentaire?: string;
   priorite: number;
-  utilisateurId: number;
+  utilisateur: User;
   statut: GiftStatus;
-  reserveParId?: number;
+  reservePar?: User;
+  dateReservation?: string;
   lieuLivraison?: string;
   dateLivraison?: string; // format ISO (string)
   recu: boolean;
+  marque: string;
+  magasin: string;
+  prixReel: number;
+  fraisPort: number;
 }

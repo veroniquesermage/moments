@@ -4,22 +4,23 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {GroupService} from 'src/core/services/group.service';
 import {GroupeDTO} from 'src/core/models/groupe-dto.model';
 import {Router} from '@angular/router';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-group-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent],
   templateUrl: './group-create.component.html',
   styleUrl: './group-create.component.scss'
 })
 export class GroupCreateComponent {
 
   groupeForm: FormGroup;
-  errorMessage: string | null = null;
-
   constructor(private fb: FormBuilder,
               private groupeService: GroupService,
-              public router: Router) {
+              public router: Router,
+              public errorService: ErrorService) {
     this.groupeForm = this.fb.group({
       nomGroupe: ['', Validators.required],
       description: [''],
@@ -39,14 +40,14 @@ export class GroupCreateComponent {
 
       if (result.success) {
         console.log('✅ Groupe créé avec succès');
-        this.router.navigate(['/dashboard']);
+        await this.router.navigate(['/dashboard']);
       } else {
-        this.errorMessage = result.message!;
+        this.errorService.showError(result.message);
       }
 
     } else {
       console.warn('❌ Formulaire invalide');
-      this.errorMessage = '❌ Formulaire invalide';
+      this.errorService.showError('❌ Formulaire invalide');
     }
   }
 }

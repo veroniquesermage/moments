@@ -41,19 +41,22 @@ export class GiftFormComponent implements OnChanges{
     return new FormGroup({
       id: new FormControl(gift?.id ?? ''),
       nom: new FormControl(gift?.nom ?? '', Validators.required),
+      marque: new FormControl(gift?.marque ?? ''),
+      magasin: new FormControl(gift?.magasin ?? ''),
       description: new FormControl(gift?.description ?? ''),
       url: new FormControl(gift?.url ?? ''),
       quantite: new FormControl(gift?.quantite ?? 1, Validators.required),
       prix: new FormControl(gift?.prix ?? 0),
+      fraisPort: new FormControl(gift?.fraisPort ?? 0),
       commentaire: new FormControl(gift?.commentaire ?? '')
     });
   }
 
-  sanitizeDecimal(event: Event): void {
+  sanitizeDecimal(event: Event, key: string ): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(',', '.');
     // met à jour le FormControl manuellement
-    this.giftForm.get('prix')?.setValue(input.value);
+    this.giftForm.get(key)?.setValue(input.value);
   }
 
 }
