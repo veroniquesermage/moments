@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app.main import get_db
-from app.schemas.auth import GoogleAuthRequest
-from app.schemas.auth_jwt import AuthResponse
+from app.schemas.auth import AuthResponse, GoogleAuthRequest
 from app.services.auth import auth_service
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])

@@ -2,8 +2,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
-from app.schemas.auth import GoogleAuthRequest
-from app.schemas.auth_jwt import AuthResponse
+from app.schemas.auth import GoogleAuthRequest, AuthResponse
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.user_service import get_or_create_user
 
@@ -23,7 +22,7 @@ async def authenticate_google_user(request: GoogleAuthRequest, db: AsyncSession)
         google_id=payload["sub"]
     )
 
-    token = create_access_token(data={"sub": user.id})
+    token = create_access_token(data={"sub": str(user.id)})
 
     return AuthResponse(
         token=token,
