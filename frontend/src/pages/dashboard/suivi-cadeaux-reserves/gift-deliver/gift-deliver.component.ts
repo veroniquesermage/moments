@@ -3,10 +3,10 @@ import {GiftFormComponent} from "src/shared/components/gift-form/gift-form.compo
 import {NgIf} from "@angular/common";
 import {TerminalModalComponent} from "src/shared/components/terminal-modal/terminal-modal.component";
 import {ActivatedRoute, Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift.model';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Gift} from "src/core/models/gift/gift.model";
 
 @Component({
   selector: 'app-gift-deliver',
@@ -51,7 +51,7 @@ export class GiftDeliverComponent implements OnInit{
     }
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
-      this.gift = result.data;
+      this.gift = result.data.gift;
       this.giftForm.patchValue({
         lieuLivraison: this.gift.lieuLivraison ?? '',
         dateLivraison: this.gift.dateLivraison ?? '',

@@ -1,12 +1,12 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {GiftService} from 'src/core/services/gift.service';
-import {Gift} from 'src/core/models/gift.model';
 import {ErrorService} from 'src/core/services/error.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {Gift} from "src/core/models/gift/gift.model";
+import {GiftStatutDTO} from "src/core/models/gift/gift-statut.model";
 
 @Component({
   selector: 'app-gift-follow-up-table',
@@ -40,7 +40,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
     } else {
       const result = await this.giftService.getGift(this.giftId);
       if (result.success) {
-        this.gift = result.data;
+        this.gift = result.data.gift;
       } else {
         this.errorService.showError(result.message);
       }
@@ -70,7 +70,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
     let updatedGift: Gift | undefined = undefined;
     if (gift.success) {
       updatedGift = {
-        ...gift.data,
+        ...gift.data.gift,
         recu: true
       };
     } else {

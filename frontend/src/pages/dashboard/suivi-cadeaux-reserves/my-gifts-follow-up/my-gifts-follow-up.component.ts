@@ -1,15 +1,15 @@
 import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
-import {NgIf} from '@angular/common';
+import {formatDate, NgIf} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
-import {Gift} from 'src/core/models/gift.model';
 import {User} from 'src/security/model/user.model';
 import {Subscription} from 'rxjs';
 import {ViewportService} from 'src/core/services/viewport.service';
 import {ColumnDefinition} from 'src/core/models/column-definition.model';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
@@ -43,7 +43,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     {key: 'quantite', label: 'Quantité'},
     {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     {key: 'lieuLivraison', label: 'Lieu de livraison'},
-    {key: 'dateLivraison', label: 'Date de livraison'},
+    {key: 'dateLivraison', label: 'Date de livraison', formatFn: (v: string) => v ? formatDate(v, 'dd/MM/yyyy', 'fr-FR') : '—'},
     {key: 'statut', label: 'Statut'}
   ];
 
@@ -54,6 +54,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   }
 
   async ngOnInit() {
+    this.giftService.clearGifts();
     this.portraitSub = this.viewport.isPortrait$.subscribe(isPortrait => {
       this.isPortrait = isPortrait; // <-- tu le stockes ici
       this.displayedColumns = isPortrait
