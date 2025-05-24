@@ -6,9 +6,36 @@
 
 .table-legend {
   font-style: italic;
-  font-size: 0.9rem;
-  color: #e6ffe6;
-  margin-bottom: 0.5rem;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  color: #ccc;
+
+  // ❌ On enlève le gap global
+  // gap: 2rem; <-- supprimé
+
+  span {
+    display: flex;
+    align-items: center;
+    margin-right: 1.5rem; // espacement entre "blocs" recu / partage
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 0.2em;
+    margin-right: 0.4em; // espacement entre pastille et texte
+    margin-bottom: 0.2em;
+    transform: translateY(1px);
+  }
+
+  .recu {
+    background-color: #6baa75;
+  }
+
+  .partage {
+    background-color: #7ca0b1;
+  }
 }
+
 

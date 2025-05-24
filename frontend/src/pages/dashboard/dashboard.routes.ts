@@ -7,7 +7,6 @@ import {GiftUpdateComponent} from 'src/pages/dashboard/mes-cadeaux/gift-update/g
 import {
   GroupMemberGiftsComponent
 } from 'src/pages/dashboard/cadeaux-membres/group-member-gifts/group-member-gifts.component';
-import {TakeGiftComponent} from 'src/pages/dashboard/cadeaux-membres/take-gift/take-gift.component';
 import {
   MyGiftsFollowUpComponent
 } from 'src/pages/dashboard/suivi-cadeaux-reserves/my-gifts-follow-up/my-gifts-follow-up.component';
@@ -25,7 +24,6 @@ export const dashboardRoutes: Routes = [
   { path: 'mes-cadeaux/modifier/:id', component: GiftUpdateComponent, data: { context: 'own' } },
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
   { path: 'leurs-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'other' } },
-  { path: 'leurs-cadeaux/:id/prendre', component: TakeGiftComponent},
   { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
   { path: 'cadeaux-suivis/detail/:id', component: GiftFollowUpDetailComponent},
   { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},

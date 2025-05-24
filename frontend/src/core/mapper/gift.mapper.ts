@@ -1,5 +1,6 @@
-import {GiftDTO} from 'src/core/models/gift-dto.model';
-import {Gift} from 'src/core/models/gift.model';
+import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
+import {Gift} from 'src/core/models/gift/gift.model';
+
 
 export class GiftMapper {
   static fromDTO(dto: GiftDTO): Gift {

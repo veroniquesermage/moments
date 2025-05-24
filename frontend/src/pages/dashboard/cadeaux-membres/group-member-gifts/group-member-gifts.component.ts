@@ -2,13 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift.model';
 import {UserGroupService} from 'src/core/services/userGroup.service';
 import {User} from 'src/security/model/user.model';
 import {NgForOf, NgIf} from '@angular/common';
 import {GroupStateService} from 'src/core/services/groupState.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-group-member-gifts',

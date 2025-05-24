@@ -1,11 +1,11 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift.model';
 import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
 import {NgIf} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-gift-update',
@@ -38,7 +38,7 @@ export class GiftUpdateComponent implements OnInit{
     }
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
-      this.gift = result.data;
+      this.gift = result.data.gift;
     } else {
       this.errorService.showError("❌ Impossible de modifier le cadeau.");
     }

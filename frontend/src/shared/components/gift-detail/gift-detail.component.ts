@@ -1,15 +1,15 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Gift} from 'src/core/models/gift.model';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {AuthService} from 'src/security/service/auth.service';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
-import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ErrorService} from 'src/core/services/error.service';
+import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 
 @Component({
   selector: 'app-gift-detail',
@@ -39,7 +39,7 @@ export class GiftDetailComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
-      this.gift = result.data;
+      this.gift = result.data.gift;
     } else {
       this.errorService.showError(result.message);
     }

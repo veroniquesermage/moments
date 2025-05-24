@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Gift} from 'src/core/models/gift.model';
 import {Router} from '@angular/router';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-gift-form',

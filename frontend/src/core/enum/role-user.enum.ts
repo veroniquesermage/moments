@@ -1,0 +1,5 @@
+export enum RoleUser {
+  CREATEUR = 'CREATEUR',
+  PRENEUR = 'PRENEUR',
+  PARTICIPANT = 'PARTICIPANT'
+}
