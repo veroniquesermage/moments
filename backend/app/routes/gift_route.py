@@ -9,7 +9,8 @@ from app.core.logger import logger
 from app.database import get_db
 from app.dependencies.current_user import get_current_user
 from app.models import User
-from app.schemas.gift import GiftResponse, EligibilityResponse, GiftStatus, GiftCreate, GiftFollowed
+from app.schemas.gift import GiftResponse, EligibilityResponse, GiftStatus, GiftCreate, GiftFollowed, \
+    GiftDetailResponse, GiftSharedSchema, RecuPayload
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
@@ -33,18 +34,26 @@ async def create_gift(
 
     return await GiftService.create_gift(db, current_user, gift)
 
-@router.get("/suivis", response_model=list[GiftFollowed])
+@router.get("/suivis", response_model=list[GiftResponse])
 async def get_followed_gifts(
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftFollowed]:
+        current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
 
     return await GiftService.get_followed_gifts(db, current_user)
 
-@router.get("/{giftId}", response_model=GiftResponse)
+@router.patch("/rembourse", response_model=GiftDetailResponse)
+async def verify_eligibility(
+        shared: GiftSharedSchema,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
+
+    return await GiftService.set_gift_refund(db, current_user, shared)
+
+@router.get("/{giftId}", response_model=GiftDetailResponse)
 async def get_gift(
         giftId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftResponse:
+        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
 
     return await GiftService.get_gift(db, giftId, current_user)
 
@@ -73,6 +82,16 @@ async def verify_eligibility(
         current_user: User = Depends(get_current_user) ) -> EligibilityResponse:
 
     return await GiftService.verify_eligibility(db, giftId, current_user, action)
+
+@router.patch("/{giftId}/recu", response_model=GiftDetailResponse)
+async def verify_eligibility(
+        giftId: int,
+        payload: RecuPayload,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
+
+    return await GiftService.set_gift_delivery(db, current_user, giftId, payload.recu)
+
 
 @router.put("/{giftId}/changer-statut", response_model=GiftResponse)
 async def change_status(

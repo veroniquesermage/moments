@@ -1,14 +1,9 @@
-from datetime import datetime
 from typing import Optional
 
-from app.schemas import UserSchema
-from app.schemas.gift import GiftBase
+from app.schemas import CamelModel
+from app.schemas.gift import GiftSharedSchema, GiftResponse
 
 
-class GiftFollowed(GiftBase):
-    id: int
-    utilisateur: UserSchema
-    dateReservation: Optional[datetime] = None
-    lieuLivraison: Optional[str] = None
-    dateLivraison: Optional[datetime] = None
-    recu: Optional[bool] = False
+class GiftFollowed(CamelModel):
+    gift: GiftResponse
+    partage: Optional[GiftSharedSchema] = None

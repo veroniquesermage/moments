@@ -34,4 +34,7 @@ class Gift(Base):
     prixReel = Column(Numeric(10, 2), nullable=True)
     fraisPort = Column(Numeric(10, 2), nullable=True)
 
+    partages = relationship("GiftShared", back_populates="cadeau")
+
+
 
