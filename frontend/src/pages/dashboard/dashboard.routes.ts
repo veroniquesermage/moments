@@ -10,22 +10,19 @@ import {
 import {
   MyGiftsFollowUpComponent
 } from 'src/pages/dashboard/suivi-cadeaux-reserves/my-gifts-follow-up/my-gifts-follow-up.component';
-import {
-  GiftFollowUpDetailComponent
-} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-follow-up-detail/gift-follow-up-detail.component';
 import {GiftDeliverComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-deliver/gift-deliver.component';
 
 export const dashboardRoutes: Routes = [
   {path: '', component: DashboardComponent},
   {path: 'mes-cadeaux', component: UserGiftsComponent},
   {path: 'mes-cadeaux/creer', component: GiftCreateComponent},
-  { path: 'mes-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'own' } },
-  { path: 'membre/:membreId/cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'other' } },
-  { path: 'mes-cadeaux/modifier/:id', component: GiftUpdateComponent, data: { context: 'own' } },
+  { path: 'mes-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'mes-cadeaux' } },
+  { path: 'membre/:membreId/cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'cadeaux-groupe' } },
+  { path: 'mes-cadeaux/modifier/:id', component: GiftUpdateComponent, data: { context: 'mes-cadeaux' } },
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
-  { path: 'leurs-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'other' } },
+  { path: 'leurs-cadeaux/:id', component: GiftDetailPageComponent, data: { context: 'cadeaux-groupe' } },
   { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
-  { path: 'cadeaux-suivis/detail/:id', component: GiftFollowUpDetailComponent},
+  { path: 'cadeaux-suivis/detail/:id', component: GiftDetailPageComponent, data: { context: 'suivi' } },
   { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},
 
 ];

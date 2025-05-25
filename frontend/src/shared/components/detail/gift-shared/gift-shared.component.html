@@ -1,0 +1,19 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title">🧑‍🤝‍🧑 Partage du cadeau</div>
+  <hr class="block-separator" />
+  <p *ngFor="let share of partage">
+    > {{ share.participant.name }} : {{ share.montant }} €
+    <span
+      class="emoji-action"
+      *ngIf="isPreneur"
+      (click)="toggleRemboursement(share.participant.id)"
+    >
+    {{ share.rembourse ? '✅' : '🕒' }}
+  </span>
+    <span *ngIf="!isPreneur">
+    {{ share.rembourse ? '✅' : '🕒' }}
+  </span>
+  </p>
+</div>
+

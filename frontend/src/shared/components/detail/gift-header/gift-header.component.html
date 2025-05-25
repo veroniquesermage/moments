@@ -1,0 +1,17 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title">🎁 {{ gift.nom }}</div>
+  <hr class="block-separator" />
+
+  <p>> Description : {{ gift.description }}</p>
+  <p>> Marque : {{ gift.marque }}</p>
+  <p>> Magasin : {{ gift.magasin }}</p>
+  <p *ngIf="gift.url">> URL :
+    <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
+  </p>
+  <p>> Quantité : {{ gift.quantite }}</p>
+  <p>> Prix : {{ gift.prix }} €</p>
+  <p>> Frais de port : {{ gift.fraisPort }} €</p>
+  <p>> Commentaire : {{ gift.commentaire }}</p>
+  <p>> Priorité : {{ gift.priorite }}</p>
+</div>

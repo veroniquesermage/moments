@@ -1,11 +1,10 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {GiftFormComponent} from "src/shared/components/gift-form/gift-form.component";
 import {NgIf} from "@angular/common";
 import {TerminalModalComponent} from "src/shared/components/terminal-modal/terminal-modal.component";
 import {ActivatedRoute, Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Gift} from "src/core/models/gift/gift.model";
 
 @Component({
@@ -74,7 +73,7 @@ export class GiftDeliverComponent implements OnInit{
 
     const result = await this.giftService.updateGift(updatedGift);
     if (result.success) {
-      await this.giftService.recupererCadeauxSuivis();
+      await this.giftService.getFollowedGifts();
       this.cancel();
     } else {
       this.errorService.showError(result.message);

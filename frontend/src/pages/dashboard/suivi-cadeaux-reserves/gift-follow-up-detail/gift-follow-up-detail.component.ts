@@ -54,7 +54,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
 
   async changeStatus(){
     const statut: GiftStatutDTO = {status: GiftStatus.DISPONIBLE};
-    const result = await this.giftService.changerStatutGift(this.giftId!, statut);
+    const result = await this.giftService.changeStatusGift(this.giftId!, statut);
     if(!result.success){
       this.errorService.showError("❌ Erreur lors de l'annulation, veuillez réessayer plus tard.")
     }
@@ -80,7 +80,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
 
     const result = await this.giftService.updateGift(updatedGift!);
     if (result.success) {
-      await this.giftService.recupererCadeauxSuivis();
+      await this.giftService.getFollowedGifts();
       this.cancel();
     } else {
       this.errorService.showError(result.message);
