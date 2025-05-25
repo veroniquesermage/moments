@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
 import {formatDate, NgIf} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
@@ -61,7 +61,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
         ? this.displayedColumnsPortrait
         : this.displayedColumnsDesktop;
     });
-    const result = await this.giftService.recupererCadeauxSuivis();
+    const result = await this.giftService.getFollowedGifts();
     if (!result.success) {
       this.errorService.showError(result.message);
     }

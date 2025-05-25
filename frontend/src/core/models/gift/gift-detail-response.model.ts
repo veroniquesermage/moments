@@ -5,7 +5,7 @@ import {RoleUser} from 'src/core/enum/role-user.enum';
 
 export interface GiftDetailResponse {
   gift: Gift
-  partage?: GiftShared
-  est_partage: boolean
-  droits_utilisateur: RoleUser
+  partage?: GiftShared[]
+  estPartage: boolean
+  droitsUtilisateur: RoleUser
 }

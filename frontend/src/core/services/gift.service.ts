@@ -10,6 +10,7 @@ import {Gift} from 'src/core/models/gift/gift.model';
 import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
+import {GiftShared} from 'src/core/models/gift/gift_shared.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -79,15 +80,14 @@ export class GiftService {
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}`;
     try {
-      const giftDto = await firstValueFrom(
+      const gift = await firstValueFrom(
         this.http.get<GiftDetailResponse>(url, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
       );
 
-
-      return {success: true, data: giftDto};
+      return {success: true, data: gift};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération du cadeau', error);
@@ -154,7 +154,7 @@ export class GiftService {
 
   }
 
-  async changerStatutGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
+  async changeStatusGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}/changer-statut`;
@@ -173,17 +173,7 @@ export class GiftService {
     }
   }
 
-  clearGifts() {
-    this.gifts.set([]);
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    });
-  }
-
-  async recupererCadeauxSuivis(): Promise<ApiResponse<Gift[]>> {
+  async getFollowedGifts(): Promise<ApiResponse<Gift[]>> {
     const url = `${this.apiUrl}/suivis`;
     try {
       const giftsDto = await firstValueFrom(
@@ -201,5 +191,53 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux suivis', error);
       return {success: false, message: "❌ Impossible de récupérer les cadeaux suivis."};
     }
+  }
+
+  async setGiftReceived(id: number, recu: boolean): Promise<ApiResponse<GiftDetailResponse>> {
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}/recu`;
+    try {
+      const gift = await firstValueFrom(
+        this.http.patch<GiftDetailResponse>(url, {recu}, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      return {success: true, data: gift};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors du changement de statut de la réception', error);
+      return {success: false, message: "❌ Impossible de changer le statut de la réception."};
+    }
+  }
+
+  async setGiftRefunded(shared: GiftShared): Promise<ApiResponse<GiftDetailResponse>>{
+    const url = `${this.apiUrl}/rembourse`;
+    try {
+      console.log('[GiftService] Envoi statut remboursement :', shared);
+      const gift = await firstValueFrom(
+        this.http.patch<GiftDetailResponse>(url, shared, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      return {success: true, data: gift};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors du changement de statut du remboursement', error);
+      return {success: false, message: "❌ Impossible de changer le statut du remboursement."};
+    }
+  }
+
+  clearGifts() {
+    this.gifts.set([]);
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+    });
   }
 }
