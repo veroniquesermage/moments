@@ -78,7 +78,9 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   }
 
   onGiftClicked(gift: Gift): void {
-    this.router.navigate(['/dashboard/cadeaux-suivis/detail', gift.id]);
+    this.router.navigate(['/dashboard/cadeau', gift.id], {
+      queryParams: { context: 'suivi' }
+    });
   }
 
   async retour() {

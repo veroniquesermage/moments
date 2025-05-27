@@ -5,11 +5,6 @@
     [gift]="giftDetail.gift"
   />
 
-  <app-gift-statut
-    *ngIf="context === 'cadeaux-groupe' || context === 'suivi'"
-    [gift]="giftDetail.gift"
-    />
-
   <app-gift-delivery
     *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur === RoleUser.PRENEUR"
     [giftDetailResponse]="giftDetail"
@@ -17,7 +12,9 @@
   />
 
   <app-gift-shared
-    *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur != RoleUser.CREATEUR"
+    *ngIf="context != 'mes-cadeaux'"
+    [currentUserId]="currentUserId"
+    [context]="context"
     [giftDetailResponse]="giftDetail"
     (remboursementToggled)="onRemboursementToggled($event)"
     />
@@ -35,7 +32,6 @@
     (manageSharingRequested)="gererPartage()"
     (backRequested)="retour()"
   />
-
 
   <!-- Confirmation -->
   <app-terminal-modal

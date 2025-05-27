@@ -7,7 +7,6 @@ import {AuthService} from 'src/security/service/auth.service';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ErrorService} from 'src/core/services/error.service';
 import {GiftHeaderComponent} from 'src/shared/components/detail/gift-header/gift-header.component';
-import {GiftStatutComponent} from 'src/shared/components/detail/gift-statut/gift-statut.component';
 import {GiftDeliveryComponent} from 'src/shared/components/detail/gift-delivery/gift-delivery.component';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {RoleUser} from 'src/core/enum/role-user.enum';
@@ -16,11 +15,12 @@ import {GiftShared} from 'src/core/models/gift/gift_shared.model';
 import {GiftActionsComponent} from 'src/shared/components/detail/gift-actions/gift-actions.component';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
+import {SharingService} from 'src/core/services/sharing.service';
 
 @Component({
   selector: 'app-gift-detail',
   standalone: true,
-  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftStatutComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent],
+  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent],
   templateUrl: './gift-detail.component.html',
   styleUrl: './gift-detail.component.scss'
 })
@@ -34,15 +34,18 @@ export class GiftDetailComponent implements OnInit{
   pendingAction: GiftAction | undefined;
   message = '';
   modalActions:  TerminalModalAction[] = [];
+  currentUserId: number |undefined;
   protected readonly RoleUser = RoleUser;
 
   constructor(public giftService: GiftService,
+              public sharingService: SharingService,
               public router: Router,
               public authService: AuthService,
               public errorService: ErrorService) {
   }
 
   async ngOnInit(): Promise<void> {
+    this.currentUserId = this.authService.profile()?.id;
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
       this.giftDetail = result.data;
@@ -62,7 +65,7 @@ export class GiftDetailComponent implements OnInit{
   }
 
   async onRemboursementToggled(newValue: GiftShared) {
-    const result = await this.giftService.setGiftRefunded(newValue);
+    const result = await this.sharingService.setGiftRefunded(newValue);
     if (result.success) {
       this.giftDetail = result.data; // met à jour localement
     } else {
@@ -79,7 +82,9 @@ export class GiftDetailComponent implements OnInit{
   }
 
   gererPartage(): void {
-    this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id]);
+    this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
+      queryParams: { context: 'suivi' }
+    });
   }
 
   retour(): void {
@@ -125,8 +130,10 @@ export class GiftDetailComponent implements OnInit{
     } else if (eventName === 'CANCEL') {
       this.pendingAction = undefined;
       this.showModal = false;
-    } else if (eventName === 'SUIVI') {
-      this.router.navigate(['/dashboard/cadeaux-suivis']);
+    } else if (eventName === 'PARTAGE') {
+      this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
+        queryParams: { context: 'cadeaux-groupe' }
+      });
     } else if (eventName === 'BACK_TO_LIST') {
       this.retour();
     }
@@ -183,10 +190,10 @@ export class GiftDetailComponent implements OnInit{
           { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' }
         ];
       } else {
-        this.message = 'Votre action est confirmée. Vous pourrez gérer la livraison, le partage ou retirer le cadeau depuis le suivi.';
+        this.message = 'Votre action est confirmée. Souhaitez-vous le partager avec d\'autres membres du groupe ?';
         this.modalActions = [
           { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' },
-          { label: 'Aller au suivi', eventName: 'SUIVI', style: 'primary' }
+          { label: 'Partager le cadeau', eventName: 'PARTAGE', style: 'primary' }
         ];
       }
 

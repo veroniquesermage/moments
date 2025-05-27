@@ -10,7 +10,6 @@ import {Gift} from 'src/core/models/gift/gift.model';
 import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -212,24 +211,6 @@ export class GiftService {
     }
   }
 
-  async setGiftRefunded(shared: GiftShared): Promise<ApiResponse<GiftDetailResponse>>{
-    const url = `${this.apiUrl}/rembourse`;
-    try {
-      console.log('[GiftService] Envoi statut remboursement :', shared);
-      const gift = await firstValueFrom(
-        this.http.patch<GiftDetailResponse>(url, shared, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
-      );
-
-      return {success: true, data: gift};
-
-    } catch (error) {
-      console.error('[GiftService] Erreur lors du changement de statut du remboursement', error);
-      return {success: false, message: "❌ Impossible de changer le statut du remboursement."};
-    }
-  }
 
   clearGifts() {
     this.gifts.set([]);

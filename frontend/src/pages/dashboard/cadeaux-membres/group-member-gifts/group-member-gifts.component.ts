@@ -63,7 +63,9 @@ export class GroupMemberGiftsComponent implements OnInit {
   }
 
   onGiftClicked(gift: Gift): void {
-    this.router.navigate(['/dashboard/leurs-cadeaux', gift.id]);
+    this.router.navigate(['/dashboard/cadeau', gift.id], {
+      queryParams: { context: 'cadeaux-groupe' }
+    });
   }
 
   retour() {
