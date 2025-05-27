@@ -4,6 +4,10 @@
   <hr class="block-separator" />
 
   <p *ngIf="gift.statut !== GiftStatus.DISPONIBLE">> {{ getLabelPreneur(gift.statut) }} : {{ gift.reservePar?.name }}</p>
-  <p *ngIf="gift.statut === GiftStatus.PARTAGE">> Ce cadeau est partagé avec d'autres utilisateurs</p>
+
+<!--
+  <ng-container *ngIf="!isPreneur && !isParticipant && partage?.length > 0">
+    <p>> Ce cadeau est partagé avec d'autres utilisateurs</p>
+  </ng-container>-->
 
 </div>

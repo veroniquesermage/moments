@@ -22,8 +22,12 @@ export class GiftDetailPageComponent {
   constructor(
     public router: Router) {
     const idParam = this.route.snapshot.paramMap.get('id');
-    this.context = this.route.snapshot.data['context'] as 'mes-cadeaux' | 'cadeaux-groupe' | 'suivi' | 'idee-cadeau';
+
+    const contexteBrut = this.route.snapshot.queryParamMap.get('context');
+    const contextValide = ['mes-cadeaux', 'cadeaux-groupe', 'suivi', 'idee-cadeau'].includes(contexteBrut ?? '');
+    this.context = (contextValide ? contexteBrut : 'mes-cadeaux') as 'mes-cadeaux' | 'cadeaux-groupe' | 'suivi' | 'idee-cadeau';
     console.log(this.context);
+
     this.giftId = idParam ? +idParam : undefined;
   }
 

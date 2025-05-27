@@ -33,7 +33,9 @@ export class UserGiftsComponent implements OnInit{
   }
 
   onGiftClicked(gift: Gift): void {
-    this.router.navigate(['/dashboard/mes-cadeaux', gift.id]);
+    this.router.navigate(['/dashboard/cadeau', gift.id], {
+      queryParams: { context: 'mes-cadeaux' }
+    });
   }
 
   retour() {

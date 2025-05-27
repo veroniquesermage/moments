@@ -1,0 +1,48 @@
+<div class="terminal">
+<h2>> Gestion du partage pour le cadeau {{this.gift?.nom}}</h2>
+
+<table class="gift-table">
+  <thead>
+    <tr>
+      <th>Participant</th>
+      <th>Montant dû (€)</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let partage of partages; let i = index">
+    <td>{{ partage.participant.name }}</td>
+    <td>
+      <input type="number" [(ngModel)]="partages![i].montant" />
+    </td>
+    <td>
+      <button class="test-align" (click)="supprimerLigne(i)">🗑</button>
+    </td>
+  </tr>
+  <tr *ngFor="let draft of partagesDraft; let i = index">
+    <td>
+      <select [(ngModel)]="draft.participant">
+        <option [ngValue]="null">choisir</option>
+        <option *ngFor="let membre of membresDisponibles" [ngValue]="membre">
+          {{ membre.name }}
+        </option>
+      </select>
+    </td>
+    <td>
+      <input type="number" [(ngModel)]="draft.montant" />
+    </td>
+    <td>
+      <button class="test-align" (click)="supprimerDraft(i)">🗑</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+  <button (click)="ajouterLigne()">➕ Ajouter un participant</button>
+  <div class="actions">
+    <button class="save-button" (click)="enregistrerPartages()">💾 Enregistrer</button>
+    <button class="save-button" (click)="retourEnArriere()">↩ Retour</button>
+  </div>
+
+
+</div>
