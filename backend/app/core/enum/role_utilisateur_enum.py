@@ -5,3 +5,4 @@ class RoleUtilisateur(str, Enum):
     CREATEUR = "CREATEUR"
     PRENEUR = "PRENEUR"
     PARTICIPANT = "PARTICIPANT"
+    SPECTATEUR = "SPECTATEUR"

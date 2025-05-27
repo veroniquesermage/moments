@@ -41,13 +41,6 @@ async def get_followed_gifts(
 
     return await GiftService.get_followed_gifts(db, current_user)
 
-@router.patch("/rembourse", response_model=GiftDetailResponse)
-async def verify_eligibility(
-        shared: GiftSharedSchema,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
-
-    return await GiftService.set_gift_refund(db, current_user, shared)
 
 @router.get("/{giftId}", response_model=GiftDetailResponse)
 async def get_gift(

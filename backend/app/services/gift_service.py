@@ -14,6 +14,7 @@ from app.models.gift import Gift
 from app.schemas.gift import EligibilityResponse, GiftResponse, GiftStatus, GiftCreate, GiftDetailResponse, \
     GiftSharedSchema
 from app.schemas.gift.gift_update import GiftUpdate
+from app.services.sharing_service import SharingService
 
 
 class GiftService:
@@ -37,33 +38,14 @@ class GiftService:
                        current_user: User) -> GiftDetailResponse:
 
         logger.info(f"Récupération du cadeau à l'id {giftId}")
-        result: Gift = await GiftService._get_gift_or_raise(db, giftId)
-        role_user = GiftService._define_user_role(current_user, result)
+        result: Gift = await GiftService.get_gift_or_raise(db, giftId)
+        shared_schema = await SharingService.get_all_shares_for_gift(db, gift_id=giftId)
 
-        # 3) recuperer les cadeaux partagés
-        shared_entries: Optional[Sequence[GiftShared]] = None
-        if role_user == RoleUtilisateur.PRENEUR:
-            logger.debug(f"L'utilisateur {current_user.id} est le preneur du cadeau {result.id}")
-            result_gift_shared = await db.execute((
-                select(GiftShared)
-                .where(and_(GiftShared.cadeau_id == result.id , GiftShared.preneur_id == current_user.id))
-                .options(selectinload(GiftShared.participant))  # charge eager les participants
-            ))
-            shared_entries = result_gift_shared.scalars().all()
-        elif role_user == RoleUtilisateur.PARTICIPANT:
-            logger.debug(f"L'utilisateur {current_user.id} est un participant du cadeau {result.id}")
-            result_gift_shared = await db.execute((
-                select(GiftShared)
-                .where(and_(GiftShared.cadeau_id == result.id, GiftShared.participant_id == current_user.id))
-                .options(selectinload(GiftShared.preneur))  # charge eager les participants
-            ))
-            shared_entries = result_gift_shared.scalars().all()
-
-        shared_schema = [GiftSharedSchema.model_validate(g) for g in shared_entries] if shared_entries else None
+        role_user = GiftService.define_user_role(current_user, result, shared_schema)
 
         logger.debug(f"Récupération du cadeau {result.id} par l'utilisateur {current_user.id} avec le rôle {role_user}")
 
-        return await GiftService._set_gift_detail(result, role_user, shared_schema)
+        return GiftService.set_gift_detail(result, current_user, shared_schema)
 
 
     @staticmethod
@@ -150,7 +132,7 @@ class GiftService:
                                 giftId: int,
                                 recu: bool) -> GiftDetailResponse:
         logger.debug(f"Marquage du cadeau {giftId} comme reçu : {recu}")
-        gift: Gift = await GiftService._get_gift_or_raise(db, giftId)
+        gift: Gift = await GiftService.get_gift_or_raise(db, giftId)
         if gift.reserve_par_id != current_user.id:
             logger.error(f"L'utilisateur {current_user.id} n'est pas autorisé à marquer le cadeau {giftId} comme reçu.")
             raise HTTPException(status_code=403, detail="Seule la personne qui a réservé le cadeau peut le marquer comme reçu.")
@@ -162,50 +144,7 @@ class GiftService:
         await db.commit()
         await db.refresh(gift)
 
-        role_user = GiftService._define_user_role(current_user, gift)
-        logger.debug(f"Rôle de l'utilisateur {current_user.id} pour le cadeau {giftId} : {role_user}")
-
-        return await GiftService._set_gift_detail(gift, role_user)
-
-    @staticmethod
-    async def set_gift_refund(db: AsyncSession,
-                                current_user: User,
-                                shared: GiftSharedSchema) -> GiftDetailResponse:
-
-        logger.debug(f"Marquage du cadeau {shared.cadeau_id} comme remboursé pour l'utilisateur : {shared.participant.id}")
-
-        if shared.preneur.id != current_user.id:
-            logger.error(f"L'utilisateur {current_user.id} n'est pas autorisé à marquer le cadeau {shared.cadeau_id} comme remboursé.")
-            raise HTTPException(status_code=403, detail="Seule la personne qui a pris le cadeau peut gérer le remboursement.")
-
-        existing: GiftShared = (await db.execute((
-                select(GiftShared)
-                .where(and_(GiftShared.cadeau_id == shared.cadeau_id, GiftShared.participant_id == shared.participant.id)) # charge eager les participants
-            ))).scalars().first()
-
-        if not existing:
-            logger.error(f"Le cadeau {shared.cadeau_id} n'est pas un cadeau partagé.")
-            raise HTTPException(status_code=403, detail="Ce cadeau n'est pas un cadeau partagé.")
-
-        existing.rembourse= shared.rembourse
-
-        logger.debug(f"Attributs de gift : {vars(existing)}")
-
-        await db.commit()
-        await db.refresh(existing)
-
-        result = (await db.execute(
-                select(GiftShared)
-                .where(GiftShared.cadeau_id == shared.cadeau_id)
-                .options(
-                    selectinload(GiftShared.cadeau)
-                )
-            )).scalars().all()
-
-        refresh = [GiftSharedSchema.model_validate(g) for g in result]
-        role_user = GiftService._define_user_role(current_user, existing.cadeau)
-
-        return await GiftService._set_gift_detail(existing.cadeau, role_user, refresh)
+        return GiftService.set_gift_detail(gift, current_user)
 
     @staticmethod
     async def delete_gift(db: AsyncSession,
@@ -235,7 +174,7 @@ class GiftService:
                             giftId: int,
                             gift_status: GiftStatus) -> GiftResponse:
 
-        result = await GiftService._get_gift_or_raise(db, giftId)
+        result = await GiftService.get_gift_or_raise(db, giftId)
 
         result.statut = gift_status.status
 
@@ -248,7 +187,11 @@ class GiftService:
             result.reservePar = None
             result.dateReservation = None
             result.recu = False
+        elif gift_status.status == GiftStatusEnum.PARTAGE:
+            # ne rien toucher de plus que le statut
+            logger.debug("Passage en PARTAGE, pas de changement de réservation.")
         else:
+            # cas PRIS ou RÉSERVÉ
             result.reservePar = current_user
             result.dateReservation = datetime.now()
 
@@ -306,16 +249,16 @@ class GiftService:
         return gifts_followed + gift_shared
 
     @staticmethod
-    async def _set_gift_detail(gift: Gift, role_user: RoleUtilisateur, partage: Optional[list[GiftSharedSchema]] = None) -> GiftDetailResponse:
+    def set_gift_detail(gift: Gift, current_user: User, partage: Optional[list[GiftSharedSchema]] = None) -> GiftDetailResponse:
         return GiftDetailResponse(
             gift=GiftResponse.model_validate(gift),
             partage=partage,
             est_partage=gift.statut == GiftStatusEnum.PARTAGE,
-            droits_utilisateur=role_user
+            droits_utilisateur= GiftService.define_user_role(current_user, gift, partage)
         )
 
     @staticmethod
-    async def _get_gift_or_raise(db: AsyncSession,
+    async def get_gift_or_raise(db: AsyncSession,
                                 giftId: int) -> Gift:
         result: Gift | None = (await db.execute(
             select(Gift).where(Gift.id == giftId)
@@ -330,14 +273,17 @@ class GiftService:
         return result
 
     @staticmethod
-    def _define_user_role(
+    def define_user_role(
             current_user: User,
             gift: Gift,
+            partages: Optional[list[GiftSharedSchema]] = None
     ) -> RoleUtilisateur:
         if gift.utilisateur.id == current_user.id:
             return RoleUtilisateur.CREATEUR
         elif gift.reservePar and gift.reservePar.id == current_user.id:
             return RoleUtilisateur.PRENEUR
-        else:
+        elif any(p.participant.id == current_user.id for p in partages):
             return RoleUtilisateur.PARTICIPANT
+        else:
+            return RoleUtilisateur.SPECTATEUR
 
