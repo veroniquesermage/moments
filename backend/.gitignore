@@ -10,6 +10,17 @@ __pycache__/
 .vscode/
 .idea/
 
+# Garder uniquement les paramètres de projet utiles
+.idea/*
+!.idea/codeStyles
+!.idea/runConfigurations
+!.idea/inspectionProfiles
+# Mais ignorer les fichiers locaux
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+
+
 # ▶️ Venv
 .venv/
 env/
