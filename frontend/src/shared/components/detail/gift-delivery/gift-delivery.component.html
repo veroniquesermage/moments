@@ -1,0 +1,25 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title"> 🚚 Livraison</div>
+  <hr class="block-separator" />
+
+  <p>> Lieu : {{ giftDetailResponse.gift.lieuLivraison }}</p>
+  <p>> Date prévue : {{ giftDetailResponse.gift.dateLivraison }}</p>
+  <p class="recu-line">
+    > Reçu :
+    <span
+      class="emoji-action"
+      *ngIf="!giftDetailResponse.gift.recu"
+      (click)="toggleRecu()"
+    >❌</span>
+    <span *ngIf="giftDetailResponse.gift.recu">✅</span>
+    <span class="legend-icon">&larr; Cliquez pour changer le statut.</span>
+  </p>
+
+
+  <hr class="block-separator" />
+  <div class="block-title"> 💸 Prix réel</div>
+  <hr class="block-separator" />
+  <p>> Prix payé : {{ giftDetailResponse.gift.prixReel }} €</p>
+
+</div>

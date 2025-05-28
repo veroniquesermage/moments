@@ -3,6 +3,7 @@
   <p>> Cliquez sur un cadeau pour obtenir son détail</p>
   <app-gift-table
     [gifts]="giftService.gifts()"
+    [griserLignes]="false"
     [displayedColumns]="displayedColumns"
     (rowClicked)="onGiftClicked($event)">
   </app-gift-table>

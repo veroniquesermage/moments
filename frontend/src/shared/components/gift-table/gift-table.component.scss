@@ -38,13 +38,14 @@
   filter: grayscale(100%);
 }
 
-
 .gift-table tr.recu {
   background-color: #4f5e52; // ou l'une des couleurs ci-dessus
   color: #e6ffe6; // texte plus clair, optionnel
   border-left: 3px solid #6baa75;
 }
-//tr.recu td:first-child::before {
-//  content: "✅ ";
-//  color: #8fdc8f;
-//}
+
+.gift-table tr.partage {
+  background-color: #4b5e6b; // fond bleu minéral
+  color: #e6f6ff; // texte légèrement bleuté très clair
+  border-left: 3px solid #7ca0b1; // bleu clair/grisé pour contraste doux
+}

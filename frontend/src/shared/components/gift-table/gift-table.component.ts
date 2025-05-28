@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Gift} from 'src/core/models/gift.model';
-import {GiftTableColumn} from 'src/core/models/gift-table-column.model';
+import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 
 @Component({
   selector: 'app-gift-table',
@@ -15,6 +15,7 @@ export class GiftTableComponent {
   @Input() displayedColumns: GiftTableColumn[] = [];
   @Input() griserLignes: boolean = true;
   @Input() isRecu: boolean = false;
+  @Input() isPartage: boolean = false;
   @Output() rowClicked = new EventEmitter<Gift>();
 
   getGiftValue(gift: Gift, column: GiftTableColumn): any {

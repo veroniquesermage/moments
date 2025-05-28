@@ -1,14 +1,15 @@
 import {Injectable, signal} from '@angular/core';
 import {environment} from 'src/environments/environment';
-import {GiftDTO} from 'src/core/models/gift-dto.model';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
-import {Gift} from 'src/core/models/gift.model';
 import {GiftMapper} from 'src/core/mapper/gift.mapper';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
-import {GiftStatutDTO} from 'src/core/models/gift-statut.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
+import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
+import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
+import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -73,19 +74,18 @@ export class GiftService {
     }
   }
 
-  async getGift(id: number): Promise<ApiResponse<Gift>> {
+  async getGift(id: number): Promise<ApiResponse<GiftDetailResponse>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}`;
     try {
-      const giftDto = await firstValueFrom(
-        this.http.get<GiftDTO>(url, {
+      const gift = await firstValueFrom(
+        this.http.get<GiftDetailResponse>(url, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
       );
 
-      const gift = GiftMapper.fromDTO(giftDto);
       return {success: true, data: gift};
 
     } catch (error) {
@@ -153,7 +153,7 @@ export class GiftService {
 
   }
 
-  async changerStatutGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
+  async changeStatusGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}/changer-statut`;
@@ -172,17 +172,7 @@ export class GiftService {
     }
   }
 
-  clearGifts() {
-    this.gifts.set([]);
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    });
-  }
-
-  async recupererCadeauxSuivis(): Promise<ApiResponse<Gift[]>> {
+  async getFollowedGifts(): Promise<ApiResponse<Gift[]>> {
     const url = `${this.apiUrl}/suivis`;
     try {
       const giftsDto = await firstValueFrom(
@@ -200,5 +190,35 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux suivis', error);
       return {success: false, message: "❌ Impossible de récupérer les cadeaux suivis."};
     }
+  }
+
+  async setGiftReceived(id: number, recu: boolean): Promise<ApiResponse<GiftDetailResponse>> {
+    const idEnc = encodeURIComponent(id);
+    const url = `${this.apiUrl}/${idEnc}/recu`;
+    try {
+      const gift = await firstValueFrom(
+        this.http.patch<GiftDetailResponse>(url, {recu}, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+
+      return {success: true, data: gift};
+
+    } catch (error) {
+      console.error('[GiftService] Erreur lors du changement de statut de la réception', error);
+      return {success: false, message: "❌ Impossible de changer le statut de la réception."};
+    }
+  }
+
+
+  clearGifts() {
+    this.gifts.set([]);
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+    });
   }
 }

@@ -3,7 +3,7 @@ import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.co
 import {CommonModule} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift.model';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-user-gifts',
@@ -33,7 +33,9 @@ export class UserGiftsComponent implements OnInit{
   }
 
   onGiftClicked(gift: Gift): void {
-    this.router.navigate(['/dashboard/mes-cadeaux', gift.id]);
+    this.router.navigate(['/dashboard/cadeau', gift.id], {
+      queryParams: { context: 'mes-cadeaux' }
+    });
   }
 
   retour() {
