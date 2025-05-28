@@ -3,4 +3,7 @@ from .gift_create import GiftCreate
 from .gift_response import GiftResponse
 from .eligibility_response import EligibilityResponse
 from .gift_status import GiftStatus
+from .gift_shared import GiftSharedSchema
+from .gift_detail_response import GiftDetailResponse
 from .gift_followed import GiftFollowed
+from .recu_payload import RecuPayload
