@@ -1,0 +1,70 @@
+.focus-action {
+  display: none;
+}
+
+.drag-handle {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: grab;
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+
+  &:focus {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.gift-table {
+  table-layout: auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+
+  th, td {
+    border: 1px solid #fff;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #111;
+    color: #fff;
+  }
+
+  tr:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+
+  tr:hover {
+    background-color: #696969;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      padding: 0.5rem;
+    }
+  }
+}
+  .gift-table td:focus {
+    outline: 2px dashed #fff;
+    background-color: #333;
+  }
+
+th.col-actions, td.col-actions {
+  width: 8rem;
+}
+@media (max-width: 768px) {
+  th.col-actions, td.col-actions {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+

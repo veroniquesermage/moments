@@ -54,6 +54,12 @@ button:hover {
   color: #000;
 }
 
+button:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  background-color: #444; // pour mieux le voir, optionnel
+}
+
 .options {
   display: flex;
   flex-direction: row;

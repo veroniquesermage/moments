@@ -1,0 +1,46 @@
+<table class="gift-table">
+  <thead>
+  <tr>
+    <th></th> <!-- poignée drag -->
+    <th scope="col">Nom</th>
+    <th scope="col">Prix</th>
+    <th scope="col">Quantité</th>
+    <th class="focus-action col-actions">Actions de tri</th>
+  </tr>
+  </thead>
+  <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+  <tr *ngFor="let gift of gifts, let i = index"
+      cdkDrag
+      (click)="onRowClick(gift)"
+      (keydown.enter)="onRowClick(gift)"
+      (keydown.space)="onRowClick(gift)">
+    <td (click)="$event.stopPropagation()">
+      <button class="drag-handle"
+              cdkDragHandle
+              attr.aria-label="Changer la priorité de {{ gift.nom }}"
+              title="Changer la priorité de ce cadeau"
+      >↕️</button>
+    </td>
+    <td tabindex="0">{{ gift.nom }}</td>
+    <td>{{ gift.prix }} €</td>
+    <td>{{ gift.quantite }}</td>
+    <td class="focus-action  col-actions"
+        (click)="$event.stopPropagation()">
+      <button class="drag-handle"
+              (click)="changeOrder(i, 'up')"
+              attr.aria-label="Monter la priorité de {{ gift.nom }}"
+              (keydown.enter)="$event.stopPropagation()"
+              (keydown.space)="$event.stopPropagation()"
+      >⬆️</button>
+      <button class="drag-handle"
+              (click)="changeOrder(i, 'down')"
+              attr.aria-label="Descendre la priorité de {{ gift.nom }}"
+              (keydown.enter)="$event.stopPropagation()"
+              (keydown.space)="$event.stopPropagation()"
+      >⬇️</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<button *ngIf="hasOrderChanged" (click)="recPriorities()"> Valider les priorités</button>

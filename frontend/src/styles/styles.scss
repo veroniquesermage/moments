@@ -4,3 +4,7 @@ body {
   font-family: "Spectral", serif;
 }
 
+body.user-is-tabbing .focus-action {
+  display: inline-block;
+}
+
