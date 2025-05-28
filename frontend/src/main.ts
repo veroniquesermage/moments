@@ -5,7 +5,6 @@ import {importProvidersFrom} from '@angular/core';
 import {provideHttpClient} from '@angular/common/http';
 import {provideRouter} from '@angular/router';
 import {routes} from 'src/app/app.routes';
-import './styles/retro-terminal.css';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 
