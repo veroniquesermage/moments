@@ -1,0 +1,44 @@
+<div class="terminal" style="position: relative;">
+  <h2>> Détail du cadeau</h2>
+
+  <app-gift-header
+    [gift]="giftDetail.gift"
+  />
+
+  <app-gift-delivery
+    *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur === RoleUser.PRENEUR"
+    [giftDetailResponse]="giftDetail"
+    (receptionToggled)="onReceptionToggled($event)"
+  />
+
+  <app-gift-shared
+    *ngIf="context != 'mes-cadeaux'"
+    [currentUserId]="currentUserId"
+    [context]="context"
+    [giftDetailResponse]="giftDetail"
+    (remboursementToggled)="onRemboursementToggled($event)"
+    />
+
+  <app-gift-actions
+    [giftDetailResponse]="giftDetail"
+    [context]="context"
+    (editRequested)="modifier()"
+    (deleteRequested)="requestDelete()"
+    (reserveRequested)="reserver()"
+    (takeRequested)="prendre()"
+    (cancelReservationRequested)="annulerReservation()"
+    (withdrawRequested)="retirerCadeau()"
+    (manageDeliveryRequested)="gererLivraison()"
+    (manageSharingRequested)="gererPartage()"
+    (backRequested)="retour()"
+  />
+
+  <!-- Confirmation -->
+  <app-terminal-modal
+    *ngIf="showModal"
+    [message]="message"
+    [actions]="modalActions"
+    (actionClicked)="handleClicked($event)"
+  />
+
+</div>

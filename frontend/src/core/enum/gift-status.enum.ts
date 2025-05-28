@@ -1,5 +1,6 @@
 export enum GiftStatus {
   DISPONIBLE = 'DISPONIBLE',
   RESERVE = 'RESERVE',
-  PRIS = 'PRIS'
+  PRIS = 'PRIS',
+  PARTAGE = 'PARTAGE'
 }

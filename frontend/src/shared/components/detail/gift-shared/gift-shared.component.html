@@ -1,0 +1,36 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title">{{getEmojiStatut(giftDetailResponse.gift.statut)}} {{giftDetailResponse.gift.statut}}</div>
+  <hr class="block-separator" />
+
+  <p *ngIf="giftDetailResponse.gift.statut !== GiftStatus.DISPONIBLE">> {{ getLabelPreneur(giftDetailResponse.gift.statut) }} : {{ giftDetailResponse.gift.reservePar?.name }}</p>
+
+  <ng-container *ngIf="context === 'suivi'">
+    <ng-container *ngIf="isPreneur">
+      <p class="legend-icon"> Cliquez sur les icônes pour changer le statut.</p>
+      <p *ngFor="let share of partage">
+        > {{ share.participant.name }} : {{ share.montant }} €
+        <span class="emoji-action" (click)="toggleRemboursement(share.participant.id)">
+          {{ share.rembourse ? '✅' : '🕒' }}
+        </span>
+      </p>
+    </ng-container>
+    <ng-container *ngIf="isParticipant">
+      <p *ngFor="let share of partage">
+        <ng-container *ngIf="share.participant.id === currentUserId">
+          > Vous devez : {{ share.montant }} €
+          <span>
+            {{ share.rembourse ? '✅ remboursé' : '🕒 en attente' }}
+          </span>
+        </ng-container>
+      </p>
+    </ng-container>
+  </ng-container>
+
+
+  <ng-container *ngIf="!isPreneur && !isParticipant && (partage == undefined || partage.length > 0 )">
+    <p>> Ce cadeau est partagé avec d'autres utilisateurs</p>
+  </ng-container>
+
+</div>
+

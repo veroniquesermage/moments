@@ -1,0 +1,17 @@
+<div class="options">
+
+  <button *ngIf="canEdit" (click)="editRequested.emit()">✏️ Modifier</button>
+  <button *ngIf="canDelete" (click)="deleteRequested.emit()">🗑 Supprimer</button>
+
+  <button *ngIf="canReserve" (click)="reserveRequested.emit()">⏳ Réserver</button>
+  <button *ngIf="canTake" (click)="takeRequested.emit()">🛒 Prendre</button>
+  <button *ngIf="canCancelReservation" (click)="cancelReservationRequested.emit()">❌ Annuler la réservation</button>
+  <button *ngIf="canWithdraw" (click)="withdrawRequested.emit()">🔁 Retirer le cadeau</button>
+
+  <button *ngIf="canManageDelivery" (click)="manageDeliveryRequested.emit()">🚚 Gérer la livraison</button>
+  <button *ngIf="canManageSharing" (click)="manageSharingRequested.emit()"> 🧑‍🤝‍🧑  Gérer le partage</button>
+
+  <button *ngIf="canGoBack" (click)="backRequested.emit()">↩ Retour à la liste</button>
+
+</div>
+

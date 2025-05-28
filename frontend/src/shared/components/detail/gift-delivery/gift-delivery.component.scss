@@ -1,0 +1,23 @@
+.recu-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .emoji-action {
+    cursor: pointer;
+    user-select: none;
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
+    transition: transform 0.1s ease;
+  }
+
+  .emoji-action:hover {
+    transform: scale(1.2);
+  }
+
+  .legend-icon {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+}

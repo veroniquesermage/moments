@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TakeGiftComponent } from './take-gift.component';
+import { GiftDeliveryComponent } from './gift-delivery.component';
 
-describe('TakeGiftComponent', () => {
-  let component: TakeGiftComponent;
-  let fixture: ComponentFixture<TakeGiftComponent>;
+describe('GiftDeliveryComponent', () => {
+  let component: GiftDeliveryComponent;
+  let fixture: ComponentFixture<GiftDeliveryComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TakeGiftComponent]
+      imports: [GiftDeliveryComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TakeGiftComponent);
+    fixture = TestBed.createComponent(GiftDeliveryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

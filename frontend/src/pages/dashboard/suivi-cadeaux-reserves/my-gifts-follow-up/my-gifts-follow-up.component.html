@@ -8,10 +8,16 @@
   <p class="total">> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
     }} €</p>
 
-  <p class="table-legend">> Les lignes vertes indiquent les cadeaux que vous avez notés comme reçus. </p>
+  <p class="table-legend">
+    <span><span class="legend-dot recu"></span> Cadeau reçu</span>
+    <span><span class="legend-dot partage"></span> Cadeau partagé</span>
+  </p>
+
+
   <app-gift-table
     [gifts]="giftService.gifts()"
     [griserLignes]="false"
+    [isPartage]="true"
     [isRecu]="true"
     [displayedColumns]="displayedColumns"
     (rowClicked)="onGiftClicked($event)">

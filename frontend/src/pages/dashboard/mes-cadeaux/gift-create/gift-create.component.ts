@@ -2,12 +2,12 @@ import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
-import {Gift} from 'src/core/models/gift.model';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {AuthService} from 'src/security/service/auth.service';
 import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {Gift} from 'src/core/models/gift/gift.model';
 
 @Component({
   selector: 'app-gift-create',

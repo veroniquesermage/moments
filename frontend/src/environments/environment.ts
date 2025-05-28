@@ -10,6 +10,7 @@ export const environment = {
     groupes: '/groupe',
     rejoindre: '/rejoindre',
     cadeaux: '/cadeaux',
-    utilisateur: '/utilisateurs'
+    utilisateur: '/utilisateurs',
+    partage: '/partage'
   }
 };
