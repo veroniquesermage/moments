@@ -22,7 +22,7 @@
   }
 
   tr:hover {
-    background-color: #222;
+    background-color: #696969;
     cursor: pointer;
   }
 
@@ -48,4 +48,9 @@
   background-color: #4b5e6b; // fond bleu minéral
   color: #e6f6ff; // texte légèrement bleuté très clair
   border-left: 3px solid #7ca0b1; // bleu clair/grisé pour contraste doux
+}
+
+.gift-table td:focus {
+  outline: 2px dashed #fff;
+  background-color: #696969;
 }
