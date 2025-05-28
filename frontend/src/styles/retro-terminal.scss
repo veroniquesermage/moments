@@ -1,9 +1,16 @@
+@font-face {
+  font-family: 'FiraCode';
+  src: url('/assets/fonts/FiraCode.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: #000;
   color: #fff;
-  font-family: 'Fira Code', monospace;
+  font-family: 'FiraCode', monospace;
 }
 
 .terminal {
