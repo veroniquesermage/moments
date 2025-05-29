@@ -34,7 +34,7 @@ export class UserGiftsComponent implements OnInit{
     });
   }
 
-  retour() {
+  return() {
     this.router.navigate(['/dashboard']);
   }
 }
