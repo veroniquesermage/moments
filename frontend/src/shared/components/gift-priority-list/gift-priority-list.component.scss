@@ -58,12 +58,17 @@
   }
 
 th.col-actions, td.col-actions {
-  width: 8rem;
+  width: 3rem;
+  margin: auto;
+  text-align: center !important;
+  vertical-align: center !important;
 }
 @media (max-width: 768px) {
   th.col-actions, td.col-actions {
     width: 3rem;
     height: 3rem;
+    text-align: center !important;
+    vertical-align: center !important;
   }
 }
 

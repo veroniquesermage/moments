@@ -4,8 +4,7 @@
     <th></th> <!-- poignée drag -->
     <th scope="col">Nom</th>
     <th scope="col">Prix</th>
-    <th scope="col">Quantité</th>
-    <th class="focus-action col-actions">Actions de tri</th>
+    <th scope="col" aria-label="Quantité">Qté</th>
   </tr>
   </thead>
   <tbody cdkDropList (cdkDropListDropped)="drop($event)">
@@ -14,31 +13,35 @@
       (click)="onRowClick(gift)"
       (keydown.enter)="onRowClick(gift)"
       (keydown.space)="onRowClick(gift)">
-    <td (click)="$event.stopPropagation()">
-      <button class="drag-handle"
-              cdkDragHandle
-              attr.aria-label="Changer la priorité de {{ gift.nom }}"
-              title="Changer la priorité de ce cadeau"
-      >↕️</button>
+
+    <td (click)="$event.stopPropagation()" class=" col-actions">
+      <ng-container *ngIf="userIsTabbing$ | async; else dragHandle">
+        <button class="drag-handle"
+                (click)="changeOrder(i, 'up')"
+                attr.aria-label="Monter la priorité de {{ gift.nom }}"
+                (keydown.enter)="$event.stopPropagation()"
+                (keydown.space)="$event.stopPropagation()">
+          ⬆️
+        </button>
+        <button class="drag-handle"
+                (click)="changeOrder(i, 'down')"
+                attr.aria-label="Descendre la priorité de {{ gift.nom }}"
+                (keydown.enter)="$event.stopPropagation()"
+                (keydown.space)="$event.stopPropagation()">
+          ⬇️
+        </button>
+      </ng-container>
+      <ng-template #dragHandle>
+        <button class="drag-handle"
+                cdkDragHandle
+                attr.aria-label="Changer la priorité de {{ gift.nom }}">
+          ↕️
+        </button>
+      </ng-template>
     </td>
     <td tabindex="0">{{ gift.nom }}</td>
     <td>{{ gift.prix }} €</td>
     <td>{{ gift.quantite }}</td>
-    <td class="focus-action  col-actions"
-        (click)="$event.stopPropagation()">
-      <button class="drag-handle"
-              (click)="changeOrder(i, 'up')"
-              attr.aria-label="Monter la priorité de {{ gift.nom }}"
-              (keydown.enter)="$event.stopPropagation()"
-              (keydown.space)="$event.stopPropagation()"
-      >⬆️</button>
-      <button class="drag-handle"
-              (click)="changeOrder(i, 'down')"
-              attr.aria-label="Descendre la priorité de {{ gift.nom }}"
-              (keydown.enter)="$event.stopPropagation()"
-              (keydown.space)="$event.stopPropagation()"
-      >⬇️</button>
-    </td>
   </tr>
   </tbody>
 </table>
