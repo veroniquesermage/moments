@@ -6,6 +6,10 @@
     > Cliquez sur un cadeau pour consulter son détail, le modifier ou le supprimer.
 
   </p>
+  <p class="visually-hidden" id="table-priorite-explication">
+    Chaque ligne commence par des boutons pour modifier la priorité : utilisez Tab pour les afficher, puis les activer avec Entrée ou Espace.
+  </p>
+
   <app-gift-priority-list
   [gifts]="this.giftService.gifts()"
   (rowClicked)="onGiftClicked($event)"

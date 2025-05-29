@@ -1,14 +1,15 @@
-<table class="gift-table">
+<table   aria-describedby="table-priorite-explication" class="gift-table">
   <thead>
   <tr>
-    <th *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
+    <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
   </tr>
   </thead>
   <tbody>
   <tr *ngFor="let gift of gifts" (click)="onRowClick(gift)"
       [class.gris]="griserLignes && gift.statut === 'PRIS'"
       [class.recu]="isRecu && gift.recu"
-      [class.partage]="isPartage && gift.statut === 'PARTAGE'">
+      [class.partage]="isPartage && gift.statut === 'PARTAGE'"
+      [attr.aria-label]="getAriaLabel(gift)">
     <td *ngFor="let column of displayedColumns"
         tabindex="0"
         (keydown.enter)="onRowClick(gift)"
