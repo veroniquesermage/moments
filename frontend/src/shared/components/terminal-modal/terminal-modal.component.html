@@ -1,16 +1,24 @@
 <div class="modal-overlay">
-  <div class="modal-box terminal">
+  <div
+    class="modal-box terminal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    cdkTrapFocus
+  >
+    <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
+
     <p [innerHTML]="message"></p>
+
     <div class="modal-actions">
       <button
         *ngFor="let action of actions"
         (click)="actionClicked.emit(action.eventName)"
         [ngClass]="action.style || 'primary'"
+        #focusBtn
       >
         {{ action.label }}
       </button>
     </div>
   </div>
 </div>
-
-

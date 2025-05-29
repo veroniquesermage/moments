@@ -8,9 +8,10 @@
   <p class="total">> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
     }} €</p>
 
-  <p class="table-legend">
-    <span><span class="legend-dot recu"></span> Cadeau reçu</span>
-    <span><span class="legend-dot partage"></span> Cadeau partagé</span>
+  <p class="table-legend" role="group" aria-labelledby="table-legend-title">
+    <strong id="table-legend-title" class="visually-hidden">Légende du tableau</strong>
+    <span><span class="legend-dot recu" aria-hidden="true"></span> Cadeau reçu</span>
+    <span><span class="legend-dot partage" aria-hidden="true"></span> Cadeau partagé</span>
   </p>
 
 
