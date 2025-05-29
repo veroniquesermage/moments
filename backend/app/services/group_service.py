@@ -5,9 +5,10 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, Group, UserGroup
-from app.schemas.group import GroupCreate, RoleEnum, GroupResponse
+from app.schemas.group import GroupCreate, GroupResponse
 from app.utils.code_generator import generate_random_code
 
 

@@ -34,21 +34,13 @@ async def create_gift(
 
     return await GiftService.create_gift(db, current_user, gift)
 
-@router.put("/", response_model=list[GiftResponse])
-async def update_all_gifts(
-        gifts: list[GiftPriority],
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
-
-    return await GiftService.update_all_gifts(db, current_user, gifts)
-
-
-@router.get("/suivis", response_model=list[GiftResponse])
+@router.get("/suivis/{groupId}", response_model=list[GiftResponse])
 async def get_followed_gifts(
+        groupId: int,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
 
-    return await GiftService.get_followed_gifts(db, current_user)
+    return await GiftService.get_followed_gifts(db, current_user, groupId)
 
 
 @router.get("/{giftId}", response_model=GiftDetailResponse)
