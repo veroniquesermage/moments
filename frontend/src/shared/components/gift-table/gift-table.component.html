@@ -9,7 +9,10 @@
       [class.gris]="griserLignes && gift.statut === 'PRIS'"
       [class.recu]="isRecu && gift.recu"
       [class.partage]="isPartage && gift.statut === 'PARTAGE'">
-    <td *ngFor="let column of displayedColumns">
+    <td *ngFor="let column of displayedColumns"
+        tabindex="0"
+        (keydown.enter)="onRowClick(gift)"
+        (keydown.space)="onRowClick(gift)">
       {{ getGiftValue(gift, column) }}
     </td>
   </tr>

@@ -1,7 +1,7 @@
 import {Component, computed} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 import {CommonModule} from '@angular/common';
 
 @Component({
