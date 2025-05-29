@@ -4,9 +4,9 @@
 <table class="gift-table">
   <thead>
     <tr>
-      <th>Participant</th>
-      <th>Montant dû (€)</th>
-      <th>Actions</th>
+      <th scope="col">Participant</th>
+      <th scope="col">Montant dû (€)</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -19,7 +19,7 @@
       <button class="test-align"
               (click)="supprimerLigne(i)"
               attr.aria-label="Enlever {{partage.participant.name}} des participants"
-      >🗑</button>
+      >🗑️</button>
     </td>
   </tr>
   <tr *ngFor="let draft of partagesDraft; let i = index">

@@ -27,4 +27,12 @@ export class GiftTableComponent {
     this.rowClicked.emit(gift);
   }
 
+  getAriaLabel(gift: Gift): string | null {
+    if (this.isRecu && gift.recu) return 'Cadeau reçu';
+    if (this.isPartage && gift.statut === 'PARTAGE') return 'Cadeau partagé';
+    if (this.griserLignes && gift.statut === 'PRIS') return 'Cadeau pris';
+    return null; // ne vocalise rien si aucune condition n’est remplie
+  }
+
+
 }
