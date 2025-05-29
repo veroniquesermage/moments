@@ -1,9 +1,9 @@
-import {Component, effect, HostListener, inject, Injector, runInInjectionContext} from '@angular/core';
+import {Component, effect, inject, Injector, runInInjectionContext} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AuthService} from 'src/security/service/auth.service';
 import {GroupService} from 'src/core/services/group.service';
 import {Router, RouterOutlet} from '@angular/router';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
@@ -59,21 +59,5 @@ export class AppComponent {
 
     this.groupService.isLoading.set(false);
   }
-
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Tab') {
-      document.body.classList.add('user-is-tabbing');
-    }
-  }
-
-  @HostListener('window:mousedown')
-  onMouseDown() {
-    document.body.classList.remove('user-is-tabbing');
-  }
-
-
-
-
 }
 

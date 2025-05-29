@@ -5,6 +5,7 @@ import {CdkDragDrop, DragDropModule, moveItemInArray} from '@angular/cdk/drag-dr
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
+import {UserInteractionService} from 'src/core/services/user-interaction.service';
 
 @Component({
   selector: 'app-gift-priority-list',
@@ -22,9 +23,13 @@ export class GiftPriorityListComponent {
 
   hasOrderChanged: boolean = false;
 
-
   constructor(private giftService: GiftService,
-              private errorService: ErrorService) {
+              private errorService: ErrorService,
+              private userInteractionService: UserInteractionService) {
+  }
+
+  get userIsTabbing$() {
+    return this.userInteractionService.isTabbing$;
   }
 
   onRowClick(gift: Gift) {

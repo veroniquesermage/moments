@@ -9,8 +9,8 @@ import {FormsModule} from '@angular/forms';
 import {GiftSharedDraft} from 'src/core/models/gift/gift-shared-draft.model';
 import {CommonModule} from '@angular/common';
 import {User} from 'src/security/model/user.model';
-import {UserGroupService} from 'src/core/services/userGroup.service';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {UserGroupService} from 'src/core/services/user-group.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 
 @Component({
   selector: 'app-gift-sharing',
