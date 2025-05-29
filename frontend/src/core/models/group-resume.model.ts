@@ -1,6 +1,6 @@
 export interface GroupeResume {
   id: number;
-  nom: string;
+  nomGroupe: string;
   description: string;
   role: string;
   dateAjout: string;

@@ -11,8 +11,9 @@
       class="emoji-action"
       *ngIf="!giftDetailResponse.gift.recu"
       (click)="toggleRecu()"
+      aria-label="Cadeau non livré"
     >❌</span>
-    <span *ngIf="giftDetailResponse.gift.recu">✅</span>
+    <span *ngIf="giftDetailResponse.gift.recu" aria-label="Cadeau livré">✅</span>
     <span class="legend-icon">&larr; Cliquez pour changer le statut.</span>
   </p>
 
