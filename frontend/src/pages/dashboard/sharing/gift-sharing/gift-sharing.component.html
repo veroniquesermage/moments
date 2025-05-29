@@ -16,7 +16,10 @@
       <input type="number" [(ngModel)]="partages![i].montant" />
     </td>
     <td>
-      <button class="test-align" (click)="supprimerLigne(i)">🗑</button>
+      <button class="test-align"
+              (click)="supprimerLigne(i)"
+              attr.aria-label="Enlever {{partage.participant.name}} des participants"
+      >🗑</button>
     </td>
   </tr>
   <tr *ngFor="let draft of partagesDraft; let i = index">
@@ -32,7 +35,10 @@
       <input type="number" [(ngModel)]="draft.montant" />
     </td>
     <td>
-      <button class="test-align" (click)="supprimerDraft(i)">🗑</button>
+      <button class="test-align"
+              (click)="supprimerDraft(i)"
+              attr.aria-label="Enlever {{draft.participant?.name}} des participants"
+      >🗑️</button>
     </td>
   </tr>
   </tbody>
