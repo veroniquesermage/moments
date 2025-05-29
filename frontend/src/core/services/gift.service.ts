@@ -11,6 +11,7 @@ import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
+import {GroupStateService} from 'src/core/services/group-state.service';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -19,7 +20,8 @@ export class GiftService {
   gifts = signal<Gift[]>([])
   isLoading = signal<boolean>(false);
 
-  constructor(private http: HttpClient,) {
+  constructor(private http: HttpClient,
+              private groupStateService: GroupStateService) {
   }
 
   async fetchGifts(userId?: number): Promise<ApiResponse<Gift[]>> {
@@ -174,7 +176,9 @@ export class GiftService {
   }
 
   async getFollowedGifts(): Promise<ApiResponse<Gift[]>> {
-    const url = `${this.apiUrl}/suivis`;
+    const groupId = this.groupStateService.getSelectedGroup()!.id;
+    const idEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/suivis/${idEnc}`;
     try {
       const giftsDto = await firstValueFrom(
         this.http.get<GiftDTO[]>(url, {
