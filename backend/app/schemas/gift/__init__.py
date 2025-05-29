@@ -7,3 +7,5 @@ from .gift_shared import GiftSharedSchema
 from .gift_detail_response import GiftDetailResponse
 from .gift_followed import GiftFollowed
 from .recu_payload import RecuPayload
+from .gift_update import GiftUpdate
+from .gift_priority import GiftPriority

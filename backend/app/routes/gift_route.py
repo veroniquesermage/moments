@@ -10,7 +10,7 @@ from app.database import get_db
 from app.dependencies.current_user import get_current_user
 from app.models import User
 from app.schemas.gift import GiftResponse, EligibilityResponse, GiftStatus, GiftCreate, GiftFollowed, \
-    GiftDetailResponse, GiftSharedSchema, RecuPayload
+    GiftDetailResponse, GiftSharedSchema, RecuPayload, GiftPriority
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
@@ -33,6 +33,15 @@ async def create_gift(
         current_user: User = Depends(get_current_user) ) -> GiftResponse:
 
     return await GiftService.create_gift(db, current_user, gift)
+
+@router.put("/", response_model=list[GiftResponse])
+async def update_all_gifts(
+        gifts: list[GiftPriority],
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
+
+    return await GiftService.update_all_gifts(db, current_user, gifts)
+
 
 @router.get("/suivis", response_model=list[GiftResponse])
 async def get_followed_gifts(
