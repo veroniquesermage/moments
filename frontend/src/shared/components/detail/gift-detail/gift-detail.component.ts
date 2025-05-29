@@ -189,10 +189,15 @@ export class GiftDetailComponent implements OnInit{
         this.modalActions = [
           { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' }
         ];
+      } else if (status === GiftStatus.DISPONIBLE) {
+        this.message = 'Votre action est confirmée.';
+        this.modalActions = [
+          { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' }
+        ];
       } else {
         this.message = 'Votre action est confirmée. Souhaitez-vous le partager avec d\'autres membres du groupe ?';
         this.modalActions = [
-          { label: 'Ok', eventName: 'BACK_TO_LIST', style: 'primary' },
+          { label: 'Non', eventName: 'BACK_TO_LIST', style: 'primary' },
           { label: 'Partager le cadeau', eventName: 'PARTAGE', style: 'primary' }
         ];
       }

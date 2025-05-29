@@ -3,7 +3,7 @@ import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupeResume} from 'src/core/models/group-resume.model';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 
 @Component({
   selector: 'app-onboarding',

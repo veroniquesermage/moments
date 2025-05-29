@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {GroupeResume} from 'src/core/models/group-resume.model';
 import {firstValueFrom} from 'rxjs';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 import {GroupeDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
