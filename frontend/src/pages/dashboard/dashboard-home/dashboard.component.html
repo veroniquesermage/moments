@@ -1,5 +1,6 @@
-<div class="terminal">
-  <h1>> Bienvenue dans le groupe : {{ selectedGroup()?.nom }}</h1>
+<div class="terminal" aria-labelledby="Menu principal">
+  <h1>> Bienvenue dans le groupe : {{ selectedGroup()?.nomGroupe }}</h1>
+  <h2 *ngIf="selectedGroup()?.description">> Description du groupe : </h2> <em> {{selectedGroup()?.description}}</em>
   <p>> Que souhaitez-vous faire ?</p>
 
   <ul class="command-list">

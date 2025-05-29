@@ -1,15 +1,22 @@
 <div class="terminal">
   <h2>> Mes cadeaux</h2>
-  <p>> Cliquez sur un cadeau pour obtenir son détail</p>
-  <app-gift-table
-    [gifts]="giftService.gifts()"
-    [griserLignes]="false"
-    [displayedColumns]="displayedColumns"
-    (rowClicked)="onGiftClicked($event)">
-  </app-gift-table>
+  <p>
+    > Les cadeaux sont triés par ordre de priorité. Utilisez la poignée ↕️ pour organiser votre liste.
+    <br>
+    > Cliquez sur un cadeau pour consulter son détail, le modifier ou le supprimer.
+
+  </p>
+  <p class="visually-hidden" id="table-priorite-explication">
+    Chaque ligne commence par des boutons pour modifier la priorité : utilisez Tab pour les afficher, puis les activer avec Entrée ou Espace.
+  </p>
+
+  <app-gift-priority-list
+  [gifts]="this.giftService.gifts()"
+  (rowClicked)="onGiftClicked($event)"
+  />
   <div class="options">
     <button (click)="goToAjout()">[+] Ajouter un cadeau</button>
-    <button (click)="retour()">↩ Retour au Menu</button>
+    <button (click)="return()">↩ Retour au Menu</button>
   </div>
 
 </div>

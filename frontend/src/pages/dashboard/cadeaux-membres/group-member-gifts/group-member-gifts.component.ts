@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
-import {UserGroupService} from 'src/core/services/userGroup.service';
+import {UserGroupService} from 'src/core/services/user-group.service';
 import {User} from 'src/security/model/user.model';
 import {NgForOf, NgIf} from '@angular/common';
-import {GroupStateService} from 'src/core/services/groupState.service';
+import {GroupStateService} from 'src/core/services/group-state.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {Gift} from 'src/core/models/gift/gift.model';
@@ -29,8 +29,9 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   displayedColumns = [
     {key: 'nom', label: 'Nom'},
-    {key: 'prix', label: 'Prix (€)', formatFn: (v: number) => `${v} €`},
-    {key: 'priorite', label: 'Priorité'},
+    {key: 'prix', label: 'Prix (€)', formatFn: (v: number | null | undefined) => v != null ? `${v} €` : '-'},
+    {key: 'fraisPort', label: 'Frais de port (€)', formatFn: (v: number | null | undefined) => v != null ? `${v} €` : '-'},
+    {key: 'quantite', label: 'Quantité'},
     {key: 'statut', label: 'Statut'}
   ];
 

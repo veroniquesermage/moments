@@ -54,6 +54,12 @@ button:hover {
   color: #000;
 }
 
+button:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  background-color: #444; // pour mieux le voir, optionnel
+}
+
 .options {
   display: flex;
   flex-direction: row;
@@ -172,5 +178,16 @@ button:hover {
   }
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
 
 

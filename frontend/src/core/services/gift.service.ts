@@ -10,6 +10,7 @@ import {Gift} from 'src/core/models/gift/gift.model';
 import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
+import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -211,6 +212,22 @@ export class GiftService {
     }
   }
 
+  async updateAllGifts(gifts: GiftPriority[]): Promise<ApiResponse<Gift[]>> {
+    try {
+      const giftsList = await firstValueFrom(this.http.put<Gift[]>(this.apiUrl, gifts, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+
+      const result: Gift[] = giftsList.map(dto => GiftMapper.fromDTO(dto));
+      this.gifts.set(result);
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la mise à jour des priorités', error);
+
+      return {success: false, message: "❌ Impossible mettre à jour les priorités."};
+    }
+  }
 
   clearGifts() {
     this.gifts.set([]);
@@ -221,4 +238,5 @@ export class GiftService {
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`
     });
   }
+
 }
