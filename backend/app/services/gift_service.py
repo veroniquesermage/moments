@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import GiftActionEnum, GiftStatusEnum, RoleUtilisateur
 from app.core.logger import logger
 from app.core.message import *
-from app.models import User, GiftShared
+from app.models import User, GiftShared, UserGroup
 from app.models.gift import Gift
 from app.schemas.gift import EligibilityResponse, GiftResponse, GiftStatus, GiftCreate, GiftDetailResponse, \
     GiftSharedSchema, GiftPriority
@@ -252,29 +252,38 @@ class GiftService:
         return GiftResponse.model_validate(gift)
 
     @staticmethod
-    async def get_followed_gifts(db: AsyncSession,
-                                 current_user: User) -> list[GiftResponse]:
+    async def get_followed_gifts(
+            db: AsyncSession,
+            current_user: User,
+            group_id: int
+    ) -> list[GiftResponse]:
 
-        # 1) récupérer les cadeaux suivis par l'utilisateur
-        result_gift = await db.execute((
+        # A. Cadeaux réservés ou pris PAR moi, créés PAR des membres du groupe courant
+        result_gift = await db.execute(
             select(Gift)
-            .where(Gift.reserve_par_id == current_user.id)
+            .join(User, Gift.utilisateur_id == User.id)
+            .join(UserGroup, User.id == UserGroup.utilisateur_id)
+            .where(
+                Gift.reserve_par_id == current_user.id,
+                UserGroup.groupe_id == group_id
+            )
             .options(selectinload(Gift.utilisateur))
-        ))
+        )
         gifts = result_gift.scalars().all()
-
         gifts_followed = [GiftResponse.model_validate(gi) for gi in gifts]
 
-        # 3) recuperer les cadeaux partagés
-
-        result_gift_shared = await db.execute((
+        # B. Cadeaux partagés AVEC moi, créés PAR des membres du groupe courant
+        result_gift_shared = await db.execute(
             select(Gift)
             .join(GiftShared, Gift.id == GiftShared.cadeau_id)
-            .where(GiftShared.participant_id == current_user.id)
-        ))
-
+            .join(User, Gift.utilisateur_id == User.id)
+            .join(UserGroup, User.id == UserGroup.utilisateur_id)
+            .where(
+                GiftShared.participant_id == current_user.id,
+                UserGroup.groupe_id == group_id
+            )
+        )
         shared = result_gift_shared.scalars().all()
-
         gift_shared = [GiftResponse.model_validate(sh) for sh in shared]
 
         return gifts_followed + gift_shared
