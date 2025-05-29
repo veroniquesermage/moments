@@ -12,7 +12,7 @@ from app.core.message import *
 from app.models import User, GiftShared
 from app.models.gift import Gift
 from app.schemas.gift import EligibilityResponse, GiftResponse, GiftStatus, GiftCreate, GiftDetailResponse, \
-    GiftSharedSchema
+    GiftSharedSchema, GiftPriority
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services.sharing_service import SharingService
 
@@ -25,6 +25,7 @@ class GiftService:
         logger.info(f"Récupération des cadeaux de l'utilisateur {effective_user_id}")
         result = (await db.execute(
             select(Gift).where(Gift.utilisateur_id == effective_user_id)
+            .order_by(Gift.priorite)
             .options(
                 selectinload(Gift.utilisateur),  # charge eager le créateur du cadeau
                 selectinload(Gift.reservePar)  # charge eager l’utilisateur qui réserve
@@ -125,6 +126,36 @@ class GiftService:
 
         # 5. Retourner l’instance ORM (FastAPI la convertira en GiftResponse si response_model est défini)
         return GiftResponse.model_validate(existing)
+
+    @staticmethod
+    async def update_all_gifts(db: AsyncSession,
+                               current_user: User,
+                               payload: list[GiftPriority]) -> list[GiftResponse]:
+        logger.info(f"Mise à jour de {len(payload)} cadeaux pour l'utilisateur {current_user.id}")
+
+        ids = [p.id for p in payload]
+        gifts_list = (await db.execute(
+            select(Gift).where(Gift.id.in_(ids))
+            .options(selectinload(Gift.reservePar))
+            .options(selectinload(Gift.utilisateur))
+        )).scalars().all()
+
+        if any(gift.utilisateur_id != current_user.id for gift in gifts_list):
+            raise HTTPException(status_code=403, detail="Vous ne pouvez modifier que vos propres cadeaux.")
+
+        gift_map = {gift.id: gift for gift in gifts_list}
+        logger.debug(f"Gift map: {gift_map}")
+        for p in payload:
+            gift_map[p.id].priorite = p.priority
+        logger.debug(f"Gift map mis à jour: {gift_map}")
+
+        await db.commit()
+        for gift in gift_map.values():
+            await db.refresh(gift)
+
+        sorted_gifts = sorted(gift_map.values(), key=lambda g: g.priorite)
+        return [GiftResponse.model_validate(gm) for gm in sorted_gifts]
+
 
     @staticmethod
     async def set_gift_delivery(db: AsyncSession,
