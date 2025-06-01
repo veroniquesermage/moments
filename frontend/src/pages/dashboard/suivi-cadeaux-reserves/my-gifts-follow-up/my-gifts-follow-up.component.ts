@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
-import {formatDate, NgIf} from '@angular/common';
+import {formatDate, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
@@ -9,35 +8,38 @@ import {User} from 'src/security/model/user.model';
 import {Subscription} from 'rxjs';
 import {ViewportService} from 'src/core/services/viewport.service';
 import {ColumnDefinition} from 'src/core/models/column-definition.model';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
+import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
   standalone: true,
   imports: [
-    GiftTableComponent,
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    NgForOf,
+    TitleCasePipe,
   ],
   templateUrl: './my-gifts-follow-up.component.html',
   styleUrl: './my-gifts-follow-up.component.scss'
 })
 export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
+  giftsFollowed: GiftFollowed[] = []
   displayedColumns: ColumnDefinition[] = [];
   portraitSub?: Subscription;
   isPortrait = false;
 
 
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
-    {key: 'utilisateur', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
     { key: 'nom', label: 'Nom' },
     {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     { key: 'statut', label: 'Statut' }
   ];
 
   readonly displayedColumnsDesktop:  ColumnDefinition[] = [
-    {key: 'utilisateur', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
     {key: 'nom', label: 'Nom'},
     {key: 'magasin', label: 'Magasin'},
     {key: 'quantite', label: 'Quantité'},
@@ -62,7 +64,10 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
         : this.displayedColumnsDesktop;
     });
     const result = await this.giftService.getFollowedGifts();
-    if (!result.success) {
+
+    if(result.success){
+      this.giftsFollowed = result.data;
+    } else {
       this.errorService.showError(result.message);
     }
   }
@@ -72,13 +77,13 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   }
 
   get totalPrixReel(): number {
-    return this.giftService.gifts()
-      .map(g => g.prixReel ?? 0)
+    return this.giftsFollowed
+      .map(g => g.delivery?.prixReel ?? 0)
       .reduce((acc, val) => acc + val, 0);
   }
 
-  onGiftClicked(gift: Gift): void {
-    this.router.navigate(['/dashboard/cadeau', gift.id], {
+  onGiftClicked(gift: GiftFollowed): void {
+    this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
       queryParams: { context: 'suivi' }
     });
   }
@@ -86,6 +91,43 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   async retour() {
       await this.router.navigate(['/dashboard']);
   }
+
+  getAriaLabel(giftFollowed: GiftFollowed): string | null {
+    if (giftFollowed.gift.statut === 'PARTAGE') return 'Cadeau partagé';
+    if (giftFollowed.gift.statut === 'PRIS') return 'Cadeau pris';
+    return null; // ne vocalise rien si aucune condition n’est remplie
+  }
+
+  getGiftValue(giftFollowed: GiftFollowed, column: GiftTableColumn): any {
+    let rawValue: any;
+
+    // Gestion manuelle des colonnes composites
+    switch (column.key) {
+      case 'nom':
+      case 'statut':
+      case 'quantite':
+      case 'magasin':
+        rawValue = giftFollowed.gift[column.key];
+        break;
+      case 'destinataire':
+        rawValue = giftFollowed.gift.destinataire;
+        break;
+      case 'prixReel':
+        rawValue = giftFollowed.delivery?.prixReel;
+        break;
+      case 'lieuLivraison':
+        rawValue = giftFollowed.delivery?.lieuLivraison;
+        break;
+      case 'dateLivraison':
+        rawValue = giftFollowed.delivery?.dateLivraison;
+        break;
+      default:
+        rawValue = undefined;
+    }
+
+    return column.formatFn ? column.formatFn(rawValue, giftFollowed) : rawValue;
+  }
+
 
   protected readonly Number = Number;
 }

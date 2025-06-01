@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Gift} from 'src/core/models/gift/gift.model';
 import {CommonModule} from '@angular/common';
 import {CdkDragDrop, DragDropModule, moveItemInArray} from '@angular/cdk/drag-drop';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
 import {UserInteractionService} from 'src/core/services/user-interaction.service';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 
 @Component({
   selector: 'app-gift-priority-list',
@@ -18,8 +18,8 @@ import {UserInteractionService} from 'src/core/services/user-interaction.service
   styleUrl: './gift-priority-list.component.scss'
 })
 export class GiftPriorityListComponent {
-  @Input() gifts: Gift[] = [];
-  @Output() rowClicked = new EventEmitter<Gift>();
+  @Input() gifts: GiftResponse[] = [];
+  @Output() rowClicked = new EventEmitter<GiftResponse>();
 
   hasOrderChanged: boolean = false;
 
@@ -32,11 +32,11 @@ export class GiftPriorityListComponent {
     return this.userInteractionService.isTabbing$;
   }
 
-  onRowClick(gift: Gift) {
+  onRowClick(gift: GiftResponse) {
     this.rowClicked.emit(gift);
   }
 
-  drop(event: CdkDragDrop<Gift[]>) {
+  drop(event: CdkDragDrop<GiftResponse[]>) {
     moveItemInArray(this.gifts, event.previousIndex, event.currentIndex);
     this.hasOrderChanged = true;
   }

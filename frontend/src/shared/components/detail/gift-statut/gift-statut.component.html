@@ -1,8 +1,0 @@
-<div class="gift-block">
-  <hr class="block-separator" />
-  <div class="block-title">{{getEmojiStatut(gift.statut)}} {{gift.statut}}</div>
-  <hr class="block-separator" />
-
-  <p *ngIf="gift.statut !== GiftStatus.DISPONIBLE">> {{ getLabelPreneur(gift.statut) }} : {{ gift.reservePar?.name }}</p>
-
-</div>

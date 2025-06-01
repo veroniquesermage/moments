@@ -11,7 +11,7 @@ import {GiftDeliveryComponent} from 'src/shared/components/detail/gift-delivery/
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {RoleUser} from 'src/core/enum/role-user.enum';
 import {GiftSharedComponent} from 'src/shared/components/detail/gift-shared/gift-shared.component';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
+import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {GiftActionsComponent} from 'src/shared/components/detail/gift-actions/gift-actions.component';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';

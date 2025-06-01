@@ -5,7 +5,9 @@ import {NgIf} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 
 @Component({
   selector: 'app-gift-update',
@@ -21,7 +23,7 @@ export class GiftUpdateComponent implements OnInit{
 
   private route = inject(ActivatedRoute);
   id: number | undefined = undefined;
-  gift: Gift | undefined = undefined;
+  gift: GiftPublicResponse | undefined = undefined;
 
   constructor(private giftService: GiftService,
               public router: Router,
@@ -44,13 +46,24 @@ export class GiftUpdateComponent implements OnInit{
     }
   }
 
-  async onSubmit(giftFormData: Gift) {
-    const gift: Gift = {
-      ...this.gift!,
-      ...giftFormData
+  async onSubmit(giftFormData: GiftResponse) {
+    const giftUpdate: GiftUpdate = {
+      id: this.gift!.id!,
+      destinataireId: this.gift!.destinataire.id,
+      nom: giftFormData.nom,
+      description: giftFormData.description,
+      marque: giftFormData.marque,
+      magasin: giftFormData.magasin,
+      url: giftFormData.url,
+      quantite: giftFormData.quantite,
+      prix: giftFormData.prix,
+      fraisPort: giftFormData.fraisPort,
+      commentaire: giftFormData.commentaire,
+      priorite: this.gift!.priorite,
+      statut: this.gift!.statut
     };
 
-    const result = await this.giftService.updateGift(gift);
+    const result = await this.giftService.updateGift(giftUpdate);
     if (result.success) {
       await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
       await this.router.navigate(['/dashboard/mes-cadeaux']);
