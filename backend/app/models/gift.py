@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, Numeric, Date, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, Enum, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from app.core.enum import GiftStatusEnum
@@ -6,35 +6,31 @@ from app.database import Base
 
 
 class Gift(Base):
-    __tablename__ = "cadeau"
+    __tablename__ = "cadeaux"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    destinataire_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=False)
+    destinataire = relationship("User", foreign_keys=[destinataire_id], back_populates="cadeaux_crees")
     nom = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    marque = Column(String, nullable=True)
+    magasin = Column(String, nullable=True)
     url = Column(String, nullable=True)
     quantite = Column(Integer, default=1)
     prix = Column(Numeric(10, 2), nullable=True)
+    frais_port = Column(Numeric(10, 2), nullable=True)
     commentaire = Column(String, nullable=True)
     priorite = Column(Integer, nullable=False)
-    utilisateur_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=False)
-    utilisateur = relationship("User", foreign_keys=[utilisateur_id], back_populates="cadeaux_crees")
-
     statut = Column(Enum(GiftStatusEnum), nullable=False)
-
     reserve_par_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=True)
-    reservePar = relationship("User", foreign_keys=[reserve_par_id], back_populates="cadeaux_reserves")
+    reserve_par = relationship("User", foreign_keys=[reserve_par_id], back_populates="cadeaux_reserves")
+    date_reservation = Column(DateTime, nullable=True)
+    gift_idea_id = Column(Integer, ForeignKey("idees_cadeaux.id"), nullable=True)
+    gift_idea = relationship("GiftIdeas", back_populates="gift", uselist=False)
 
-    dateReservation = Column(DateTime, nullable=True)
-    lieuLivraison = Column(String, nullable=True)
-    dateLivraison = Column(DateTime, nullable=True)
-    recu = Column(Boolean, default=False)
-
-    marque = Column(String, nullable=True)
-    magasin = Column(String, nullable=True)
-    prixReel = Column(Numeric(10, 2), nullable=True)
-    fraisPort = Column(Numeric(10, 2), nullable=True)
-
+    gift_delivery = relationship("GiftDelivery", back_populates="gift", uselist=False, cascade="all, delete-orphan")
     partages = relationship("GiftShared", back_populates="cadeau")
+
 
 
 

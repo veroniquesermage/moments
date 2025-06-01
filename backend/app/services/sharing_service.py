@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.enum import RoleUtilisateur, GiftStatusEnum
 from app.core.logger import logger
-from app.models import User, Gift, GiftShared
+from app.models import User, GiftShared, Gift
 from app.schemas.gift import GiftSharedSchema, GiftDetailResponse, GiftStatus
 
 
@@ -66,11 +66,12 @@ class SharingService:
         if gift.statut == GiftStatusEnum.PRIS and len(shared_schema) > 0:
             gift.statut = GiftStatusEnum.PARTAGE
             new_status = GiftStatus(status=GiftStatusEnum.PARTAGE)
+            await GiftService.change_status(db, current_user, gift_id, new_status)
+
         elif gift.statut == GiftStatusEnum.PARTAGE and len(shared_schema) == 0:
             gift.statut = GiftStatusEnum.PRIS
             new_status = GiftStatus(status=GiftStatusEnum.PRIS)
-
-        await GiftService.change_status(db, current_user, gift_id, new_status)
+            await GiftService.change_status(db, current_user, gift_id, new_status)
 
         # 5. Retour d’un GiftDetailResponse mis à jour
         return GiftService.set_gift_detail(gift, current_user, shared_schema)
@@ -108,49 +109,66 @@ class SharingService:
         shared_entries = result.scalars().all()
         return [GiftSharedSchema.model_validate(entry) for entry in shared_entries] if shared_entries else None
 
+    from sqlalchemy.future import select
+    from sqlalchemy.orm import selectinload
 
     @staticmethod
-    async def set_gift_refund(db: AsyncSession,
-                                current_user: User,
-                                shared: GiftSharedSchema) -> GiftDetailResponse:
+    async def set_gift_refund(db: AsyncSession, current_user: User, shared: GiftSharedSchema) -> GiftDetailResponse:
+        logger.debug(
+            f"Marquage du cadeau {shared.cadeau_id} comme remboursé pour l'utilisateur : {shared.participant.id}")
 
-        logger.debug(f"Marquage du cadeau {shared.cadeau_id} comme remboursé pour l'utilisateur : {shared.participant.id}")
-
+        # Vérif du preneur
         if shared.preneur.id != current_user.id:
-            logger.error(f"L'utilisateur {current_user.id} n'est pas autorisé à marquer le cadeau {shared.cadeau_id} comme remboursé.")
-            raise HTTPException(status_code=403, detail="Seule la personne qui a pris le cadeau peut gérer le remboursement.")
+            raise HTTPException(status_code=403,
+                                detail="Seule la personne qui a pris le cadeau peut gérer le remboursement.")
 
-        existing: GiftShared = (await db.execute((
-                select(GiftShared)
-                .where(and_(GiftShared.cadeau_id == shared.cadeau_id, GiftShared.participant_id == shared.participant.id)) # charge eager les participants
-            ))).scalars().first()
+        # Récup de la ligne GiftShared à modifier
+        existing: GiftShared = (await db.execute(
+            select(GiftShared).where(
+                and_(
+                    GiftShared.cadeau_id == shared.cadeau_id,
+                    GiftShared.participant_id == shared.participant.id
+                )
+            )
+        )).scalars().first()
 
         if not existing:
-            logger.error(f"Le cadeau {shared.cadeau_id} n'est pas un cadeau partagé.")
             raise HTTPException(status_code=403, detail="Ce cadeau n'est pas un cadeau partagé.")
 
-        existing.rembourse= shared.rembourse
-
-        logger.debug(f"Attributs de gift : {vars(existing)}")
+        # Maj du remboursement
+        existing.rembourse = shared.rembourse
 
         await db.commit()
         await db.refresh(existing)
 
-        result = (await db.execute(
+        # 🔁 Requête : lignes de partage avec les relations nécessaires
+        partage = (await db.execute(
             select(GiftShared)
             .where(GiftShared.cadeau_id == shared.cadeau_id)
             .options(
-        selectinload(GiftShared.participant),
-                selectinload(GiftShared.preneur),
-                selectinload(GiftShared.cadeau).selectinload(Gift.utilisateur),
-                selectinload(GiftShared.cadeau).selectinload(Gift.reservePar)
+                selectinload(GiftShared.participant),
+                selectinload(GiftShared.preneur)
             )
         )).scalars().all()
 
-        refresh = [GiftSharedSchema.model_validate(g) for g in result]
+        partage_schema = [GiftSharedSchema.model_validate(p) for p in partage]
+
+        # 🔁 Requête : le cadeau avec ses relations
+        gift: Gift = (await db.execute(
+            select(Gift)
+            .where(Gift.id == shared.cadeau_id)
+            .options(
+                selectinload(Gift.destinataire),
+                selectinload(Gift.reserve_par),
+                selectinload(Gift.gift_delivery)
+            )
+        )).scalars().first()
+
+        if not gift:
+            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
-        return GiftService.set_gift_detail(result[0].cadeau, current_user, refresh)
+        return GiftService.set_gift_detail(gift, current_user, partage_schema)
 
     @staticmethod
     async def get_all_shares_for_gift(db: AsyncSession, gift_id: int) -> list[GiftSharedSchema]:

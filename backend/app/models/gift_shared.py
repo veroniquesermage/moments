@@ -16,7 +16,7 @@ class GiftShared(Base):
         back_populates="cadeaux_partages"
     )
 
-    cadeau_id = Column(Integer, ForeignKey("cadeau.id"), nullable=False)
+    cadeau_id = Column(Integer, ForeignKey("cadeaux.id"), nullable=False)
     cadeau = relationship("Gift", back_populates="partages")
 
     participant_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=False)
