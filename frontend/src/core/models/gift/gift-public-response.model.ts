@@ -1,24 +1,21 @@
-import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {User} from 'src/security/model/user.model';
+import {GiftStatus} from 'src/core/enum/gift-status.enum';
 
-export interface GiftDTO {
+export interface GiftPublicResponse {
   id?: number;
+  destinataire: User;
   nom: string;
   description?: string;
+  marque?: string;
+  magasin?: string;
   url?: string;
   quantite: number;
   prix?: number;
+  fraisPort?: number;
   commentaire?: string;
   priorite: number;
-  utilisateur: User;
+
   statut: GiftStatus;
   reservePar?: User;
   dateReservation?: string;
-  lieuLivraison?: string;
-  dateLivraison?: string;
-  recu: boolean;
-  marque: string;
-  magasin: string;
-  prixReel: number;
-  fraisPort: number;
 }

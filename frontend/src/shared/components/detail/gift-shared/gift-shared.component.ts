@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
+import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {RoleUser} from 'src/core/enum/role-user.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {CommonModule} from '@angular/common';

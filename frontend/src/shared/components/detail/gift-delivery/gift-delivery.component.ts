@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {CommonModule} from '@angular/common';
+import {GiftDelivery} from 'src/core/models/gift/gift-delivery.model';
 
 @Component({
   selector: 'app-gift-delivery',
@@ -13,12 +13,12 @@ import {CommonModule} from '@angular/common';
 })
 export class GiftDeliveryComponent {
   @Input()
-  giftDetailResponse!: GiftDetailResponse;
+  giftDelivery!: GiftDelivery;
 
   @Output() receptionToggled = new EventEmitter<boolean>();
 
   toggleRecu() {
-    this.receptionToggled.emit(!this.giftDetailResponse.gift.recu);
+    this.receptionToggled.emit(!this.giftDelivery.recu);
   }
 
 }

@@ -2,8 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift/gift.model';
 import {GiftPriorityListComponent} from 'src/shared/components/gift-priority-list/gift-priority-list.component';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 
 @Component({
   selector: 'app-user-gifts',
@@ -28,7 +28,7 @@ export class UserGiftsComponent implements OnInit{
     this.router.navigate(['/dashboard/mes-cadeaux/creer']);
   }
 
-  onGiftClicked(gift: Gift): void {
+  onGiftClicked(gift: GiftResponse): void {
     this.router.navigate(['/dashboard/cadeau', gift.id], {
       queryParams: { context: 'mes-cadeaux' }
     });

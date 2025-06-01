@@ -21,5 +21,51 @@
   }
 }
 
+.gift-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+
+  th, td {
+    border: 1px solid #fff;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #111;
+    color: #fff;
+  }
+
+  tr:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+
+  tr:hover {
+    background-color: #696969;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      padding: 0.5rem;
+    }
+  }
+}
+
+.gift-table tr.gris {
+  opacity: 0.4;
+  filter: grayscale(100%);
+}
+
+.gift-table td:focus {
+  outline: 2px dashed #fff;
+  background-color: #696969;
+}
+
+
 
 

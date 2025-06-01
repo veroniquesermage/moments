@@ -2,29 +2,33 @@ import {Injectable, signal} from '@angular/core';
 import {environment} from 'src/environments/environment';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
-import {GiftMapper} from 'src/core/mapper/gift.mapper';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
-import {Gift} from 'src/core/models/gift/gift.model';
-import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
 import {GroupStateService} from 'src/core/services/group-state.service';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
+import {GiftCreate} from 'src/core/models/gift/gift-create.model';
+import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
+import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.cadeaux;
-  gifts = signal<Gift[]>([])
+  giftsResponse = signal<GiftResponse[]>([])
+  giftsFollowed = signal<GiftFollowed[]>([])
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
               private groupStateService: GroupStateService) {
   }
 
-  async fetchGifts(userId?: number): Promise<ApiResponse<Gift[]>> {
+  async fetchGifts(userId?: number): Promise<ApiResponse<GiftResponse[]>> {
 
     this.isLoading.set(true);
 
@@ -34,18 +38,17 @@ export class GiftService {
     }
 
     try {
-      const giftsDto = await firstValueFrom(
-        this.http.get<GiftDTO[]>(this.apiUrl, {
+      const giftsResponse = await firstValueFrom(
+        this.http.get<GiftResponse[]>(this.apiUrl, {
           headers: this.getAuthHeaders(),
           params: params,
           withCredentials: true
         })
       );
 
-      const result: Gift[] = giftsDto.map(dto => GiftMapper.fromDTO(dto));
-      this.gifts.set(result);
+      this.giftsResponse.set(giftsResponse);
 
-      return {success: true, data: result};
+      return {success: true, data: giftsResponse};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux', error);
@@ -57,19 +60,33 @@ export class GiftService {
 
   }
 
-  async createGift(gift: Gift): Promise<ApiResponse<Gift>> {
-
-    const giftDTO = GiftMapper.toDTO(gift);
-
+  async getVisibleGiftsForMember(userId: number): Promise<ApiResponse<GiftPublicResponse[]>> {
+    const idEnc = encodeURIComponent(userId);
+    const url = `${this.apiUrl}/membre/${idEnc}`;
     try {
-      const giftDto = await firstValueFrom(this.http.post<GiftDTO>(this.apiUrl, giftDTO, {
+      const giftsResponse = await firstValueFrom(
+        this.http.get<GiftPublicResponse[]>(url, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+      return {success: true, data: giftsResponse};
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la récupération des cadeaux d\'un membre', error);
+      return {success: false, message: "❌ Impossible de créer le cadeau."};
+    }
+
+  }
+
+  async createGift(gift: GiftCreate): Promise<ApiResponse<GiftResponse>> {
+    try {
+      const giftResponse = await firstValueFrom(this.http.post<GiftResponse>(this.apiUrl, gift, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
       await this.fetchGifts();
 
-      const result: Gift = GiftMapper.fromDTO(giftDto);
-      return {success: true, data: result};
+      return {success: true, data: giftResponse};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
 
@@ -88,7 +105,6 @@ export class GiftService {
           withCredentials: true
         })
       );
-
       return {success: true, data: gift};
 
     } catch (error) {
@@ -104,7 +120,7 @@ export class GiftService {
 
     try {
       await firstValueFrom(
-        this.http.delete<GiftDTO>(url, {
+        this.http.delete<GiftResponse>(url, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
@@ -117,22 +133,37 @@ export class GiftService {
 
   }
 
-  async updateGift(gift: Gift): Promise<ApiResponse<Gift>> {
+  async updateGift(gift: GiftUpdate): Promise<ApiResponse<GiftResponse>> {
 
-    const giftDTO = GiftMapper.toDTO(gift);
     const url = `${this.apiUrl}/${gift.id}`;
     try {
-      const result = await firstValueFrom(this.http.put<GiftDTO>(url, giftDTO, {
+      const result = await firstValueFrom(this.http.put<GiftResponse>(url, gift, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
 
-      const gift = GiftMapper.fromDTO(result);
-
-      return {success: true, data: gift};
+      return {success: true, data: result};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
       return {success: false, message: "❌ Impossible de créer le cadeau."};
+    }
+  }
+
+  async updateGiftDelivery(giftId: number, giftUpdate: GiftDeliveryUpdate): Promise<ApiResponse<GiftDeliveryUpdate>> {
+
+    const idEnc = encodeURIComponent(giftId);
+    const url = `${this.apiUrl}/${idEnc}/livraison`;
+
+    try {
+      const result = await firstValueFrom(this.http.put<GiftDeliveryUpdate>(url, giftUpdate, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la mise à jour de la livraison', error);
+      return {success: false, message: "❌ Impossible de mettre à jour de la livraison."};
     }
   }
 
@@ -156,40 +187,38 @@ export class GiftService {
 
   }
 
-  async changeStatusGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<Gift>> {
+  async changeStatusGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<GiftResponse>> {
 
     const idEnc = encodeURIComponent(id);
     const url = `${this.apiUrl}/${idEnc}/changer-statut`;
     try {
-      const giftDto = await firstValueFrom(
-        this.http.put<GiftDTO>(url, status, {
+      const giftResponse = await firstValueFrom(
+        this.http.put<GiftResponse>(url, status, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
       );
-      const gift = GiftMapper.fromDTO(giftDto);
-      return {success: true, data: gift};
+      return {success: true, data: giftResponse};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la réservation du cadeau', error);
       return {success: false, message: "❌ Impossible de réserver le cadeau."};
     }
   }
 
-  async getFollowedGifts(): Promise<ApiResponse<Gift[]>> {
+  async getFollowedGifts(): Promise<ApiResponse<GiftFollowed[]>> {
     const groupId = this.groupStateService.getSelectedGroup()!.id;
     const idEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/suivis/${idEnc}`;
     try {
-      const giftsDto = await firstValueFrom(
-        this.http.get<GiftDTO[]>(url, {
+      const giftsFollowed = await firstValueFrom(
+        this.http.get<GiftFollowed[]>(url, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
       );
 
-      const result: Gift[] = giftsDto.map(dto => GiftMapper.fromDTO(dto));
-      this.gifts.set(result);
-      return {success: true, data: result};
+      this.giftsFollowed.set(giftsFollowed);
+      return {success: true, data: giftsFollowed};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux suivis', error);
@@ -216,16 +245,15 @@ export class GiftService {
     }
   }
 
-  async updateAllGifts(gifts: GiftPriority[]): Promise<ApiResponse<Gift[]>> {
+  async updateAllGifts(gifts: GiftPriority[]): Promise<ApiResponse<GiftResponse[]>> {
     try {
-      const giftsList = await firstValueFrom(this.http.put<Gift[]>(this.apiUrl, gifts, {
+      const giftsList = await firstValueFrom(this.http.put<GiftResponse[]>(this.apiUrl, gifts, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
 
-      const result: Gift[] = giftsList.map(dto => GiftMapper.fromDTO(dto));
-      this.gifts.set(result);
-      return {success: true, data: result};
+      this.giftsResponse.set(giftsList);
+      return {success: true, data: giftsList};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la mise à jour des priorités', error);
 
@@ -234,7 +262,7 @@ export class GiftService {
   }
 
   clearGifts() {
-    this.gifts.set([]);
+    this.giftsResponse.set([]);
   }
 
   private getAuthHeaders(): HttpHeaders {
