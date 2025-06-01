@@ -13,11 +13,26 @@
   </div>
 
   <p>> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
-  <app-gift-table
-    [gifts]="giftService.gifts()"
-    [displayedColumns]="displayedColumns"
-    (rowClicked)="onGiftClicked($event)">
-  </app-gift-table>
+  <table   aria-describedby="table-priorite-explication" class="gift-table">
+    <thead>
+    <tr>
+      <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let gift of giftPublic" (click)="onGiftClicked(gift)"
+        [class.gris]="gift.statut === 'PRIS'"
+        [attr.aria-label]="getAriaLabel(gift)">
+      <td *ngFor="let column of displayedColumns"
+          tabindex="0"
+          (keydown.enter)="onGiftClicked(gift)"
+          (keydown.space)="onGiftClicked(gift)">
+        {{ getGiftValue(gift, column) }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
   <div class="options">
     <button (click)="retour()">↩ Retour au Menu</button>
   </div>

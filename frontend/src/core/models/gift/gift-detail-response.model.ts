@@ -1,11 +1,15 @@
-import {Gift} from 'src/core/models/gift/gift.model';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
+import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {RoleUser} from 'src/core/enum/role-user.enum';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GiftDelivery} from 'src/core/models/gift/gift-delivery.model';
+import {GiftIdea} from 'src/core/models/gift/gift-ideas.model';
 
 
 export interface GiftDetailResponse {
-  gift: Gift
+  gift: GiftPublicResponse
+  delivery?: GiftDelivery
   partage?: GiftShared[]
+  idea?: GiftIdea;
   estPartage: boolean
   droitsUtilisateur: RoleUser
 }

@@ -1,23 +1,23 @@
 import {Component, OnInit} from '@angular/core';
-import {GiftTableComponent} from 'src/shared/components/gift-table/gift-table.component';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {UserGroupService} from 'src/core/services/user-group.service';
 import {User} from 'src/security/model/user.model';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {GroupStateService} from 'src/core/services/group-state.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 
 @Component({
   selector: 'app-group-member-gifts',
   standalone: true,
   imports: [
-    GiftTableComponent,
     NgForOf,
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    TitleCasePipe
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
@@ -26,6 +26,7 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   users: User[] | undefined = [];
   selectedMember: User | undefined = undefined;
+  giftPublic: GiftPublicResponse[] = []
 
   displayedColumns = [
     {key: 'nom', label: 'Nom'},
@@ -63,7 +64,7 @@ export class GroupMemberGiftsComponent implements OnInit {
     }
   }
 
-  onGiftClicked(gift: Gift): void {
+  onGiftClicked(gift: GiftPublicResponse): void {
     this.router.navigate(['/dashboard/cadeau', gift.id], {
       queryParams: { context: 'cadeaux-groupe' }
     });
@@ -76,14 +77,28 @@ export class GroupMemberGiftsComponent implements OnInit {
     this.router.navigate(['/dashboard']);
   }
 
-  async selectMember(user: User | undefined) {
+  async selectMember(user: User) {
     this.selectedMember = user;
     this.userGroupService.setSelectedMemberId(user ? user.id : null);
 
-    const result = await this.giftService.fetchGifts(user?.id);
-
-    if(!result.success){
+    if(!user.id){
+      this.errorService.showError("❌ Impossible d\'accéder au membre. Veuillez réessayer plus tard.");
+    }
+    const result = await this.giftService.getVisibleGiftsForMember(user!.id);
+    if (result.success) {
+      this.giftPublic = result.data;
+    }else {
       this.errorService.showError("❌ Impossible d\'afficher la liste de ce membre. Veuillez réessayer plus tard.");
     }
+  }
+
+  getAriaLabel(giftPublic: GiftPublicResponse): string | null {
+    if (giftPublic.statut === 'PRIS') return 'Cadeau pris';
+    return null; // ne vocalise rien si aucune condition n’est remplie
+  }
+
+  getGiftValue(gift: GiftPublicResponse, column: GiftTableColumn): any {
+    const rawValue = (gift as any)[column.key];
+    return column.formatFn ? column.formatFn(rawValue, gift) : rawValue;
   }
 }

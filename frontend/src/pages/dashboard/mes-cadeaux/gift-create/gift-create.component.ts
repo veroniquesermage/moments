@@ -7,7 +7,8 @@ import {AuthService} from 'src/security/service/auth.service';
 import {GiftFormComponent} from 'src/shared/components/gift-form/gift-form.component';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
+import {GiftCreate} from 'src/core/models/gift/gift-create.model';
 
 @Component({
   selector: 'app-gift-create',
@@ -24,25 +25,32 @@ export class GiftCreateComponent {
               public errorService: ErrorService) {
   }
 
-  async onSubmit(giftFormData: Gift): Promise<void> {
-    const giftslist = this.giftService.gifts();
-    const utilisateur = this.authService.profile();
+  async onSubmit(giftFormData: GiftResponse): Promise<void> {
+    const giftslist = this.giftService.giftsResponse();
+    const destinataire = this.authService.profile();
     const newPriority = Math.max(1, giftslist.length + 1);
 
-    if (!utilisateur) {
+    if (!destinataire) {
       this.errorService.showError("❌ Impossible de créer un cadeau sans utilisateur connecté.");
       return;
     }
 
-    const gift: Gift = {
-      ...giftFormData,
-      utilisateur: utilisateur,
-      statut: GiftStatus.DISPONIBLE,
-      recu: false,
+    const giftCreate: GiftCreate = {
+      destinataireId: destinataire.id,
+      nom: giftFormData.nom,
+      description: giftFormData.description,
+      marque: giftFormData.marque,
+      magasin: giftFormData.magasin,
+      url: giftFormData.url,
+      quantite: giftFormData.quantite,
+      prix: giftFormData.prix,
+      fraisPort: giftFormData.fraisPort,
+      commentaire: giftFormData.commentaire,
       priorite: newPriority,
+      statut: GiftStatus.DISPONIBLE,
     };
 
-    const result = await  this.giftService.createGift(gift);
+    const result = await  this.giftService.createGift(giftCreate);
     if (result.success) {
       await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
       await this.router.navigate(['/dashboard/mes-cadeaux']);

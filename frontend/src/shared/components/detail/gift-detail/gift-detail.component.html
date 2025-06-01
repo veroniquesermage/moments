@@ -6,8 +6,8 @@
   />
 
   <app-gift-delivery
-    *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur === RoleUser.PRENEUR"
-    [giftDetailResponse]="giftDetail"
+    *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur === RoleUser.PRENEUR && giftDetail.delivery"
+    [giftDelivery]="giftDetail.delivery"
     (receptionToggled)="onReceptionToggled($event)"
   />
 

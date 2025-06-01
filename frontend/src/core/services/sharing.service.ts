@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {environment} from 'src/environments/environment';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
+import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {firstValueFrom} from 'rxjs';

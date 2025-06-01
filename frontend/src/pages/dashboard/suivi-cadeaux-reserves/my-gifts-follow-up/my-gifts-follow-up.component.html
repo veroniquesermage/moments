@@ -14,15 +14,27 @@
     <span><span class="legend-dot partage" aria-hidden="true"></span> Cadeau partagé</span>
   </p>
 
+  <table   aria-describedby="table-priorite-explication" class="gift-table">
+    <thead>
+    <tr>
+      <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
+    </tr>
+    </thead>
+    <tbody *ngIf="displayedColumns.length > 0 && giftsFollowed.length > 0">
+    <tr *ngFor="let gift of giftsFollowed" (click)="onGiftClicked(gift)"
+        [class.recu]="gift.delivery?.recu"
+        [class.partage]="gift.gift.statut === 'PARTAGE'"
+        [attr.aria-label]="getAriaLabel(gift)">
+      <td *ngFor="let column of displayedColumns"
+          tabindex="0"
+          (keydown.enter)="onGiftClicked(gift)"
+          (keydown.space)="onGiftClicked(gift)">
+        {{ getGiftValue(gift, column) }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
 
-  <app-gift-table
-    [gifts]="giftService.gifts()"
-    [griserLignes]="false"
-    [isPartage]="true"
-    [isRecu]="true"
-    [displayedColumns]="displayedColumns"
-    (rowClicked)="onGiftClicked($event)">
-  </app-gift-table>
   <div class="options">
     <button (click)="retour()">↩ Retour au Menu</button>
   </div>

@@ -11,7 +11,7 @@
   </p>
 
   <app-gift-priority-list
-  [gifts]="this.giftService.gifts()"
+  [gifts]="this.giftService.giftsResponse()"
   (rowClicked)="onGiftClicked($event)"
   />
   <div class="options">

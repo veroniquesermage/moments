@@ -3,14 +3,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {SharingService} from 'src/core/services/sharing.service';
-import {Gift} from 'src/core/models/gift/gift.model';
-import {GiftShared} from 'src/core/models/gift/gift_shared.model';
+import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {FormsModule} from '@angular/forms';
 import {GiftSharedDraft} from 'src/core/models/gift/gift-shared-draft.model';
 import {CommonModule} from '@angular/common';
 import {User} from 'src/security/model/user.model';
 import {UserGroupService} from 'src/core/services/user-group.service';
 import {GroupStateService} from 'src/core/services/group-state.service';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 
 @Component({
   selector: 'app-gift-sharing',
@@ -28,7 +28,7 @@ export class GiftSharingComponent implements OnInit {
   id?: number | undefined = undefined;
   partages: GiftShared[] | undefined = [];
   partagesDraft: GiftSharedDraft[] = [];
-  gift: Gift | undefined = undefined;
+  gift: GiftPublicResponse | undefined = undefined;
   membresDisponibles: User[] = [];
   contextBrut: string | null = null;
 
@@ -51,7 +51,7 @@ export class GiftSharingComponent implements OnInit {
     }
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
-      this.gift = result.data.gift;         // 🧠 le cadeau lui-même
+      this.gift = result.data.gift;
       this.partages = result.data.partage;
     } else {
       this.errorService.showError("❌ Impossible de modifier le partage.");

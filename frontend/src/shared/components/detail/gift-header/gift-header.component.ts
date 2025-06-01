@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {Gift} from 'src/core/models/gift/gift.model';
 import {CommonModule} from '@angular/common';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 @Component({
   selector: 'app-gift-header',
   standalone: true,
@@ -13,6 +13,6 @@ import {CommonModule} from '@angular/common';
 export class GiftHeaderComponent {
 
   @Input()
-  gift!: Gift;
+  gift!: GiftPublicResponse;
 
 }
