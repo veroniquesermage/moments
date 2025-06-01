@@ -1,15 +1,18 @@
-from datetime import datetime
 from typing import Optional
 
-from app.schemas import UserSchema
-from app.schemas.gift import GiftBase
+from app.schemas import CamelModel, UserSchema
 
 
-class GiftResponse(GiftBase):
+class GiftResponse(CamelModel):
     id: int
-    utilisateur: UserSchema
-    reservePar: Optional[UserSchema] = None
-    dateReservation: Optional[datetime] = None
-    lieuLivraison: Optional[str] = None
-    dateLivraison: Optional[datetime] = None
-    recu: Optional[bool] = False
+    destinataire: UserSchema
+    nom: str
+    description: Optional[str] = None
+    marque: Optional[str] = None
+    magasin: Optional[str] = None
+    url: Optional[str] = None
+    quantite: int = 1
+    prix: Optional[float] = None
+    frais_port: Optional[float] = None
+    commentaire: Optional[str] = None
+    priorite: int

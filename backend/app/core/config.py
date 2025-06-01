@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -12,7 +13,8 @@ class Settings(BaseSettings):
     jwt_secret: str
 
     # Database
-    database_url: str
+    database_url: str  # URL principale (async pour FastAPI)
+    sync_database_url: str = Field(..., alias="SYNC_DB_URL")  # URL sync pour Alembic
 
     class Config:
         env_file = ".env"
