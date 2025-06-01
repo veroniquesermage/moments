@@ -12,8 +12,9 @@ class User(Base):
     google_id = Column(String(255), nullable=False)
 
     groupes = relationship("UserGroup", back_populates="utilisateur")
-    cadeaux_crees = relationship("Gift", foreign_keys="Gift.utilisateur_id", back_populates="utilisateur")
-    cadeaux_reserves = relationship("Gift", foreign_keys="Gift.reserve_par_id", back_populates="reservePar")
+    cadeaux_crees = relationship("Gift", foreign_keys="Gift.destinataire_id", back_populates="destinataire")
+    cadeaux_reserves = relationship("Gift", foreign_keys="Gift.reserve_par_id", back_populates="reserve_par")
+    gift_ideas_created = relationship("GiftIdeas", foreign_keys="GiftIdeas.proposee_par_id", back_populates="proposee_par")
 
     cadeaux_partages = relationship(
         "GiftShared",
