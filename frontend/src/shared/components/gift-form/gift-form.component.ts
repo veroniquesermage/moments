@@ -2,7 +2,8 @@ import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {GiftResponse} from 'src/core/models/gift/gift-response.model';
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 
 @Component({
   selector: 'app-gift-form',
@@ -14,8 +15,8 @@ import {Gift} from 'src/core/models/gift/gift.model';
 export class GiftFormComponent implements OnChanges{
 
   giftForm: FormGroup;
-  @Input() gift: Gift | undefined = undefined;
-  @Output() formSubmitted = new EventEmitter<Gift>();
+  @Input() gift: GiftPublicResponse | undefined = undefined;
+  @Output() formSubmitted = new EventEmitter<GiftResponse>();
   @Output() cancel = new EventEmitter<void>();
 
 
@@ -32,12 +33,12 @@ export class GiftFormComponent implements OnChanges{
 
   onSubmit(): void {
     if (this.giftForm.valid) {
-      this.formSubmitted.emit(this.giftForm.value as Gift);
+      this.formSubmitted.emit(this.giftForm.value as GiftResponse);
     }
   }
 
 
-  private createGiftForm(gift: Gift | undefined): FormGroup {
+  private createGiftForm(gift: GiftPublicResponse | undefined): FormGroup {
     return new FormGroup({
       id: new FormControl(gift?.id ?? ''),
       nom: new FormControl(gift?.nom ?? '', Validators.required),

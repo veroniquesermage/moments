@@ -1,26 +1,26 @@
 <div class="gift-block">
-  <hr class="block-separator" />
+  <hr class="block-separator"/>
   <div class="block-title"> 🚚 Livraison</div>
-  <hr class="block-separator" />
+  <hr class="block-separator"/>
 
-  <p>> Lieu : {{ giftDetailResponse.gift.lieuLivraison }}</p>
-  <p>> Date prévue : {{ giftDetailResponse.gift.dateLivraison }}</p>
+  <p>> Lieu : {{ giftDelivery.lieuLivraison }}</p>
+  <p>> Date prévue : {{ giftDelivery.dateLivraison }}</p>
   <p class="recu-line">
     > Reçu :
     <span
       class="emoji-action"
-      *ngIf="!giftDetailResponse.gift.recu"
       (click)="toggleRecu()"
-      aria-label="Cadeau non livré"
-    >❌</span>
-    <span *ngIf="giftDetailResponse.gift.recu" aria-label="Cadeau livré">✅</span>
+      [attr.aria-label]="giftDelivery.recu ? 'Cadeau livré' : 'Cadeau non livré'"
+    >
+      {{ giftDelivery.recu ? '✅' : '❌' }}
+    </span>
     <span class="legend-icon">&larr; Cliquez pour changer le statut.</span>
   </p>
 
 
-  <hr class="block-separator" />
+  <hr class="block-separator"/>
   <div class="block-title"> 💸 Prix réel</div>
-  <hr class="block-separator" />
-  <p>> Prix payé : {{ giftDetailResponse.gift.prixReel }} €</p>
+  <hr class="block-separator"/>
+  <p>> Prix payé : {{ giftDelivery.prixReel }} €</p>
 
 </div>

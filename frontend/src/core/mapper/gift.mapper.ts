@@ -1,5 +1,5 @@
 import {GiftDTO} from 'src/core/models/gift/gift-dto.model';
-import {Gift} from 'src/core/models/gift/gift.model';
+import {Gift} from 'src/core/models/gift/gift-response.model';
 
 
 export class GiftMapper {

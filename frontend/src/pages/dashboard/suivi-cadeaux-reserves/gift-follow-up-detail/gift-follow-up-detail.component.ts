@@ -5,8 +5,9 @@ import {ErrorService} from 'src/core/services/error.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
-import {Gift} from "src/core/models/gift/gift.model";
 import {GiftStatutDTO} from "src/core/models/gift/gift-statut.model";
+import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
 
 @Component({
   selector: 'app-gift-follow-up-table',
@@ -20,7 +21,7 @@ import {GiftStatutDTO} from "src/core/models/gift/gift-statut.model";
 })
 export class GiftFollowUpDetailComponent implements OnInit{
 
-  gift: Gift | undefined = undefined;
+  gift: GiftPublicResponse | undefined = undefined;
   private route = inject(ActivatedRoute);
   private giftId: number | undefined;
   protected readonly GiftStatus = GiftStatus;
@@ -67,25 +68,30 @@ export class GiftFollowUpDetailComponent implements OnInit{
 
   async confirmReception() {
     const gift = await this.giftService.getGift(this.giftId!);
-    let updatedGift: Gift | undefined = undefined;
-    if (gift.success) {
-      updatedGift = {
-        ...gift.data.gift,
-        recu: true
-      };
-    } else {
+
+    if (!gift.success) {
       this.errorService.showError("❌ Impossible de confirmer la réception.");
+      return;
     }
 
+    const updatedGift: GiftDeliveryUpdate = {
+      lieuLivraison: gift.data.delivery?.lieuLivraison ?? undefined,
+      dateLivraison: gift.data.delivery?.dateLivraison ?? undefined,
+      prixReel: gift.data.delivery?.prixReel ?? undefined,
+      recu: true
+    };
 
-    const result = await this.giftService.updateGift(updatedGift!);
+    const result = await this.giftService.updateGiftDelivery(this.giftId!, updatedGift);
+
     if (result.success) {
       await this.giftService.getFollowedGifts();
-      this.cancel();
+      // ici tu peux ajouter un toast ou redirection
     } else {
-      this.errorService.showError(result.message);
+      this.errorService.showError("❌ Échec de la confirmation de réception.");
     }
   }
+
+
 
 
   cancel(){
