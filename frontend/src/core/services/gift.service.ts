@@ -8,13 +8,13 @@ import {ApiResponse} from 'src/core/models/api-response.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {GiftCreate} from 'src/core/models/gift/gift-create.model';
 import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
 import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -25,7 +25,7 @@ export class GiftService {
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
-              private groupStateService: GroupStateService) {
+              private groupContextService: GroupContextService) {
   }
 
   async fetchGifts(userId?: number): Promise<ApiResponse<GiftResponse[]>> {
@@ -206,7 +206,7 @@ export class GiftService {
   }
 
   async getFollowedGifts(): Promise<ApiResponse<GiftFollowed[]>> {
-    const groupId = this.groupStateService.getSelectedGroup()!.id;
+    const groupId = this.groupContextService.getGroupId()!;
     const idEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/suivis/${idEnc}`;
     try {

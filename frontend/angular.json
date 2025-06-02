@@ -35,7 +35,8 @@
             "styles": [
               "src/styles/retro-terminal.scss",
               "src/styles/form-styles.scss",
-              "src/styles/styles.scss"
+              "src/styles/styles.scss",
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
           },

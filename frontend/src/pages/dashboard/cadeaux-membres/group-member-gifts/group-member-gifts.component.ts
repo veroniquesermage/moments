@@ -4,11 +4,14 @@ import {Router} from '@angular/router';
 import {UserGroupService} from 'src/core/services/user-group.service';
 import {User} from 'src/security/model/user.model';
 import {NgForOf, NgIf, TitleCasePipe} from '@angular/common';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
+import {
+  RefreshGroupMembersComponent
+} from 'src/shared/components/refresh-group-members/refresh-group-members.component';
 
 @Component({
   selector: 'app-group-member-gifts',
@@ -17,7 +20,8 @@ import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
     NgForOf,
     NgIf,
     TerminalModalComponent,
-    TitleCasePipe
+    TitleCasePipe,
+    RefreshGroupMembersComponent
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
@@ -39,28 +43,16 @@ export class GroupMemberGiftsComponent implements OnInit {
   constructor(public giftService: GiftService,
               public userGroupService: UserGroupService,
               public router: Router,
-              private groupStateService: GroupStateService,
+              private groupContextService: GroupContextService,
               public errorService: ErrorService) {
   }
 
   async ngOnInit() {
-    console.log('📦 Groupe courant :', this.groupStateService.getSelectedGroup());
     this.giftService.clearGifts();
-
-    const idGroup = this.groupStateService.getSelectedGroup()?.id;
-    const result = await this.userGroupService.fetchUserGroup(idGroup!);
-    if (result.success) {
-      this.users = result.data;
-
-      const savedId = this.userGroupService.getSelectedMemberId();
-      if (savedId) {
-        const found = this.users?.find(u => u.id === savedId);
-        if (found) {
-          this.selectMember(found);
-        }
-      }
-    } else {
-      this.errorService.showError(result.message);
+    try {
+      this.users = await this.groupContextService.getGroupMembers();
+    }  catch (err) {
+      this.errorService.showError("❌ Impossible de récupérer les membres du groupe. Veuillez réessayer plus tard.");
     }
   }
 
@@ -72,14 +64,12 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   retour() {
     this.selectedMember = undefined;
-    this.userGroupService.setSelectedMemberId(null);
     this.giftService.clearGifts();
     this.router.navigate(['/dashboard']);
   }
 
   async selectMember(user: User) {
     this.selectedMember = user;
-    this.userGroupService.setSelectedMemberId(user ? user.id : null);
 
     if(!user.id){
       this.errorService.showError("❌ Impossible d\'accéder au membre. Veuillez réessayer plus tard.");
