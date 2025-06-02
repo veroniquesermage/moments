@@ -7,6 +7,8 @@ import {provideRouter} from '@angular/router';
 import {routes} from 'src/app/app.routes';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {provideToastr} from 'ngx-toastr';
 
 registerLocaleData(localeFr);
 
@@ -14,6 +16,9 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    importProvidersFrom(OAuthModule.forRoot())
+    importProvidersFrom(OAuthModule.forRoot(), BrowserAnimationsModule),
+    provideToastr({
+      positionClass: 'toast-bottom-right',
+    }),
   ]
 });

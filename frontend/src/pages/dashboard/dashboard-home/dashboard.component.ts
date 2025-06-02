@@ -1,8 +1,9 @@
-import {Component, computed} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {CommonModule} from '@angular/common';
+import {GroupContextService} from 'src/core/services/group-context.service';
+import {GroupeResume} from 'src/core/models/group-resume.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,16 +12,25 @@ import {CommonModule} from '@angular/common';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit{
 
-  selectedGroup = computed(() => this.groupState.selectedGroup());
+  selectedGroup: GroupeResume | undefined = undefined;
   estAdmin = true;
 
   constructor(
     public groupService: GroupService,
     public router: Router,
-    public groupState: GroupStateService
+    public groupContextService: GroupContextService
   ) {
+  }
+
+  async ngOnInit() {
+    const groupId = this.groupContextService.getGroupId();
+    const result = await this.groupService.getGroup(groupId);
+
+    if(result.success){
+      this.selectedGroup = result.data;
+    }
   }
 
   goToMesCadeaux() {

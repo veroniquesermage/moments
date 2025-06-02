@@ -3,9 +3,9 @@ import {CommonModule} from '@angular/common';
 import {AuthService} from 'src/security/service/auth.service';
 import {GroupService} from 'src/core/services/group.service';
 import {Router, RouterOutlet} from '@angular/router';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +19,7 @@ export class AppComponent {
     public auth: AuthService,
     private groupService: GroupService,
     private router: Router,
-    private groupStateService: GroupStateService,
+    private groupContext: GroupContextService,
     public errorService: ErrorService
   ) {
     const injector = inject(Injector);
@@ -47,7 +47,7 @@ export class AppComponent {
 
     if (result.success) {
       if (result.data.length === 1) {
-        this.groupStateService.setSelectedGroup(result.data.at(0)!);
+        this.groupContext.setGroupContext(result.data.at(0)?.id!)
         await this.router.navigate(['/dashboard']);
       } else {
         await this.router.navigate(['/groupe/onboarding']);
