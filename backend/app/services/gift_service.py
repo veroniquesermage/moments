@@ -337,6 +337,7 @@ class GiftService:
     ) -> list[GiftFollowed]:
 
         # A. Cadeaux réservés ou pris PAR moi, créés PAR des membres du groupe courant
+        gifts_followed = []
         result_gift = await db.execute(
             select(Gift)
             .join(User, Gift.destinataire_id == User.id)
@@ -347,20 +348,25 @@ class GiftService:
             )
             .options(
                 selectinload(Gift.destinataire),
+                selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery))
         )
         gifts = result_gift.scalars().all()
-        gifts_followed = [
-            GiftFollowed(
-                gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
-                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                           from_attributes=True) if gift.gift_delivery else None,
-                partage=None  # à remplir si tu en as besoin
-            )
-            for gift in gifts
-        ]
+
+        if gifts:
+            logger.debug(f"Aucun cadeau trouvé pour l'utilisateur {current_user.id} dans le groupe {group_id}.")
+            gifts_followed = [
+                GiftFollowed(
+                    gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
+                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
+                                                               from_attributes=True) if gift.gift_delivery else None,
+                    partage=None  # à remplir si tu en as besoin
+                )
+                for gift in gifts
+            ]
 
         # B. Cadeaux partagés AVEC moi, créés PAR des membres du groupe courant
+        gifts_shared = []
         result_gift_shared = await db.execute(
             select(Gift, GiftShared)
             .join(GiftShared, Gift.id == GiftShared.cadeau_id)
@@ -370,17 +376,22 @@ class GiftService:
                 GiftShared.participant_id == current_user.id,
                 UserGroup.groupe_id == group_id
             )
+            .options(
+                selectinload(Gift.destinataire),
+                selectinload(Gift.reserve_par),
+                selectinload(Gift.gift_delivery))
         )
         rows = result_gift_shared.all()
-        gifts_shared = [
-            GiftFollowed(
-                gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
-                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                           from_attributes=True) if gift.gift_delivery else None,
-                partage=GiftSharedSchema.model_validate(gift_shared, from_attributes=True)
-            )
-            for gift, gift_shared in rows
-        ]
+        if rows:
+            gifts_shared = [
+                GiftFollowed(
+                    gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
+                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
+                                                               from_attributes=True) if gift.gift_delivery else None,
+                    partage=GiftSharedSchema.model_validate(gift_shared, from_attributes=True)
+                )
+                for gift, gift_shared in rows
+            ]
 
         return gifts_followed + gifts_shared
 

@@ -28,7 +28,6 @@ async def get_groups(
 ):
     return await GroupService.get_groups(db, current_user )
 
-
 @router.post("/rejoindre/{code}", response_model=GroupResponse)
 async def get_groups(
         code: str,
@@ -37,3 +36,13 @@ async def get_groups(
 
 ):
     return await GroupService.join_group(db, current_user, code)
+
+@router.get("/{groupId}", response_model=GroupResponse)
+async def get_groups(
+        groupId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+) -> GroupResponse:
+    return await GroupService.get_group(db, current_user, groupId )
+
+
