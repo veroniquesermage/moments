@@ -8,7 +8,6 @@ import {ApiResponse} from 'src/core/models/api-response.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {GiftCreate} from 'src/core/models/gift/gift-create.model';
 import {GiftUpdate} from 'src/core/models/gift/gift-update.model';

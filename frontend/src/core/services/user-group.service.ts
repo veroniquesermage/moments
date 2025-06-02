@@ -1,4 +1,4 @@
-import {Injectable, signal} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
@@ -9,8 +9,6 @@ import {ApiResponse} from 'src/core/models/api-response.model';
 export class UserGroupService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.utilisateur;
-  private selectedMemberId = signal<number | null>(null);
-  users = signal<User[]>([])
 
   constructor(private http: HttpClient,) {
   }
@@ -22,20 +20,11 @@ export class UserGroupService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      this.users.set(users);
       return {success: true, data: users};
     } catch (error) {
       console.error('[UserGroupService] Erreur lors de la récupération des membres du groupe', error);
       return {success: false, message: "❌ Groupe inexistant."};
     }
-  }
-
-  setSelectedMemberId(id: number | null) {
-    this.selectedMemberId.set(id);
-  }
-
-  getSelectedMemberId(): number | null {
-    return this.selectedMemberId();
   }
 
   private getAuthHeaders(): HttpHeaders {

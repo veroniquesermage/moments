@@ -3,7 +3,6 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {GroupeResume} from 'src/core/models/group-resume.model';
 import {firstValueFrom} from 'rxjs';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {GroupeDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
@@ -45,7 +44,7 @@ export class GroupService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      this.groupContextService.setGroupId(groupeCreated.id);
+      await this.groupContextService.setGroupContext(groupeCreated.id);
       return {success: true, data: groupeCreated};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);
@@ -62,13 +61,29 @@ export class GroupService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      this.groupContextService.setGroupId(groupeJoined.id);
+      await this.groupContextService.setGroupContext(groupeJoined.id);
       return {success: true, data: groupeJoined};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);
       return {success: false, message: "❌ Code invalide ou groupe inexistant."};
     }
   }
+
+  async getGroup(groupId: number): Promise<ApiResponse<GroupeResume>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}`;
+    try {
+      const result = await firstValueFrom(this.http.get<GroupeResume>(url, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la récupération du groupe', error);
+      return {success: false, message: "❌ Aucun groupe trouvé."};
+    }
+  }
+
 
   loadGroupesIfEmpty(): Promise<Result<GroupeResume[]>> {
     if (this.groupes().length > 0) {

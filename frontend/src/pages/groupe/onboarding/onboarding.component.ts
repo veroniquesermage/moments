@@ -3,7 +3,6 @@ import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupeResume} from 'src/core/models/group-resume.model';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
@@ -36,7 +35,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   choisirGroupe(groupe: GroupeResume): void {
-    this.groupContextService.setGroupId(groupe.id);
+    this.groupContextService.setGroupContext(groupe.id);
         this.router.navigate(['/dashboard']);
   }
 
