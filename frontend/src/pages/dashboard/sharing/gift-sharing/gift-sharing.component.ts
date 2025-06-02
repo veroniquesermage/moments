@@ -8,17 +8,19 @@ import {FormsModule} from '@angular/forms';
 import {GiftSharedDraft} from 'src/core/models/gift/gift-shared-draft.model';
 import {CommonModule} from '@angular/common';
 import {User} from 'src/security/model/user.model';
-import {UserGroupService} from 'src/core/services/user-group.service';
-import {GroupStateService} from 'src/core/services/group-state.service';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {
+  RefreshGroupMembersComponent
+} from 'src/shared/components/refresh-group-members/refresh-group-members.component';
 
 @Component({
   selector: 'app-gift-sharing',
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    RefreshGroupMembersComponent
   ],
   templateUrl: './gift-sharing.component.html',
   styleUrl: './gift-sharing.component.scss'
@@ -26,7 +28,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 export class GiftSharingComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
-  id?: number | undefined = undefined;
+  idGift?: number | undefined = undefined;
   partages: GiftShared[] | undefined = [];
   partagesDraft: GiftSharedDraft[] = [];
   gift: GiftPublicResponse | undefined = undefined;
@@ -35,7 +37,6 @@ export class GiftSharingComponent implements OnInit {
 
   constructor(private sharingService: SharingService,
               private giftService: GiftService,
-              private userGroupService: UserGroupService,
               private groupContextService: GroupContextService,
               public router: Router,
               public errorService: ErrorService) {
@@ -43,27 +44,22 @@ export class GiftSharingComponent implements OnInit {
 
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
-    this.id = idParam ? +idParam : undefined;
+    this.idGift = idParam ? +idParam : undefined;
     this.contextBrut = this.route.snapshot.queryParamMap.get('context');
 
-    if(!this.id){
+    if(!this.idGift){
       this.errorService.showError("❌ Impossible de modifier le partage.");
       return;
     }
-    const result = await this.giftService.getGift(this.id);
+    const result = await this.giftService.getGift(this.idGift);
     if (result.success) {
       this.gift = result.data.gift;
       this.partages = result.data.partage;
     } else {
       this.errorService.showError("❌ Impossible de modifier le partage.");
     }
-    const groupUsers = await this.userGroupService.fetchUserGroup(this.groupContextService.getGroupId()!);
 
-    if(groupUsers.success){
-      this.membresDisponibles = groupUsers.data;
-    } else {
-      this.membresDisponibles = [];
-    }
+    this.membresDisponibles = await this.groupContextService.getGroupMembers();
   }
 
   supprimerLigne(index: number) {
@@ -76,7 +72,7 @@ export class GiftSharingComponent implements OnInit {
       participant: null,
       montant: null
     });
-    console.log("partagesDraft ACTUEL :", this.partagesDraft);
+    console.log("partagesDraft actuels :", this.partagesDraft);
   }
 
   supprimerDraft(index: number) {
@@ -84,7 +80,7 @@ export class GiftSharingComponent implements OnInit {
   }
 
   retourEnArriere(){
-    this.router.navigate(['/dashboard/cadeau', this.id], {
+    this.router.navigate(['/dashboard/cadeau', this.idGift], {
       queryParams: { context: this.contextBrut }
     });
   }
@@ -109,10 +105,10 @@ export class GiftSharingComponent implements OnInit {
     ];
     console.log('💾 Partages complets à envoyer :', allPartages);
 
-    const result = await this.sharingService.saveAllShares(allPartages, this.id! );
+    const result = await this.sharingService.saveAllShares(allPartages, this.idGift! );
     if(result.success){
       console.log('retour au cadeau avec context : ', this.contextBrut);
-      await this.router.navigate(['/dashboard/cadeau', this.id], {
+      await this.router.navigate(['/dashboard/cadeau', this.idGift], {
         queryParams: { context: this.contextBrut }
       });
     } else {

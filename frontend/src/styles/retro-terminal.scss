@@ -189,5 +189,29 @@ button:focus {
   overflow: hidden;
   white-space: nowrap;
 }
+// Rendre les toasts visuellement cohérents avec ton thème
+.toast {
+  background-color: #222;
+  color: #0f0;
+  border: 1px solid #0f0;
+  font-family: monospace;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px #0f0;
+  max-width: 300px;
+}
+
+.toast-success {
+  background-color: #0f0;
+  color: black;
+  font-weight: bold;
+}
+
+.toast-error {
+  background-color: #f00;
+  color: white;
+  font-weight: bold;
+}
+
 
 
