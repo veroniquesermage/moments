@@ -71,6 +71,19 @@ class GroupService:
 
         return [GroupResponse.model_validate(g) for g in groups]
 
+    @staticmethod
+    async def get_group(
+        db: AsyncSession,
+        current_user: User,
+        group_id: int
+    ) -> GroupResponse:
+        """Retourne la liste des Group dont current_user est membre."""
+        result = (await db.execute(
+            select(Group)
+            .where(Group.id == group_id)
+        )).scalars().first()
+
+        return GroupResponse.model_validate(result)
 
     @staticmethod
     async def join_group(
