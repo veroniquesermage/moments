@@ -45,7 +45,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     {key: 'quantite', label: 'Quantité'},
     {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     {key: 'lieuLivraison', label: 'Lieu de livraison'},
-    {key: 'dateLivraison', label: 'Date de livraison', formatFn: (v: string) => v ? formatDate(v, 'dd/MM/yyyy', 'fr-FR') : '—'},
+    {key: 'dateLivraison', label: 'Date de livraison', formatFn: (v: string) => v ? formatDate(v, 'dd-MM-yyyy', 'fr-FR') : '—'},
     {key: 'statut', label: 'Statut'}
   ];
 

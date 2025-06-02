@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupeResume} from 'src/core/models/group-resume.model';
 import {GroupStateService} from 'src/core/services/group-state.service';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -19,7 +20,7 @@ export class OnboardingComponent implements OnInit {
   constructor(
     public groupService: GroupService,
     public router: Router,
-    public groupState: GroupStateService
+    public groupContextService: GroupContextService
   ) {
   }
 
@@ -35,8 +36,8 @@ export class OnboardingComponent implements OnInit {
   }
 
   choisirGroupe(groupe: GroupeResume): void {
-    this.groupState.setSelectedGroup(groupe);
-    this.router.navigate(['/dashboard']);
+    this.groupContextService.setGroupId(groupe.id);
+        this.router.navigate(['/dashboard']);
   }
 
 }
