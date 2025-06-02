@@ -7,6 +7,7 @@ import {GroupStateService} from 'src/core/services/group-state.service';
 import {GroupeDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Injectable({providedIn: 'root'})
 export class GroupService {
@@ -16,7 +17,7 @@ export class GroupService {
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
-              private groupStateService: GroupStateService) {
+              private groupContextService: GroupContextService) {
   }
 
   async fetchGroups(): Promise<ApiResponse<GroupeResume[]>> {
@@ -44,7 +45,7 @@ export class GroupService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      this.groupStateService.setSelectedGroup(groupeCreated);
+      this.groupContextService.setGroupId(groupeCreated.id);
       return {success: true, data: groupeCreated};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);
@@ -61,7 +62,7 @@ export class GroupService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      this.groupStateService.setSelectedGroup(groupeJoined);
+      this.groupContextService.setGroupId(groupeJoined.id);
       return {success: true, data: groupeJoined};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);

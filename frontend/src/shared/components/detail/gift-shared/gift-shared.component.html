@@ -14,6 +14,7 @@
         > {{ share.participant.name }} : {{ share.montant }} €
         <span
           class="emoji-action"
+          role="button"
           (click)="toggleRemboursement(share.participant.id)"
           [attr.aria-label]="share.rembourse ? 'Marquer comme non remboursé' : 'Marquer comme remboursé'"
         >
@@ -24,13 +25,11 @@
     <ng-container *ngIf="isParticipant">
       <p *ngFor="let share of partage">
         <ng-container *ngIf="share.participant.id === currentUserId">
-          > Vous devez : {{ share.montant }} €
-          <span aria-hidden="true">
-            {{ share.rembourse ? '✅' : '🕒' }}
-          </span>
-          <span class="visually-hidden">
-            {{ share.rembourse ? 'remboursé' : 'en attente de remboursement' }}
-          </span>
+          <span *ngIf="share.rembourse">
+          > ✅ Vous avez remboursé {{ share.montant }} €</span>
+
+          <span *ngIf="!share.rembourse">
+          > 🕒 Vous devez {{ share.montant }} € </span>
         </ng-container>
       </p>
     </ng-container>

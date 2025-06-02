@@ -11,6 +11,7 @@ import {User} from 'src/security/model/user.model';
 import {UserGroupService} from 'src/core/services/user-group.service';
 import {GroupStateService} from 'src/core/services/group-state.service';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-gift-sharing',
@@ -35,7 +36,7 @@ export class GiftSharingComponent implements OnInit {
   constructor(private sharingService: SharingService,
               private giftService: GiftService,
               private userGroupService: UserGroupService,
-              private groupStateService: GroupStateService,
+              private groupContextService: GroupContextService,
               public router: Router,
               public errorService: ErrorService) {
   }
@@ -56,7 +57,7 @@ export class GiftSharingComponent implements OnInit {
     } else {
       this.errorService.showError("❌ Impossible de modifier le partage.");
     }
-    const groupUsers = await this.userGroupService.fetchUserGroup(this.groupStateService.getSelectedGroup()!.id);
+    const groupUsers = await this.userGroupService.fetchUserGroup(this.groupContextService.getGroupId()!);
 
     if(groupUsers.success){
       this.membresDisponibles = groupUsers.data;

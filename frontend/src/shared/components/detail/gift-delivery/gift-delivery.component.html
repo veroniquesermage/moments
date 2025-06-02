@@ -4,12 +4,13 @@
   <hr class="block-separator"/>
 
   <p>> Lieu : {{ giftDelivery.lieuLivraison }}</p>
-  <p>> Date prévue : {{ giftDelivery.dateLivraison }}</p>
+  <p>> Date prévue : {{ giftDelivery.dateLivraison | date:'dd-MM-yyyy' }}</p>
   <p class="recu-line">
     > Reçu :
     <span
       class="emoji-action"
       (click)="toggleRecu()"
+      role="button"
       [attr.aria-label]="giftDelivery.recu ? 'Cadeau livré' : 'Cadeau non livré'"
     >
       {{ giftDelivery.recu ? '✅' : '❌' }}

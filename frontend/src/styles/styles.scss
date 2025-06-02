@@ -4,3 +4,13 @@ body {
   font-family: "Spectral", serif;
 }
 
+.emoji-action {
+  cursor: pointer;
+}
+
+.emoji-action:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+  transition: all 0.1s ease;
+}
+
