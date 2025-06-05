@@ -13,11 +13,14 @@
     <li *ngIf="estAdmin">
       <button (click)="goToSuiviCadeaux()">[3] Suivi des cadeaux réservés/pris</button>
     </li>
+    <li *ngIf="estAdmin">
+      <button (click)="goToIdeeCadeaux()">[4] Mes idées de cadeaux pour autrui</button>
+    </li>
     <li>
-      <button (click)="goToChangerGroupe()">[4] Changer de groupe</button>
+      <button (click)="goToChangerGroupe()">[5] Changer de groupe</button>
     </li>
     <li *ngIf="estAdmin">
-      <button (click)="goToGestionGroupe()">[5] Gérer le groupe</button>
+      <button (click)="goToGestionGroupe()">[*] Gérer le groupe</button>
     </li>
   </ul>
 </div>
