@@ -71,8 +71,8 @@ export class GiftDeliverComponent implements OnInit {
     if (!this.gift) return;
 
     const updatedDelivery: GiftDeliveryUpdate = {
-      lieuLivraison: this.giftForm.value.lieuLivraison,
-      dateLivraison: this.giftForm.value.dateLivraison,
+      lieuLivraison: this.giftForm.value.lieuLivraison || null,
+      dateLivraison: this.giftForm.value.dateLivraison || null,
       prixReel: Number(this.giftForm.value.prixReel),
       recu: this.delivery?.recu ?? false
 

@@ -12,6 +12,7 @@ import {
 } from 'src/pages/dashboard/suivi-cadeaux-reserves/my-gifts-follow-up/my-gifts-follow-up.component';
 import {GiftDeliverComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-deliver/gift-deliver.component';
 import {GiftSharingComponent} from 'src/pages/dashboard/sharing/gift-sharing/gift-sharing.component';
+import {MyGiftsIdeasComponent} from 'src/pages/dashboard/gift-ideas/my-gifts-ideas/my-gifts-ideas.component';
 
 export const dashboardRoutes: Routes = [
   {path: '', component: DashboardComponent},
@@ -23,4 +24,5 @@ export const dashboardRoutes: Routes = [
   { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},
   { path: 'partage/:id', component: GiftSharingComponent},
   { path: 'cadeau/:id', component: GiftDetailPageComponent },
+  { path: 'idees', component: MyGiftsIdeasComponent },
 ];

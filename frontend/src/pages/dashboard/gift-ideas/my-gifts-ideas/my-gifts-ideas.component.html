@@ -1,0 +1,45 @@
+<div class="terminal">
+  <h2>> Vos idées de cadeaux</h2>
+  <p>> Enregistrez ici vos idées de cadeaux pour d'autres membres du groupe. </p>
+  <p>> Cliquez sur votre idée pour obtenir son détail et la gérer. </p>
+
+  <table   aria-describedby="table-priorite-explication" class="gift-table">
+    <thead>
+    <tr>
+      <th scope="col">Destinataire</th>
+      <th scope="col">Nom</th>
+      <th scope="col">Prix</th>
+      <th scope="col">Visibilité</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let gift of giftIdeas"
+        (click)="onRowClick(gift)"
+        (keydown.enter)="onRowClick(gift)"
+        (keydown.space)="onRowClick(gift)">
+      <td tabindex="0">{{ gift.gift.destinataire.name }}</td>
+      <td>{{ gift.gift.nom }}</td>
+      <td>{{ gift.gift.prix }} €</td>
+      <td
+        class="emoji-action"
+        role="button"
+        (click)="toggleVisibilite(gift.giftIdea.id); $event.stopPropagation()"
+        [attr.aria-label]="gift.giftIdea.visibilite ? 'Visible par les autres' : 'Privé'">
+        {{ gift.giftIdea.visibilite ? '👁️' : '🔒' }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="options">
+    <button (click)="goToAjout()">[+] Ajouter un cadeau</button>
+    <button (click)="return()">↩ Retour au Menu</button>
+  </div>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>
