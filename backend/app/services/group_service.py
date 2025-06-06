@@ -82,6 +82,8 @@ class GroupService:
             select(Group)
             .where(Group.id == group_id)
         )).scalars().first()
+        if not result:
+            raise HTTPException(status_code=404)
 
         return GroupResponse.model_validate(result)
 
