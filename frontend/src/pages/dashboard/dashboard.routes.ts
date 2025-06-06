@@ -13,11 +13,12 @@ import {
 import {GiftDeliverComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-deliver/gift-deliver.component';
 import {GiftSharingComponent} from 'src/pages/dashboard/sharing/gift-sharing/gift-sharing.component';
 import {MyGiftsIdeasComponent} from 'src/pages/dashboard/gift-ideas/my-gifts-ideas/my-gifts-ideas.component';
+import {IdeasCreateComponent} from 'src/pages/dashboard/gift-ideas/ideas-create/ideas-create.component';
 
 export const dashboardRoutes: Routes = [
-  {path: '', component: DashboardComponent},
-  {path: 'mes-cadeaux', component: UserGiftsComponent},
-  {path: 'mes-cadeaux/creer', component: GiftCreateComponent},
+  { path: '', component: DashboardComponent},
+  { path: 'mes-cadeaux', component: UserGiftsComponent},
+  { path: 'mes-cadeaux/creer', component: GiftCreateComponent},
   { path: 'mes-cadeaux/modifier/:id', component: GiftUpdateComponent, data: { context: 'mes-cadeaux' } },
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
   { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
@@ -25,4 +26,5 @@ export const dashboardRoutes: Routes = [
   { path: 'partage/:id', component: GiftSharingComponent},
   { path: 'cadeau/:id', component: GiftDetailPageComponent },
   { path: 'idees', component: MyGiftsIdeasComponent },
+  { path: 'idees/creer', component: IdeasCreateComponent},
 ];

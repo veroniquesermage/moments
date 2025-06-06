@@ -50,7 +50,7 @@ export class MyGiftsIdeasComponent implements OnInit{
   }
 
   goToAjout(){
-
+    this.router.navigate(['/dashboard/idees/creer']);
   }
 
 }

@@ -5,6 +5,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {firstValueFrom} from 'rxjs';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
+import {GiftIdeaCreate} from 'src/core/models/gift/gift-idea-create.model';
 
 
 @Injectable({providedIn: 'root'})
@@ -32,12 +33,25 @@ export class IdeaService {
     }
   }
 
+  async createIdeas(giftIdeaCreate: GiftIdeaCreate): Promise<ApiResponse<GiftIdeasResponse>> {
+    try {
+      const giftIdeaResponse = await firstValueFrom(this.http.post<GiftIdeasResponse>(this.apiUrl, giftIdeaCreate, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+
+      return {success: true, data: giftIdeaResponse};
+
+    } catch (error) {
+      console.error('[IdeaService] Erreur lors de la création de l\'idée', error);
+
+      return {success: false, message: "❌ Impossible de créer le  l\'idée."};
+    }
+  }
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`
     });
   }
-
-
 }
