@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import HTTPException
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -11,6 +11,7 @@ from app.core.logger import logger
 from app.core.message import *
 from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup
 from app.models.gift import Gift
+from app.schemas.gift import GiftIdeasSchema
 from app.schemas.gift.gift_followed import GiftFollowed
 from app.schemas.gift.gift_detail_response import GiftDetailResponse
 from app.schemas.gift.gift_public_response import GiftPublicResponse
@@ -34,7 +35,7 @@ class GiftService:
                            effective_user_id: int) -> list[GiftResponse]:
         logger.info(f"Récupération des cadeaux de l'utilisateur {effective_user_id}")
         result = (await db.execute(
-            select(Gift).where(Gift.destinataire_id == effective_user_id)
+            select(Gift).where(and_(Gift.destinataire_id == effective_user_id, Gift.gift_idea_id.is_(None)))
             .order_by(Gift.priorite)
             .options(
                 selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
@@ -45,11 +46,12 @@ class GiftService:
 
     @staticmethod
     async def get_gift(db: AsyncSession,
-                       giftId: int,
+                       gift_id: int,
                        current_user: User) -> GiftDetailResponse:
-        logger.info(f"Récupération du cadeau à l'id {giftId}")
-        result: Gift = await GiftService.get_gift_or_raise(db, giftId)
-        shared_schema = await SharingService.get_all_shares_for_gift(db, gift_id=giftId)
+        logger.info(f"Récupération du cadeau à l'id {gift_id}")
+
+        result: Gift = await GiftService.get_gift_or_raise(db, gift_id)
+        shared_schema = await SharingService.get_all_shares_for_gift(db, gift_id=gift_id)
 
         role_user = GiftService.define_user_role(current_user, result, shared_schema)
 
@@ -396,12 +398,14 @@ class GiftService:
         return gifts_followed + gifts_shared
 
     @staticmethod
-    def set_gift_detail(gift: Gift, current_user: User,
+    def set_gift_detail(gift: Gift,
+                        current_user: User,
                         partage: Optional[list[GiftSharedSchema]] = None) -> GiftDetailResponse:
         return GiftDetailResponse(
             gift=GiftPublicResponse.model_validate(gift),
             delivery=GiftDeliverySchema.model_validate(gift.gift_delivery) if gift.gift_delivery else None,
             partage=partage,
+            ideas = gift.gift_idea,
             est_partage=gift.statut == GiftStatusEnum.PARTAGE,
             droits_utilisateur=GiftService.define_user_role(current_user, gift, partage)
         )
@@ -414,7 +418,8 @@ class GiftService:
             .options(
                 selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
                 selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery)
+                selectinload(Gift.gift_delivery),
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par)
             )
         )).scalars().first()
         if result is None:
