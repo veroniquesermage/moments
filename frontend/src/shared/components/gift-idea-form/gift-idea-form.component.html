@@ -1,0 +1,45 @@
+<div class="form-container">
+  <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
+
+    <label>Destinataire</label>
+    <ng-container *ngIf="giftIdeasResponse?.gift?.id; else selectDestinataire">
+      <input type="text" [value]="giftIdeasResponse?.gift?.destinataire!.name" disabled />
+    </ng-container>
+    <ng-template #selectDestinataire>
+      <select formControlName="destinataireId">
+        <option *ngFor="let membre of membersGroup" [ngValue]="membre.id">
+          {{ membre.name }}
+        </option>
+      </select>
+    </ng-template>
+
+    <label>Nom</label>
+    <input formControlName="nom" type="text" />
+    <label>Marque</label>
+    <input formControlName="marque" type="text" />
+    <label>Magasin</label>
+    <input formControlName="magasin" type="text" />
+    <label>Description</label>
+    <textarea formControlName="description"></textarea>
+    <label>Url du cadeau</label>
+    <input formControlName="url" type="text" />
+    <label>Quantité</label>
+    <input formControlName="quantite" type="text" />
+    <label>Prix à l'unité</label>
+    <input type="text" formControlName="prix" (input)="sanitizeDecimal($event, 'prix')" />
+    <label>Frais de port</label>
+    <input type="text" formControlName="fraisPort" (input)="sanitizeDecimal($event, 'fraisPort')" />
+    <label>Commentaire</label>
+    <textarea formControlName="commentaire"></textarea>
+
+    <button type="submit">
+      {{ giftIdeasResponse?.gift?.id ? 'Modifier l\'idée' : 'Créer l\'idée' }}
+    </button>
+  </form>
+
+  <div class="options">
+    <button (click)="cancel.emit()">↩ Retour</button>
+  </div>
+</div>
+
+
