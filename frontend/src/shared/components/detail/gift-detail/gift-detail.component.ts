@@ -16,11 +16,12 @@ import {GiftActionsComponent} from 'src/shared/components/detail/gift-actions/gi
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {SharingService} from 'src/core/services/sharing.service';
+import {GiftIdeaComponent} from 'src/shared/components/detail/gift-idea/gift-idea.component';
 
 @Component({
   selector: 'app-gift-detail',
   standalone: true,
-  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent],
+  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent, GiftIdeaComponent],
   templateUrl: './gift-detail.component.html',
   styleUrl: './gift-detail.component.scss'
 })
@@ -48,6 +49,7 @@ export class GiftDetailComponent implements OnInit{
     this.currentUserId = this.authService.profile()?.id;
     const result = await this.giftService.getGift(this.id);
     if (result.success) {
+      console.log("Gift detail :", result.data);
       this.giftDetail = result.data;
       console.log(this.giftDetail.droitsUtilisateur)
     } else {
