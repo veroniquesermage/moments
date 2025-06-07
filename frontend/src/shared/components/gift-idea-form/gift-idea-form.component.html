@@ -2,16 +2,18 @@
   <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
 
     <label>Destinataire</label>
-    <ng-container *ngIf="giftIdeasResponse?.gift?.id; else selectDestinataire">
-      <input type="text" [value]="giftIdeasResponse?.gift?.destinataire!.name" disabled />
+    <ng-container *ngIf="giftIdeasResponse?.gift?.id; else editableDestinataire">
+      <input type="text" [value]="giftIdeasResponse!.gift.destinataire.name" readonly />
     </ng-container>
-    <ng-template #selectDestinataire>
+
+    <ng-template #editableDestinataire>
       <select formControlName="destinataireId">
-        <option *ngFor="let membre of membersGroup" [ngValue]="membre.id">
+        <option *ngFor="let membre of membersGroup" [value]="membre.id">
           {{ membre.name }}
         </option>
       </select>
     </ng-template>
+
 
     <label>Nom</label>
     <input formControlName="nom" type="text" />

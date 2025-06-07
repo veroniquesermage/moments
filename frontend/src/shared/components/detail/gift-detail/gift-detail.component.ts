@@ -79,6 +79,10 @@ export class GiftDetailComponent implements OnInit{
     this.router.navigate(['/dashboard/mes-cadeaux/modifier', this.giftDetail.gift.id]);
   }
 
+  modifierIdee():void {
+    this.router.navigate(['/dashboard/idees/modifier', this.giftDetail.gift.id]);
+  }
+
   gererLivraison(): void {
     this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftDetail.gift.id]);
   }
@@ -110,6 +114,15 @@ export class GiftDetailComponent implements OnInit{
     this.showModal = true;
   }
 
+  deleteIdea(): void{
+    this.message = 'Êtes-vous sûr de vouloir supprimer cette idée de cadeau ?'
+    this.modalActions = [
+      { label: 'Oui', eventName: 'DELETE_IDEA', style: 'primary' },
+      { label: 'Non', eventName: 'CANCEL', style: 'secondary' }
+    ];
+    this.showModal = true;
+  }
+
   async confirmDelete(): Promise<void> {
     const result = await this.giftService.deleteGift(this.id);
 
@@ -120,9 +133,22 @@ export class GiftDetailComponent implements OnInit{
     }
   }
 
+  async confirmDeleteIdea(): Promise<void> {
+    //TODO gerer la suppression dans le back
+    const result = await this.giftService.deleteGift(this.id);
+
+    if (result.success) {
+      await this.router.navigate(['/dashboard/idee']);
+    } else {
+      this.errorService.showError(result.message);
+    }
+  }
+
   handleClicked(eventName: string): void {
     if (eventName === 'DELETE') {
       this.confirmDelete();
+    } else if (eventName === 'DELETE_IDEA') {
+      this.confirmDeleteIdea();
     } else if (eventName === 'RESERVER') {
       this.confirmerStatut(GiftStatus.RESERVE);
     } else if (eventName === 'PRENDRE') {
