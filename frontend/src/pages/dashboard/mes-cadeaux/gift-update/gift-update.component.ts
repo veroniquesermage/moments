@@ -65,7 +65,6 @@ export class GiftUpdateComponent implements OnInit{
 
     const result = await this.giftService.updateGift(giftUpdate);
     if (result.success) {
-      await this.giftService.fetchGifts(); // tu appelles que si c’est réussi et seulement si le composant a besoin
       await this.router.navigate(['/dashboard/mes-cadeaux']);
     } else {
       this.errorService.showError(result.message);

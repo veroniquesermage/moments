@@ -39,7 +39,7 @@ export class MyGiftsIdeasComponent implements OnInit{
 
   onRowClick(gift: GiftIdeasResponse){
     this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
-      queryParams: { context: 'cadeaux-groupe' }
+      queryParams: { context: 'idee-cadeau' }
     });
   }
 
