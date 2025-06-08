@@ -75,8 +75,8 @@ export class GiftFollowUpDetailComponent implements OnInit{
     }
 
     const updatedGift: GiftDeliveryUpdate = {
-      lieuLivraison: gift.data.delivery?.lieuLivraison ?? undefined,
-      dateLivraison: gift.data.delivery?.dateLivraison ?? undefined,
+      lieuLivraison: gift.data.delivery?.lieuLivraison ?? null,
+      dateLivraison: gift.data.delivery?.dateLivraison ?? null,
       prixReel: gift.data.delivery?.prixReel ?? undefined,
       recu: true
     };

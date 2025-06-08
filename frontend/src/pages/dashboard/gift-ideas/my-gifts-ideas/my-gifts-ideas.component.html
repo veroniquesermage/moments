@@ -1,15 +1,22 @@
 <div class="terminal">
   <h2>> Vos idées de cadeaux</h2>
+
+  <section class="intro-bloc" aria-label="Introduction pour la page Idées de cadeaux pour les autres">
   <p>> Enregistrez ici vos idées de cadeaux pour d'autres membres du groupe. </p>
-  <p>> Cliquez sur votre idée pour obtenir son détail et la gérer. </p>
+  <p class="sub-intro">Cliquez sur votre idée pour obtenir son détail et la gérer. </p>
+  </section>
+
+
+  <p class="actions-legend"> <em>> Actions rapides: 🔒 Changer la visibilité | 📄 Dupliquer l'idée | 🛒 Prendre le cadeau (si privé et disponible) </em> </p>
 
   <table   aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
     <tr>
       <th scope="col">Destinataire</th>
       <th scope="col">Nom</th>
-      <th scope="col">Prix</th>
-      <th scope="col">Visibilité</th>
+      <th scope="col" class="col-actions">Prix</th>
+      <th scope="col" class="col-actions">Privé</th>
+      <th scope="col" class="col-actions">Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -19,13 +26,32 @@
         (keydown.space)="onRowClick(gift)">
       <td tabindex="0">{{ gift.gift.destinataire.name }}</td>
       <td>{{ gift.gift.nom }}</td>
-      <td>{{ gift.gift.prix }} €</td>
+      <td class="col-actions">{{ gift.gift.prix }} €</td>
       <td
-        class="emoji-action"
-        role="button"
-        (click)="toggleVisibilite(gift.giftIdea.id); $event.stopPropagation()"
-        [attr.aria-label]="gift.giftIdea.visibilite ? 'Visible par les autres' : 'Privé'">
-        {{ gift.giftIdea.visibilite ? '👁️' : '🔒' }}
+        class="col-actions">
+        {{ gift.giftIdea.visibilite ? 'NON' : 'OUI' }}
+      </td>
+      <td class="emoji-action col-actions">
+        <button type="button" class="emoji-button"
+                title="Modifier la visibilité"
+                attr.aria-label="Modifier la visibilité de {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="changeVisibility(); $event.stopPropagation()">🔒</span>
+        </button>
+        <button type="button" class="emoji-button"
+                title="Dupliquer l'idée"
+                attr.aria-label="Dupliquer l'idée {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="duplicateIdea(); $event.stopPropagation()">📄</span>
+        </button>
+        <button *ngIf="!gift.giftIdea.visibilite && gift.gift.statut == 'DISPONIBLE' "
+          type="button" class="emoji-button"
+                title="Prendre le cadeau"
+                attr.aria-label="Prendre le cadeau {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="takeIt(gift.gift.id!); $event.stopPropagation()">🛒</span>
+        </button>
+
       </td>
     </tr>
     </tbody>
