@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
@@ -27,3 +27,26 @@ async def get_my_ideas(
 
     logger.info(f"L'utilisateur concerné est {current_user}")
     return await GiftIdeasService.get_my_ideas(db, current_user, groupId)
+
+
+@router.patch("/{ideaId}", response_model=GiftIdeasResponse)
+async def change_visibility(
+        ideaId: int,
+        payload: dict = Body(...),
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
+    visibility = payload.get("visibility")
+    if visibility is None:
+        raise HTTPException(status_code=422, detail="❌ Le champ 'visibility' est requis.")
+
+    return await GiftIdeasService.change_visibility(db, current_user, ideaId, visibility)
+
+
+@router.post("/{ideaId}", response_model=GiftIdeasResponse)
+async def duplicate_gift_idea(
+        ideaId: int,
+        newDestId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)) -> GiftIdeasResponse:
+
+    return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, newDestId)
