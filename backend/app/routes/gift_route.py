@@ -74,7 +74,7 @@ async def update_gift(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) -> GiftResponse:
 
-    return await GiftService.update_gift(db, giftId, giftUpdate)
+    return await GiftService.update_gift(db, current_user, giftId, giftUpdate)
 
 @router.delete("/{giftId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_gift(

@@ -131,8 +131,10 @@ class GiftService:
     @staticmethod
     async def update_gift(
             db: AsyncSession,
+            current_user: User,
             gift_id: int,
             updates: GiftUpdate) -> GiftResponse:
+
         # 1. Vérifier la cohérence des IDs
         if gift_id != updates.id:
             raise HTTPException(
@@ -145,11 +147,19 @@ class GiftService:
             select(Gift).where(Gift.id == gift_id)
             .options(
                 selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
-                selectinload(Gift.reserve_par)  # charge eager l’utilisateur qui réserve
+                selectinload(Gift.reserve_par),
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par)# charge eager l’utilisateur qui réserve
             )
         )).scalars().first()
         if not existing:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+
+        if updates.destinataire_id != current_user.id and (existing.gift_idea.proposee_par.id != current_user.id):
+            raise HTTPException(
+                status_code=400,
+                detail="❌ Vous ne pouvez modifier que vos propres cadeaux ou idées."
+            )
+
         logger.info(f"Modification du cadeau {gift_id} : champs modifiés → {updates.model_fields_set}")
 
         # 3. Appliquer les mises à jour dynamiquement
