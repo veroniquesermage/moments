@@ -1,7 +1,10 @@
 <div class="terminal" aria-labelledby="Menu principal">
   <h1>> Bienvenue dans le groupe : {{ selectedGroup?.nomGroupe }}</h1>
   <h2 *ngIf="selectedGroup?.description">> Description du groupe : </h2> <em> {{selectedGroup?.description}}</em>
+
+  <section class="intro-bloc" aria-label="Introduction pour la page Menu principal">
   <p>> Que souhaitez-vous faire ?</p>
+  </section>
 
   <ul class="command-list">
     <li>
