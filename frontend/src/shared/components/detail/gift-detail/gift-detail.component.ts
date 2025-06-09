@@ -103,6 +103,8 @@ export class GiftDetailComponent implements OnInit{
       this.router.navigate(['/dashboard/leurs-cadeaux']);
     } else if (this.context === 'suivi') {
       this.router.navigate(['/dashboard/cadeaux-suivis']);
+    } else if (this.context === 'idee-cadeau') {
+      this.router.navigate(['/dashboard/idees']);
     } else {
       this.router.navigate(['/dashboard']);
     }
@@ -144,7 +146,7 @@ export class GiftDetailComponent implements OnInit{
     const result = await this.ideaService.deleteIdea(ideaId!);
 
     if (result.success) {
-      await this.router.navigate(['/dashboard/idee']);
+      await this.router.navigate(['/dashboard/idees']);
     } else {
       this.errorService.showError(result.message);
     }

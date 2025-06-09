@@ -64,7 +64,23 @@ export class IdeaService {
       console.error('[IdeaService] Erreur lors du changement de visibilité', error);
       return {success: false, message: "❌ Impossible de changer la visibilité de l'idée."};
     }
+  }
 
+  async duplicateIdea(ideaId: number, newDestId: number) : Promise<ApiResponse<GiftIdeasResponse>> {
+    const idEnc = encodeURIComponent(ideaId);
+    const url = `${this.apiUrl}/${idEnc}`;
+
+    try {
+      const result = await firstValueFrom(this.http.post<GiftIdeasResponse>(url, {newDestId}, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+
+      return {success: true, data: result };
+    } catch (error) {
+      console.error('[IdeaService] Erreur lors de la duplication de l\'idée', error);
+      return {success: false, message: "❌ Impossible de dupliquer l'idée."};
+    }
   }
 
   async deleteIdea(ideaId: number) : Promise<ApiResponse<any>>{
