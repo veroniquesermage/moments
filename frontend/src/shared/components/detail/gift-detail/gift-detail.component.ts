@@ -17,6 +17,7 @@ import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {SharingService} from 'src/core/services/sharing.service';
 import {GiftIdeaComponent} from 'src/shared/components/detail/gift-idea/gift-idea.component';
+import {IdeaService} from 'src/core/services/idea.service';
 
 @Component({
   selector: 'app-gift-detail',
@@ -39,6 +40,7 @@ export class GiftDetailComponent implements OnInit{
   protected readonly RoleUser = RoleUser;
 
   constructor(public giftService: GiftService,
+              public ideaService: IdeaService,
               public sharingService: SharingService,
               public router: Router,
               public authService: AuthService,
@@ -134,8 +136,11 @@ export class GiftDetailComponent implements OnInit{
   }
 
   async confirmDeleteIdea(): Promise<void> {
-    //TODO gerer la suppression dans le back
-    const result = await this.giftService.deleteGift(this.id);
+    const ideaId = this.giftDetail.ideas?.id;
+    if(!ideaId){
+      this.errorService.showError('Aucune idée associée à ce cadeau');
+    }
+    const result = await this.ideaService.deleteIdea(ideaId!);
 
     if (result.success) {
       await this.router.navigate(['/dashboard/idee']);

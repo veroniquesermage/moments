@@ -49,6 +49,22 @@ export class IdeaService {
     }
   }
 
+  async deleteIdea(ideaId: number) : Promise<ApiResponse<any>>{
+    const idEnc = encodeURIComponent(ideaId);
+    const url = `${this.apiUrl}/${idEnc}`;
+
+    try {
+      await firstValueFrom(this.http.delete<void>(url,{
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: 'ok' };
+    } catch (error) {
+      console.error('[IdeaService] Erreur lors de la suppression de l\'idée', error);
+      return {success: false, message: "❌ Impossible de supprimer l'idée."};
+    }
+  }
+
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`
