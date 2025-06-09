@@ -50,6 +50,14 @@ alembic upgrade head
 | Déclencher une action spécifique sur une ressource | `POST`  | `/gift-ideas/:id/actions/convert`         | (optionnel)                        | Action métier ciblée, générique |
 
 ---
+| Code             | Quand l’utiliser                                        | Détail                                                                              |
+| ---------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `204 No Content` | Action réussie, rien à renvoyer                         | Ex: modification, mise à jour, suppression                                          |
+| `202 Accepted`   | Action **asynchrone**, déclenchée mais **pas terminée** | Ex: tu démarres un traitement qui prendra du temps                                  |
+| `200 OK`         | OK même sans contenu, mais…                             | C’est toléré, mais on attend souvent un body. À éviter si tu renvoies rien.         |
+| `201 Created`    | Tu crées une ressource                                  | Mais tu dois renvoyer au **minimum un `Location` header** ou l’ID nouvellement créé |
+
+---
 
 ### 🔧 Convention pour les **actions spécifiques**
 

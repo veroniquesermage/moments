@@ -145,3 +145,30 @@ class GiftIdeasService:
 
             return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
 
+    @staticmethod
+    async def delete_gift_idea(db: AsyncSession,
+                               current_user: User,
+                               ideaId: int) :
+
+        logger.info(f"Suppression de l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
+
+        existing: Gift = (await db.execute(select(Gift)
+                                           .where(Gift.gift_idea_id == ideaId)
+                                           .options(selectinload(Gift.gift_idea)))).scalars().first()
+
+        if not existing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"❌ L'idée de cadeau avec l'ID {ideaId} n'existe pas."
+            )
+
+        if existing.gift_idea.proposee_par_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="❌ Vous n'êtes pas autorisé à supprimer cette idée."
+            )
+
+        await db.delete(existing.gift_idea)
+        await db.delete(existing)
+        await db.commit()
+
