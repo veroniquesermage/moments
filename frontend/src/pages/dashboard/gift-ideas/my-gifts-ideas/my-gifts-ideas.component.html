@@ -36,7 +36,7 @@
                 title="Modifier la visibilité"
                 attr.aria-label="Modifier la visibilité de {{ gift.gift.nom }}">
           <span class="emoji"
-                (click)="changeVisibility(); $event.stopPropagation()">🔒</span>
+                (click)="changeVisibility(gift.giftIdea.visibilite, gift.giftIdea.id); $event.stopPropagation()">🔒</span>
         </button>
         <button type="button" class="emoji-button"
                 title="Dupliquer l'idée"
@@ -68,4 +68,11 @@
     [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
     (actionClicked)="errorService.clearError()"
   ></app-terminal-modal>
+
+  <app-terminal-modal
+    *ngIf="showModal"
+    [message]="message"
+    [actions]="modalActions"
+    (actionClicked)="handleClicked($event)">
+  </app-terminal-modal>
 </div>

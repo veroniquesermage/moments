@@ -49,6 +49,24 @@ export class IdeaService {
     }
   }
 
+  async changeVisibility(ideaId: number, visibility: boolean) : Promise<ApiResponse<any>> {
+    const idEnc = encodeURIComponent(ideaId);
+    const url = `${this.apiUrl}/${idEnc}`;
+
+    try {
+      await firstValueFrom(this.http.patch<void>(url, {visibility}, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+
+      return {success: true, data: 'ok' };
+    } catch (error) {
+      console.error('[IdeaService] Erreur lors du changement de visibilité', error);
+      return {success: false, message: "❌ Impossible de changer la visibilité de l'idée."};
+    }
+
+  }
+
   async deleteIdea(ideaId: number) : Promise<ApiResponse<any>>{
     const idEnc = encodeURIComponent(ideaId);
     const url = `${this.apiUrl}/${idEnc}`;

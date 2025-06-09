@@ -8,6 +8,8 @@ import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
+import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
+import {ModalActionType} from 'src/core/enum/modal-action.enum';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -20,9 +22,14 @@ import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'
 })
-export class MyGiftsIdeasComponent implements OnInit{
+export class MyGiftsIdeasComponent implements OnInit {
 
   giftIdeas: GiftIdeasResponse[] = [];
+  message = '';
+  modalActions: TerminalModalAction[] = [];
+  showModal = false;
+  targetVisibilityLabel = '';
+  ideaId: number | undefined;
 
   constructor(private ideaService: IdeaService,
               private giftService: GiftService,
@@ -34,17 +41,44 @@ export class MyGiftsIdeasComponent implements OnInit{
     await this.loadIdeas();
   }
 
-  onRowClick(gift: GiftIdeasResponse){
+  changeVisibility(actualVisibility: boolean, ideaId: number) {
+    this.ideaId = ideaId
+    this.targetVisibilityLabel = actualVisibility ? 'privée' : 'publique';
+    this.message = `Voulez-vous rendre cette idée ${this.targetVisibilityLabel} ?`;
+    this.modalActions = [{label: 'OUI', eventName: ModalActionType.VISIBILITY, style: 'primary'},
+      {label: 'NON', eventName: ModalActionType.CANCEL, style: 'primary'}];
+    this.showModal = true;
+
+  }
+
+  async handleClicked(eventName: string) {
+    if (eventName === ModalActionType.VISIBILITY) {
+      await this.ideaService.changeVisibility(this.ideaId!, this.targetVisibilityLabel != 'privée');
+      await this.loadIdeas();
+      this.clearIdea();
+    } else if (eventName === ModalActionType.CANCEL) {
+      this.showModal = false;
+      await this.router.navigate(['/dashboard/idees'])
+    }
+  }
+
+  clearIdea() {
+    this.ideaId = undefined;
+    this.targetVisibilityLabel = '';
+    this.showModal = false;
+  }
+
+  onRowClick(gift: GiftIdeasResponse) {
     this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
-      queryParams: { context: 'idee-cadeau' }
+      queryParams: {context: 'idee-cadeau'}
     });
   }
 
-  return(){
+  return() {
     this.router.navigate(['/dashboard']);
   }
 
-  goToAjout(){
+  goToAjout() {
     this.router.navigate(['/dashboard/idees/creer']);
   }
 
@@ -53,25 +87,21 @@ export class MyGiftsIdeasComponent implements OnInit{
   }
 
   async takeIt(id: number) {
-    const giftStatut : GiftStatutDTO = {
+    const giftStatut: GiftStatutDTO = {
       status: GiftStatus.PRIS
     }
     const result = await this.giftService.changeStatusGift(id, giftStatut);
 
-    if(result.success){
+    if (result.success) {
       await this.loadIdeas();
-    } else{
+    } else {
       this.errorService.showError("❌ Erreur lors de la tentative de prendre le cadeau, veuillez réessayer plus tard.")
     }
   }
 
-  changeVisibility() {
-
-  }
-
   async loadIdeas() {
     const result = await this.ideaService.fetchIdeas();
-    if(result.success){
+    if (result.success) {
       this.giftIdeas = result.data
     } else {
       this.errorService.showError(result.message);
