@@ -22,3 +22,20 @@ class UserGroupService:
             )
         )).scalars().all()
         return [UserSchema.model_validate(result) for result in results]
+
+    @staticmethod
+    async def get_all_my_users( db: AsyncSession,
+                                current_user: User) -> list[UserSchema]:
+        results = (await db.execute(
+            select(User)
+            .join(UserGroup, User.id == UserGroup.utilisateur_id)
+            .where(
+                UserGroup.groupe_id.in_(
+                    select(UserGroup.groupe_id)
+                    .where(UserGroup.utilisateur_id == current_user.id)
+                ),
+                User.id != current_user.id
+            )
+        )).scalars().all()
+
+        return [UserSchema.model_validate(result) for result in results]

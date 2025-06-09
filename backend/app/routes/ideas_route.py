@@ -5,6 +5,7 @@ from app.core.logger import logger
 from app.database import get_db
 from app.dependencies.current_user import get_current_user
 from app.models import User
+from app.schemas.gift import DuplicationPayload
 from app.schemas.gift.gift_idea_create import GiftIdeaCreate
 from app.schemas.gift.gift_ideas_response import GiftIdeasResponse
 from app.services import GiftIdeasService
@@ -45,11 +46,11 @@ async def change_visibility(
 @router.post("/{ideaId}", response_model=GiftIdeasResponse)
 async def duplicate_gift_idea(
         ideaId: int,
-        newDestId: int,
+        payload: DuplicationPayload,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user)) -> GiftIdeasResponse:
 
-    return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, newDestId)
+    return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, payload.new_dest_id)
 
 @router.delete("/{ideaId}", status_code=204)
 async def delete_gift_idea(
