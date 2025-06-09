@@ -76,6 +76,7 @@ class GiftIdeasService:
 
         await db.commit()
         await db.refresh(idea)
+        await db.refresh(gift, attribute_names=["destinataire"])
 
         return GiftIdeasResponse(
             gift=GiftPublicResponse.model_validate(gift),

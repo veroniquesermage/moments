@@ -14,3 +14,4 @@ from .gift_shared import GiftSharedSchema
 from .gift_status import GiftStatus
 from .gift_update import GiftUpdate
 from .recu_payload import RecuPayload
+from .duplication_payload import DuplicationPayload
