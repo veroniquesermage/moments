@@ -10,6 +10,10 @@ import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
+import {User} from 'src/security/model/user.model';
+import {FormsModule} from '@angular/forms';
+import {UserGroupService} from 'src/core/services/user-group.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -17,7 +21,8 @@ import {ModalActionType} from 'src/core/enum/modal-action.enum';
   imports: [
     NgForOf,
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    FormsModule
   ],
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'
@@ -30,11 +35,17 @@ export class MyGiftsIdeasComponent implements OnInit {
   showModal = false;
   targetVisibilityLabel = '';
   ideaId: number | undefined;
+  selectedDestId?: number;
+  showDuplicationModal = false;
+  allUsers: User[] = [];
+
 
   constructor(private ideaService: IdeaService,
               private giftService: GiftService,
+              private usersGroupService : UserGroupService,
               private router: Router,
-              public errorService: ErrorService) {
+              public errorService: ErrorService,
+              private toastr: ToastrService) {
   }
 
   async ngOnInit() {
@@ -42,13 +53,26 @@ export class MyGiftsIdeasComponent implements OnInit {
   }
 
   changeVisibility(actualVisibility: boolean, ideaId: number) {
-    this.ideaId = ideaId
+    this.ideaId = ideaId;
     this.targetVisibilityLabel = actualVisibility ? 'privée' : 'publique';
     this.message = `Voulez-vous rendre cette idée ${this.targetVisibilityLabel} ?`;
     this.modalActions = [{label: 'OUI', eventName: ModalActionType.VISIBILITY, style: 'primary'},
       {label: 'NON', eventName: ModalActionType.CANCEL, style: 'primary'}];
     this.showModal = true;
 
+  }
+
+  async duplicateIdea(ideaId: number) {
+    this.ideaId = ideaId;
+    const result = await this.usersGroupService.getAllUsers();
+
+    if(result.success){
+      this.allUsers = result.data;
+      this.showDuplicationModal = true;
+    } else {
+      this.showModal = true;
+      this.errorService.showError(result.message);
+    }
   }
 
   async handleClicked(eventName: string) {
@@ -82,10 +106,6 @@ export class MyGiftsIdeasComponent implements OnInit {
     this.router.navigate(['/dashboard/idees/creer']);
   }
 
-  duplicateIdea() {
-
-  }
-
   async takeIt(id: number) {
     const giftStatut: GiftStatutDTO = {
       status: GiftStatus.PRIS
@@ -106,5 +126,29 @@ export class MyGiftsIdeasComponent implements OnInit {
     } else {
       this.errorService.showError(result.message);
     }
+  }
+
+  async confirmDuplication() {
+
+    if(!this.selectedDestId){
+      this.showDuplicationModal = false;
+      this.errorService.showError("Un destinataire est obligatoire.")
+    }
+    const result = await this.ideaService.duplicateIdea(this.ideaId!, this.selectedDestId!);
+
+    if(result.success){
+      await this.loadIdeas()
+      this.toastr.success('Duplication confirmée 👍');
+      this.showDuplicationModal = false;
+      await this.router.navigate(['/dashboard/idees'])
+    } else {
+      this.showDuplicationModal = false;
+      this.errorService.showError(result.message);
+    }
+  }
+
+  async cancelDuplication() {
+    this.showDuplicationModal = false;
+    await this.router.navigate(['/dashboard/idees'])
   }
 }
