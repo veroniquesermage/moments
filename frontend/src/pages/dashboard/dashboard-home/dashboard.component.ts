@@ -47,6 +47,10 @@ export class DashboardComponent implements OnInit{
     this.router.navigate(['dashboard', 'cadeaux-suivis']);
   }
 
+  goToIdeeCadeaux(){
+    this.router.navigate(['dashboard', 'idees']);
+  }
+
   goToGestionGroupe() {
 
   }

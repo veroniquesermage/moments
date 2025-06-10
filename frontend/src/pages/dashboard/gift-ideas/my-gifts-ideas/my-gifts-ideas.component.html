@@ -1,0 +1,103 @@
+<div class="terminal">
+  <h2>> Vos idées de cadeaux</h2>
+
+  <section class="intro-bloc" aria-label="Introduction pour la page Idées de cadeaux pour les autres">
+  <p>> Enregistrez ici vos idées de cadeaux pour d'autres membres du groupe. </p>
+  <p class="sub-intro">Cliquez sur votre idée pour obtenir son détail et la gérer. </p>
+  </section>
+
+
+  <p class="actions-legend"> <em>> Actions rapides: 🔒 Changer la visibilité | 📄 Dupliquer l'idée | 🛒 Prendre le cadeau (si privé et disponible) </em> </p>
+
+  <table   aria-describedby="table-priorite-explication" class="gift-table">
+    <thead>
+    <tr>
+      <th scope="col">Destinataire</th>
+      <th scope="col">Nom</th>
+      <th scope="col" class="col-actions">Prix</th>
+      <th scope="col" class="col-actions">Privé</th>
+      <th scope="col" class="col-actions">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let gift of giftIdeas"
+        (click)="onRowClick(gift)"
+        (keydown.enter)="onRowClick(gift)"
+        (keydown.space)="onRowClick(gift)">
+      <td tabindex="0">{{ gift.gift.destinataire.name }}</td>
+      <td>{{ gift.gift.nom }}</td>
+      <td class="col-actions">{{ gift.gift.prix }} €</td>
+      <td
+        class="col-actions">
+        {{ gift.giftIdea.visibilite ? 'NON' : 'OUI' }}
+      </td>
+      <td class="emoji-action col-actions">
+        <button type="button" class="emoji-button"
+                title="Modifier la visibilité"
+                attr.aria-label="Modifier la visibilité de {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="changeVisibility(gift.giftIdea.visibilite, gift.giftIdea.id); $event.stopPropagation()">🔒</span>
+        </button>
+        <button type="button" class="emoji-button"
+                title="Dupliquer l'idée"
+                attr.aria-label="Dupliquer l'idée {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="duplicateIdea(gift.giftIdea.id); $event.stopPropagation()">📄</span>
+        </button>
+        <button *ngIf="!gift.giftIdea.visibilite && gift.gift.statut == 'DISPONIBLE' "
+          type="button" class="emoji-button"
+                title="Prendre le cadeau"
+                attr.aria-label="Prendre le cadeau {{ gift.gift.nom }}">
+          <span class="emoji"
+                (click)="takeIt(gift.gift.id!); $event.stopPropagation()">🛒</span>
+        </button>
+
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="options">
+    <button (click)="goToAjout()">[+] Ajouter une idée</button>
+    <button (click)="return()">↩ Retour au Menu</button>
+  </div>
+</div>
+  <ng-container *ngIf="showDuplicationModal">
+    <div class="modal-overlay">
+      <div
+        class="modal-box terminal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title">
+
+        <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
+        <p>Pour qui souhaitez-vous dupliquer ce cadeau ?</p>
+
+        <select id="selectDest" [(ngModel)]="selectedDestId">
+          <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
+          <option *ngFor="let user of allUsers" [value]="user.id">{{ user.name }}</option>
+        </select>
+
+
+        <div class="modal-actions">
+          <button (click)="confirmDuplication()">Valider</button>
+          <button (click)="cancelDuplication()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+
+  <app-terminal-modal
+    *ngIf="showModal"
+    [message]="message"
+    [actions]="modalActions"
+    (actionClicked)="handleClicked($event)">
+  </app-terminal-modal>
+

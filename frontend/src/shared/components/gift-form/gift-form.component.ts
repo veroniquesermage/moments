@@ -37,7 +37,6 @@ export class GiftFormComponent implements OnChanges{
     }
   }
 
-
   private createGiftForm(gift: GiftPublicResponse | undefined): FormGroup {
     return new FormGroup({
       id: new FormControl(gift?.id ?? ''),

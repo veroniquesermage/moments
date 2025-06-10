@@ -4,8 +4,8 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
-    cdkTrapFocus
-  >
+    cdkTrapFocus>
+
     <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
 
     <p [innerHTML]="message"></p>
@@ -15,8 +15,7 @@
         *ngFor="let action of actions"
         (click)="actionClicked.emit(action.eventName)"
         [ngClass]="action.style || 'primary'"
-        #focusBtn
-      >
+        #focusBtn>
         {{ action.label }}
       </button>
     </div>

@@ -1,7 +1,7 @@
 
 export interface GiftDeliveryUpdate{
-  lieuLivraison?: string
-  dateLivraison?: string
+  lieuLivraison: string | null
+  dateLivraison: string | null
   prixReel?: number
   recu?: boolean
 

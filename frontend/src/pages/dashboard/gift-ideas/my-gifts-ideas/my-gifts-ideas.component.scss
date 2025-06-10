@@ -1,0 +1,115 @@
+.gift-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+
+  th, td {
+    border: 1px solid #fff;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #111;
+    color: #fff;
+  }
+
+  th.col-actions,
+  td.col-actions {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  tr:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+
+  tr:hover {
+    background-color: #696969;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      padding: 0.5rem;
+    }
+    .emoji {
+      font-size: 1rem; // ajuste ici la taille de l’emoji
+      line-height: 1;
+    }
+  }
+}
+
+.gift-table td:focus {
+  outline: 2px dashed #fff;
+  background-color: #696969;
+}
+
+.emoji-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  vertical-align: middle;
+
+  &:hover {
+    background-color: #333; // ou rien, à toi de voir
+  }
+}
+
+.emoji {
+  font-size: 1.4rem; // ajuste ici la taille de l’emoji
+  line-height: 1;
+}
+
+.actions-legend {
+  margin-bottom: 0.75rem;
+  font-style: italic;
+  color: #aaa;
+}
+
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.75); // Si tu veux un fond sombre temporaire
+  z-index: 10;
+}
+
+
+.modal-box {
+  background-color: #111;
+  border: 2px solid #fff;
+  padding: 2rem;
+  min-width: 250px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
