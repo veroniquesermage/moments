@@ -104,7 +104,7 @@ async def verify_eligibility(
     return await GiftService.verify_eligibility(db, giftId, current_user, action)
 
 @router.patch("/{giftId}/recu", response_model=GiftDetailResponse)
-async def verify_eligibility(
+async def set_gift_delivery(
         giftId: int,
         payload: RecuPayload,
         db: AsyncSession = Depends(get_db),
