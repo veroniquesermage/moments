@@ -11,6 +11,7 @@ export const environment = {
     rejoindre: '/rejoindre',
     cadeaux: '/cadeaux',
     utilisateur: '/utilisateurs',
-    partage: '/partage'
+    partage: '/partage',
+    idees: '/idees'
   }
 };

@@ -14,8 +14,6 @@ import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 })
 export class UserGiftsComponent implements OnInit{
 
-
-
   constructor(public giftService: GiftService,
               public router : Router) {
   }
