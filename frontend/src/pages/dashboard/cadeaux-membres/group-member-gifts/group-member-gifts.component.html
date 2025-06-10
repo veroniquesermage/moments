@@ -25,16 +25,25 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let gift of giftPublic" (click)="onGiftClicked(gift)"
-        [class.gris]="gift.statut === 'PRIS'"
-        [attr.aria-label]="getAriaLabel(gift)">
-      <td *ngFor="let column of displayedColumns"
-          tabindex="0"
-          (keydown.enter)="onGiftClicked(gift)"
-          (keydown.space)="onGiftClicked(gift)">
-        {{ getGiftValue(gift, column) }}
-      </td>
-    </tr>
+      <ng-container *ngFor="let gift of giftPublic; let i = index">
+        <!-- Insère le sous-titre si c’est le premier 'proposé' -->
+        <tr *ngIf="gift.priorite === 0 && (i === 0 || giftPublic[i-1].priorite !== 0)">
+          <td colspan="5" class="separator-row">
+            > Idées proposées par les autres membres
+          </td>
+        </tr>
+
+        <tr (click)="onGiftClicked(gift)"
+            [class.gris]="gift.statut === 'PRIS'"
+            [attr.aria-label]="getAriaLabel(gift)">
+          <td *ngFor="let column of displayedColumns"
+              tabindex="0"
+              (keydown.enter)="onGiftClicked(gift)"
+              (keydown.space)="onGiftClicked(gift)">
+            {{ getGiftValue(gift, column) }}
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 
