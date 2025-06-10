@@ -1,6 +1,12 @@
 <div class="terminal" style="position: relative;">
   <h2>> Détail du cadeau</h2>
 
+  <app-gift-idea
+    *ngIf="giftDetail.ideas && context != 'mes-cadeaux'"
+    [giftDetail]="giftDetail"
+    [currentUserId]="currentUserId!"
+    />
+
   <app-gift-header
     [gift]="giftDetail.gift"
   />
@@ -31,6 +37,8 @@
     (manageDeliveryRequested)="gererLivraison()"
     (manageSharingRequested)="gererPartage()"
     (backRequested)="retour()"
+    (editIdeaRequested)="modifierIdee()"
+    (deleteIdeaRequested)="deleteIdea()"
   />
 
   <!-- Confirmation -->

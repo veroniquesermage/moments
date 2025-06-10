@@ -57,7 +57,6 @@ export class GiftService {
     } finally {
       this.isLoading.set(false);
     }
-
   }
 
   async getVisibleGiftsForMember(userId: number): Promise<ApiResponse<GiftPublicResponse[]>> {
@@ -75,7 +74,6 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux d\'un membre', error);
       return {success: false, message: "❌ Impossible de créer le cadeau."};
     }
-
   }
 
   async createGift(gift: GiftCreate): Promise<ApiResponse<GiftResponse>> {
@@ -84,8 +82,6 @@ export class GiftService {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
-      await this.fetchGifts();
-
       return {success: true, data: giftResponse};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
@@ -111,7 +107,6 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la récupération du cadeau', error);
       return {success: false, message: "❌ Impossible de récupérer le cadeau."};
     }
-
   }
 
   async deleteGift(id: number): Promise<ApiResponse<void>> {
@@ -130,7 +125,6 @@ export class GiftService {
       console.error('[GiftService] Erreur lors de la suppression du cadeau', error);
       return {success: false, message: "❌ Impossible de supprimer le cadeau."};
     }
-
   }
 
   async updateGift(gift: GiftUpdate): Promise<ApiResponse<GiftResponse>> {
@@ -184,7 +178,6 @@ export class GiftService {
       console.error('Erreur pendant la vérification d’éligibilité', error);
       return {success: false, message: "Erreur de communication avec le serveur"};
     }
-
   }
 
   async changeStatusGift(id: number, status: GiftStatutDTO): Promise<ApiResponse<GiftResponse>> {

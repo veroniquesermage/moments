@@ -12,15 +12,21 @@ import {
 } from 'src/pages/dashboard/suivi-cadeaux-reserves/my-gifts-follow-up/my-gifts-follow-up.component';
 import {GiftDeliverComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-deliver/gift-deliver.component';
 import {GiftSharingComponent} from 'src/pages/dashboard/sharing/gift-sharing/gift-sharing.component';
+import {MyGiftsIdeasComponent} from 'src/pages/dashboard/gift-ideas/my-gifts-ideas/my-gifts-ideas.component';
+import {IdeasCreateComponent} from 'src/pages/dashboard/gift-ideas/ideas-create/ideas-create.component';
+import {IdeasUpdateComponent} from 'src/pages/dashboard/gift-ideas/ideas-update/ideas-update.component';
 
 export const dashboardRoutes: Routes = [
-  {path: '', component: DashboardComponent},
-  {path: 'mes-cadeaux', component: UserGiftsComponent},
-  {path: 'mes-cadeaux/creer', component: GiftCreateComponent},
+  { path: '', component: DashboardComponent},
+  { path: 'mes-cadeaux', component: UserGiftsComponent},
+  { path: 'mes-cadeaux/creer', component: GiftCreateComponent},
   { path: 'mes-cadeaux/modifier/:id', component: GiftUpdateComponent, data: { context: 'mes-cadeaux' } },
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
   { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
   { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},
   { path: 'partage/:id', component: GiftSharingComponent},
   { path: 'cadeau/:id', component: GiftDetailPageComponent },
+  { path: 'idees', component: MyGiftsIdeasComponent },
+  { path: 'idees/creer', component: IdeasCreateComponent},
+  { path: 'idees/modifier/:id', component: IdeasUpdateComponent},
 ];
