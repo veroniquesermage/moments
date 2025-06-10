@@ -304,10 +304,10 @@ class GiftService:
                 result.gift_delivery.lieu_livraison = None
                 result.gift_delivery.date_livraison = None
                 result.gift_delivery.prix_reel = None
+                result.gift_delivery.recu = False
             result.reserve_par_id = None
             result.reserve_par = None
             result.date_reservation = None
-            result.gift_delivery.recu = False
         elif gift_status.status == GiftStatusEnum.PARTAGE:
             # ne rien toucher de plus que le statut
             logger.debug("Passage en PARTAGE, pas de changement de réservation.")
