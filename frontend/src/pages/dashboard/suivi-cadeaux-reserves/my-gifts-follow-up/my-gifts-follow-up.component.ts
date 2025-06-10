@@ -77,9 +77,14 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   }
 
   get totalPrixReel(): number {
-    return this.giftsFollowed
-      .map(g => g.delivery?.prixReel ?? 0)
-      .reduce((acc, val) => acc + val, 0);
+    return this.giftsFollowed.map(g => {
+    if(g.partage){
+      return g.partage.montant;
+    }
+    return g.delivery?.prixReel ?? 0;
+  })
+    .reduce((acc, val) => acc + val, 0);
+
   }
 
   onGiftClicked(gift: GiftFollowed): void {
