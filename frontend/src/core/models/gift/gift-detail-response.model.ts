@@ -9,7 +9,7 @@ export interface GiftDetailResponse {
   gift: GiftPublicResponse
   delivery?: GiftDelivery
   partage?: GiftShared[]
-  idea?: GiftIdea;
+  ideas?: GiftIdea;
   estPartage: boolean
   droitsUtilisateur: RoleUser
 }

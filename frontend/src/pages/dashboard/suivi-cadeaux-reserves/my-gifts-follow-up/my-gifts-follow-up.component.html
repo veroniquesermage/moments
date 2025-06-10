@@ -1,9 +1,12 @@
 <div class="terminal">
   <h2>> Les listes des cadeaux réservés ou pris</h2>
+
+  <section class="intro-bloc" aria-label="Introduction pour la page Listes des cadeaux réservés ou pris">
   <p>> Cliquez sur un cadeau pour obtenir son détail et le gérer</p>
   <p *ngIf="isPortrait" class="orientation-hint">
     > 📱 Pour plus de fonctionnalités, passez en mode paysage.
   </p>
+  </section>
 
   <p class="total">> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
     }} €</p>

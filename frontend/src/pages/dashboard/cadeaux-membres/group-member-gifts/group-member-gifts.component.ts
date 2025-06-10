@@ -76,7 +76,8 @@ export class GroupMemberGiftsComponent implements OnInit {
     }
     const result = await this.giftService.getVisibleGiftsForMember(user!.id);
     if (result.success) {
-      this.giftPublic = result.data;
+      this.giftPublic = [ ...result.data.filter(gift => gift.priorite !==0),
+                          ...result.data.filter(gift => gift.priorite === 0)];
     }else {
       this.errorService.showError("❌ Impossible d\'afficher la liste de ce membre. Veuillez réessayer plus tard.");
     }

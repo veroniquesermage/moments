@@ -31,8 +31,9 @@ export class GiftActionsComponent {
   @Output() manageDeliveryRequested = new EventEmitter<void>();
   @Output() manageSharingRequested = new EventEmitter<void>();
   @Output() backRequested = new EventEmitter<void>();
+  @Output() editIdeaRequested = new EventEmitter<void>();
+  @Output() deleteIdeaRequested = new EventEmitter<void>();
 
-  protected readonly RoleUser = RoleUser;
   protected readonly GiftStatus = GiftStatus;
 
   constructor(public giftService: GiftService,
@@ -61,6 +62,14 @@ export class GiftActionsComponent {
 
   get canDelete(): boolean {
     return this.context === 'mes-cadeaux' && this.role === RoleUser.CREATEUR;
+  }
+
+  get canEditIdea(): boolean {
+    return this.context === 'idee-cadeau';
+  }
+
+  get canDeleteIdea(): boolean {
+    return this.context === 'idee-cadeau';
   }
 
   get canReserve(): boolean {
