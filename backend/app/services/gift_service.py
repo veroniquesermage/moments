@@ -361,7 +361,8 @@ class GiftService:
             .options(
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery))
+                selectinload(Gift.gift_delivery),
+                selectinload(Gift.gift_idea))
         )
         gifts = result_gift.scalars().all()
 
