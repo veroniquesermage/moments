@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="feat(modification detail) : modification du detail et ajout des partages et role_user sur les cadeaux">
-      <change afterPath="$PROJECT_DIR$/app/routes/sharing_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/services/sharing_service.py" afterDir="false" />
+    <list default="true" id="98adb516-b20b-4fda-9f55-2e1943e3aa5b" name="Changes" comment="tests integration sharing_route">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/enum/role_utilisateur_enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/enum/role_utilisateur_enum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/gift_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/gift_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/gift_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/gift_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,10 +24,11 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="tests" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -61,32 +57,42 @@
   "keyToString": {
     "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests for test_group_route.test_get_group_not_found.executor": "Run",
+    "Python tests.Python tests for test_group_service.test_create_group_should_create_group.executor": "Run",
+    "Python tests.Python tests for test_group_service.test_create_group_should_fail_if_name_exists.executor": "Run",
+    "Python tests.Python tests for test_group_service.test_create_group_should_store_valid_group.executor": "Run",
+    "Python tests.Python tests for test_group_service.test_create_group_success.executor": "Run",
     "Python tests.Python tests for test_main.test_app_exists.executor": "Run",
     "Python tests.Python tests for test_router.test_router_exists.executor": "Run",
+    "Python tests.Python tests for test_services.test_group_creation_and_join.executor": "Run",
     "Python tests.Python tests for test_user.test_user_model_fields.executor": "Run",
+    "Python tests.Python tests in tests.executor": "Run",
     "Python.Run FastAPI debug.executor": "Run",
     "Python.Run FastAPI.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "gestion-cadaux-partages",
+    "git-widget-placeholder": "idees__cadeaux",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Dev/projects/list2wish-back",
+    "last_opened_file_path": "C:/Dev/projects/list2wish/list2wish-back",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
+      "postgresql",
       "sqlite"
     ]
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Dev\projects\list2wish\list2wish-back" />
+      <recent name="C:\Dev\projects\list2wish-back\app\schemas\gift" />
       <recent name="C:\Dev\projects\list2wish-back\app\core\enum" />
       <recent name="C:\Dev\projects\list2wish-back\app\schemas\auth" />
       <recent name="C:\Dev\projects\liste2Wish-back\app\services\auth" />
@@ -102,8 +108,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (list2wish-back)" />
-      <option name="WORKING_DIRECTORY" value="C:\Dev\projects\list2wish-back" />
+      <option name="SDK_NAME" value="Python 3.13 virtualenv at C:\Dev\projects\list2wish\list2wish-back\.venv" />
+      <option name="WORKING_DIRECTORY" value="C:\Dev\projects\list2wish\list2wish-back" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -139,6 +145,22 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_group_route.test_get_group_not_found" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_group_route.test_get_group_not_found&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <configuration name="Python tests for test_main.test_app_exists" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
@@ -189,18 +211,38 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests in tests" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="liste2Wish-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.Run FastAPI debug" />
       <item itemvalue="Python.Run FastAPI" />
+      <item itemvalue="Python tests.Python tests for test_group_route.test_get_group_not_found" />
       <item itemvalue="Python tests.Python tests for test_main.test_app_exists" />
       <item itemvalue="Python tests.Python tests for test_router.test_router_exists" />
       <item itemvalue="Python tests.Python tests for test_user.test_user_model_fields" />
+      <item itemvalue="Python tests.Python tests in tests" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests in tests" />
         <item itemvalue="Python tests.Python tests for test_user.test_user_model_fields" />
         <item itemvalue="Python tests.Python tests for test_router.test_router_exists" />
         <item itemvalue="Python tests.Python tests for test_main.test_app_exists" />
+        <item itemvalue="Python tests.Python tests for test_group_route.test_get_group_not_found" />
       </list>
     </recent_temporary>
   </component>
@@ -236,6 +278,18 @@
       <workItem from="1748194587059" duration="8174000" />
       <workItem from="1748202876538" duration="7891000" />
       <workItem from="1748272736054" duration="17185000" />
+      <workItem from="1748503494896" duration="4949000" />
+      <workItem from="1748524119582" duration="11725000" />
+      <workItem from="1748581376747" duration="2034000" />
+      <workItem from="1748629947145" duration="3172000" />
+      <workItem from="1748674186645" duration="10101000" />
+      <workItem from="1748763244164" duration="2047000" />
+      <workItem from="1748769515027" duration="20402000" />
+      <workItem from="1748858100011" duration="11435000" />
+      <workItem from="1748938502229" duration="30151000" />
+      <workItem from="1749142241727" duration="6347000" />
+      <workItem from="1749194616063" duration="25610000" />
+      <workItem from="1749368364803" duration="7503000" />
     </task>
     <task id="LOCAL-00001" summary="feat(migration backend) : ajout group et premiere requete gift">
       <option name="closed" value="true" />
@@ -269,7 +323,135 @@
       <option name="project" value="LOCAL" />
       <updated>1748187359689</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Gestion de la priorité dans mes-cadeaux">
+      <option name="closed" value="true" />
+      <created>1748461993571</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1748461993571</updated>
+    </task>
+    <task id="LOCAL-00006" summary="modification de l'appel pour les cadeaux suivis limités aux utilisateurs du groupe">
+      <option name="closed" value="true" />
+      <created>1748536969591</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1748536969591</updated>
+    </task>
+    <task id="LOCAL-00007" summary="modification de l'appel pour les cadeaux suivis limités aux utilisateurs du groupe">
+      <option name="closed" value="true" />
+      <created>1748543674017</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1748543674017</updated>
+    </task>
+    <task id="LOCAL-00008" summary="refonte de débile">
+      <option name="closed" value="true" />
+      <created>1748787403530</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1748787403530</updated>
+    </task>
+    <task id="LOCAL-00009" summary="ajout du docker-compose.yml">
+      <option name="closed" value="true" />
+      <created>1748792095280</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1748792095281</updated>
+    </task>
+    <task id="LOCAL-00010" summary="modification de la date de livraison + gestion cadeaux suivis vide">
+      <option name="closed" value="true" />
+      <created>1748870493406</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1748870493406</updated>
+    </task>
+    <task id="LOCAL-00011" summary="ajout d'une endpoint de récupération d'un groupe par son id">
+      <option name="closed" value="true" />
+      <created>1748892475563</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1748892475563</updated>
+    </task>
+    <task id="LOCAL-00012" summary="ajout de la récupération et de la création d'une idée de cadeau">
+      <option name="closed" value="true" />
+      <created>1749196350906</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1749196350906</updated>
+    </task>
+    <task id="LOCAL-00013" summary="AGENTS.md">
+      <option name="closed" value="true" />
+      <created>1749220921941</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1749220921941</updated>
+    </task>
+    <task id="LOCAL-00014" summary="AGENTS.md">
+      <option name="closed" value="true" />
+      <created>1749221432643</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1749221432643</updated>
+    </task>
+    <task id="LOCAL-00015" summary="tests du groupService">
+      <option name="closed" value="true" />
+      <created>1749285677418</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749285677418</updated>
+    </task>
+    <task id="LOCAL-00016" summary="tests du sharingService">
+      <option name="closed" value="true" />
+      <created>1749286189078</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749286189078</updated>
+    </task>
+    <task id="LOCAL-00017" summary="tests du giftService">
+      <option name="closed" value="true" />
+      <created>1749291872713</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749291872713</updated>
+    </task>
+    <task id="LOCAL-00018" summary="tests du code_generator">
+      <option name="closed" value="true" />
+      <created>1749293441697</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1749293441697</updated>
+    </task>
+    <task id="LOCAL-00019" summary="tests integration group_route">
+      <option name="closed" value="true" />
+      <created>1749294356424</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1749294356424</updated>
+    </task>
+    <task id="LOCAL-00020" summary="tests integration sharing_route">
+      <option name="closed" value="true" />
+      <created>1749294911243</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1749294911243</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -280,7 +462,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -290,15 +484,44 @@
     <MESSAGE value="feat(migration backend) : ajout group et premiere requete gift" />
     <MESSAGE value="feat(migration backend) : ajout des requêtes gift" />
     <MESSAGE value="feat(modification detail) : modification du detail et ajout des partages et role_user sur les cadeaux" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(modification detail) : modification du detail et ajout des partages et role_user sur les cadeaux" />
+    <MESSAGE value="Gestion de la priorité dans mes-cadeaux" />
+    <MESSAGE value="modification de l'appel pour les cadeaux suivis limités aux utilisateurs du groupe" />
+    <MESSAGE value="refonte de débile" />
+    <MESSAGE value="ajout du docker-compose.yml" />
+    <MESSAGE value="modification de la date de livraison + gestion cadeaux suivis vide" />
+    <MESSAGE value="ajout d'une endpoint de récupération d'un groupe par son id" />
+    <MESSAGE value="ajout de la récupération et de la création d'une idée de cadeau" />
+    <MESSAGE value="AGENTS.md" />
+    <MESSAGE value="tests du groupService" />
+    <MESSAGE value="tests du sharingService" />
+    <MESSAGE value="tests du giftService" />
+    <MESSAGE value="tests du code_generator" />
+    <MESSAGE value="tests integration group_route" />
+    <MESSAGE value="tests integration sharing_route" />
+    <option name="LAST_COMMIT_MESSAGE" value="tests integration sharing_route" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/routes/gift_route.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="5" />
+          <line>76</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/main.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/main.py</url>
+          <line>44</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/services/gift_service.py</url>
+          <line>156</line>
+          <option name="timeStamp" value="45" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -313,7 +536,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/liste2Wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747579428908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\liste2Wish-back" />
     <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI.coverage" NAME="Run FastAPI Coverage Results" MODIFIED="1747730273145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
-    <SUITE FILE_PATH="coverage/list2wish_back$.coverage" NAME=" Coverage Results" MODIFIED="1747822661535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/models" />
-    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI_debug.coverage" NAME="Run FastAPI debug Coverage Results" MODIFIED="1748368696588" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish-back" />
+    <SUITE FILE_PATH="coverage/list2wish_back$.coverage" NAME=" Coverage Results" MODIFIED="1749294783984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/list2wish_back$Run_FastAPI_debug.coverage" NAME="Run FastAPI debug Coverage Results" MODIFIED="1749369392920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Dev\projects\list2wish\list2wish-back" />
   </component>
 </project>

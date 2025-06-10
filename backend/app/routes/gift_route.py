@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -74,15 +74,16 @@ async def update_gift(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) -> GiftResponse:
 
-    return await GiftService.update_gift(db, giftId, giftUpdate)
+    return await GiftService.update_gift(db, current_user, giftId, giftUpdate)
 
-@router.delete("/{giftId}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{giftId}", status_code=204)
 async def delete_gift(
         giftId: int,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ):
 
     await GiftService.delete_gift(db, giftId, current_user)
+    return Response(status_code=204)
 
 @router.put("/{giftId}/livraison", response_model=GiftDeliveryUpdate)
 async def update_gift_delivery(
@@ -103,7 +104,7 @@ async def verify_eligibility(
     return await GiftService.verify_eligibility(db, giftId, current_user, action)
 
 @router.patch("/{giftId}/recu", response_model=GiftDetailResponse)
-async def verify_eligibility(
+async def set_gift_delivery(
         giftId: int,
         payload: RecuPayload,
         db: AsyncSession = Depends(get_db),
