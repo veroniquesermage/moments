@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String
+from datetime import datetime, UTC
+
+from sqlalchemy import Column, Integer, String, Date, DateTime
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -10,6 +12,7 @@ class User(Base):
     email = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
     google_id = Column(String(255), nullable=False)
+    date_creation = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
 
     groupes = relationship("UserGroup", back_populates="utilisateur")
     cadeaux_crees = relationship("Gift", foreign_keys="Gift.destinataire_id", back_populates="destinataire")
