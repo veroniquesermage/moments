@@ -1,6 +1,6 @@
-from sqlalchemy import Column, BigInteger, ForeignKey, String, DateTime, CheckConstraint, Integer
+from sqlalchemy import Column, ForeignKey, String, DateTime, CheckConstraint, Integer
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, UTC
 from app.database import Base
 
 
@@ -10,7 +10,8 @@ class UserGroup(Base):
     utilisateur_id = Column(Integer, ForeignKey("utilisateur.id"), primary_key=True)
     groupe_id = Column(Integer, ForeignKey("groupe.id"), primary_key=True)
     role = Column(String(50), nullable=False)
-    date_ajout = Column(DateTime, default=datetime.utcnow)
+    surnom = Column(String(255), nullable=True)
+    date_ajout = Column(DateTime, default=lambda: datetime.now(UTC))
 
     __table_args__ = (
         CheckConstraint("role IN ('ADMIN', 'MEMBRE', 'INVITE')", name="check_role"),
