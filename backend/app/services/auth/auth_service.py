@@ -18,7 +18,8 @@ async def authenticate_google_user(request: GoogleAuthRequest, db: AsyncSession)
     user = await get_or_create_user(
         db=db,
         email=payload["email"],
-        name=payload["name"],
+        prenom=payload["given_name"],
+        nom=payload["family_name"],
         google_id=payload["sub"]
     )
 
