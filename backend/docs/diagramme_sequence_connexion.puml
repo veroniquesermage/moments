@@ -1,0 +1,36 @@
+@startuml
+actor Utilisateur as User
+participant "Frontend" as FE
+participant "Backend" as BE
+participant "Google Auth" as Google
+database "Base de données" as DB
+
+== Connexion ==
+
+User -> FE : Se connecte via Google
+FE -> Google : Demande un id_token
+Google --> FE : Renvoie id_token
+
+FE -> BE : POST /auth/login {"mode": "google", "id_token": "..."}
+
+BE -> Google : Vérifie id_token
+Google --> BE : OK (identité vérifiée)
+
+BE -> DB : Cherche utilisateur via email
+DB --> BE : Renvoie user ou None
+
+alt Utilisateur inconnu
+    BE -> DB : Crée un nouvel utilisateur
+end
+
+BE -> BE : Génère un JWT maison (user_id, exp, etc.)
+BE --> FE : Renvoie token maison
+
+== Utilisation du token ==
+
+FE -> BE : Appels API avec Authorization: Bearer <JWT maison>
+BE -> BE : Décode JWT
+BE -> DB : Charge user_id depuis JWT
+DB --> BE : Données utilisateur
+BE --> FE : Réponse de l'API
+@enduml
