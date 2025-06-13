@@ -5,13 +5,13 @@
   <hr class="block-separator"/>
 
   <p *ngIf="giftDetailResponse.gift.statut !== GiftStatus.DISPONIBLE">
-    > {{ getLabelPreneur(giftDetailResponse.gift.statut) }} : {{ giftDetailResponse.gift.reservePar?.name }}</p>
+    > {{ getLabelPreneur(giftDetailResponse.gift.statut) }} : {{ giftDetailResponse.gift.reservePar?.prenom }}</p>
 
   <ng-container *ngIf="context === 'suivi'">
     <ng-container *ngIf="isPreneur">
       <p class="legend-icon"> Cliquez sur les icônes pour changer le statut.</p>
       <p *ngFor="let share of partage">
-        > {{ share.participant.name }} : {{ share.montant }} €
+        > {{ share.participant.prenom }} : {{ share.montant }} €
         <span
           class="emoji-action"
           role="button"

@@ -1,7 +1,8 @@
 export interface User {
   id: number;
   email: string;
-  name: string;
-  googleId?: string; // facultatif, si jamais tu l’exposes
+  prenom: string;
+  nom: string;
+  googleId?: string;
   dateCreation: string
 }
