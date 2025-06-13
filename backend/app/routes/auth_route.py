@@ -11,5 +11,5 @@ router = APIRouter(prefix="/api/auth", tags=["Authentification"])
 async def authenticate_with_google(
     request: GoogleAuthRequest,
     db: AsyncSession = Depends(get_db)
-):
+) -> AuthResponse:
     return await auth_service.authenticate_google_user(request, db)
