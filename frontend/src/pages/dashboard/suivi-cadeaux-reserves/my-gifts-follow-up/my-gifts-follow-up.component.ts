@@ -32,14 +32,14 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
 
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
-    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.prenom || '—' },
     { key: 'nom', label: 'Nom' },
     {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     { key: 'statut', label: 'Statut' }
   ];
 
   readonly displayedColumnsDesktop:  ColumnDefinition[] = [
-    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.name || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.prenom || '—' },
     {key: 'nom', label: 'Nom'},
     {key: 'magasin', label: 'Magasin'},
     {key: 'quantite', label: 'Quantité'},

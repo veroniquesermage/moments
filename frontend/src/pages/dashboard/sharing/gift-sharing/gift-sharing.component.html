@@ -13,14 +13,14 @@
   </thead>
   <tbody>
   <tr *ngFor="let partage of partages; let i = index">
-    <td>{{ partage.participant.name }}</td>
+    <td>{{ partage.participant.prenom }}</td>
     <td>
       <input type="number" [(ngModel)]="partages![i].montant" />
     </td>
     <td>
       <button class="test-align"
               (click)="supprimerLigne(i)"
-              attr.aria-label="Enlever {{partage.participant.name}} des participants"
+              attr.aria-label="Enlever {{partage.participant.prenom}} des participants"
       >🗑️</button>
     </td>
   </tr>
@@ -29,7 +29,7 @@
       <select [(ngModel)]="draft.participant">
         <option [ngValue]="null">choisir</option>
         <option *ngFor="let membre of membresDisponibles" [ngValue]="membre">
-          {{ membre.name }}
+          {{ membre.prenom }}
         </option>
       </select>
     </td>
@@ -39,7 +39,7 @@
     <td>
       <button class="test-align"
               (click)="supprimerDraft(i)"
-              attr.aria-label="Enlever {{draft.participant?.name}} des participants"
+              attr.aria-label="Enlever {{draft.participant?.prenom}} des participants"
       >🗑️</button>
     </td>
   </tr>

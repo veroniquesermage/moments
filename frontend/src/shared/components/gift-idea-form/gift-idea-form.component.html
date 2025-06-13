@@ -3,13 +3,13 @@
 
     <label>Destinataire</label>
     <ng-container *ngIf="giftIdeasResponse?.gift?.id; else editableDestinataire">
-      <input type="text" [value]="giftIdeasResponse!.gift.destinataire.name" readonly />
+      <input type="text" [value]="giftIdeasResponse!.gift.destinataire.prenom" readonly />
     </ng-container>
 
     <ng-template #editableDestinataire>
       <select formControlName="destinataireId">
         <option *ngFor="let membre of membersGroup" [value]="membre.id">
-          {{ membre.name }}
+          {{ membre.prenom }}
         </option>
       </select>
     </ng-template>

@@ -24,7 +24,7 @@
         (click)="onRowClick(gift)"
         (keydown.enter)="onRowClick(gift)"
         (keydown.space)="onRowClick(gift)">
-      <td tabindex="0">{{ gift.gift.destinataire.name }}</td>
+      <td tabindex="0">{{ gift.gift.destinataire.prenom }}</td>
       <td>{{ gift.gift.nom }}</td>
       <td class="col-actions">{{ gift.gift.prix }} €</td>
       <td
@@ -75,7 +75,7 @@
 
         <select id="selectDest" [(ngModel)]="selectedDestId">
           <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
-          <option *ngFor="let user of allUsers" [value]="user.id">{{ user.name }}</option>
+          <option *ngFor="let user of allUsers" [value]="user.id">{{ user.prenom }}</option>
         </select>
 
 
