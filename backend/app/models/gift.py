@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, Enum, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, Enum, ForeignKey, DateTime, Index
 from sqlalchemy.orm import relationship
 
 from app.core.enum import GiftStatusEnum
@@ -31,6 +31,10 @@ class Gift(Base):
     gift_delivery = relationship("GiftDelivery", back_populates="gift", uselist=False, cascade="all, delete-orphan")
     partages = relationship("GiftShared", back_populates="cadeau")
 
-
+    __table_args__ = (
+        Index("ix_gift_utilisateur", "destinataire_id"),
+        Index("ix_gift_reserve_par", "reserve_par_id"),
+        Index("ix_gift_statut", "statut"),
+    )
 
 
