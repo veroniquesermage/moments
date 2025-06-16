@@ -101,7 +101,7 @@ export class IdeaService {
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
     });
   }
 }

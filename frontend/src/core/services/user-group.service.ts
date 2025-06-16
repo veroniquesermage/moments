@@ -55,7 +55,7 @@ export class UserGroupService {
   }
 
   async updateNickname(groupId: number, nickname: string): Promise<ApiResponse<any>> {
-    const url = `${this.apiUrl + environment.api.utilisateurGroupe}/${groupId}/surnom`;
+    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}/surnom`;
     try{
       await firstValueFrom(this.http.patch(url, {nickname}, {
         headers: this.getAuthHeaders(),
@@ -69,7 +69,7 @@ export class UserGroupService {
   }
 
   async deleteUserInGroup(groupId: number): Promise<ApiResponse<any>> {
-    const url = `${this.apiUrl + environment.api.utilisateurGroupe}/${groupId}`;
+    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}`;
     try{
       await firstValueFrom(this.http.delete(url, {
         headers: this.getAuthHeaders(),
@@ -84,7 +84,7 @@ export class UserGroupService {
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
     });
   }
 
