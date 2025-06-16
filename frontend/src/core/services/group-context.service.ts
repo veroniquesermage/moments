@@ -28,7 +28,7 @@ export class GroupContextService{
 
 
   getGroupId(): number {
-    const id = localStorage.getItem('activeGroupId');
+    const id = localStorage.getItem('app_kdo.activeGroupId');
     if (!id || isNaN(Number(id))) {
       this.router.navigate(['/onboarding']);
     }
@@ -40,7 +40,7 @@ export class GroupContextService{
       return await Promise.resolve(this.memberCache);
     }
 
-    const raw = localStorage.getItem('groupMembers');
+    const raw = localStorage.getItem('app_kdo.groupMembers');
     if (raw && !this.isMembersCacheTooOld()) {
       this.memberCache = JSON.parse(raw);
       return await Promise.resolve(this.memberCache!);
@@ -49,7 +49,7 @@ export class GroupContextService{
   }
 
   private isMembersCacheTooOld(): boolean {
-    const ts = localStorage.getItem('groupMembers_timestamp');
+    const ts = localStorage.getItem('app_kdo.groupMembers_timestamp');
     if (!ts) return true;
 
     const age = Date.now() - Number(ts);
@@ -69,8 +69,8 @@ export class GroupContextService{
 
     console.warn('[GroupContext] Échec du refresh des membres');
     this.memberCache = [];
-    localStorage.removeItem('groupMembers');
-    localStorage.removeItem('groupMembers_timestamp');
+    localStorage.removeItem('app_kdo.groupMembers');
+    localStorage.removeItem('app_kdo.groupMembers_timestamp');
     return [];
   }
 
