@@ -11,20 +11,18 @@ from app.core.logger import logger
 from app.core.message import *
 from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup
 from app.models.gift import Gift
-from app.schemas.gift import GiftIdeasSchema
-from app.schemas.gift.gift_followed import GiftFollowed
+from app.schemas.gift.eligibility_response import EligibilityResponse
+from app.schemas.gift.gift_create import GiftCreate
+from app.schemas.gift.gift_delivery_schema import GiftDeliverySchema
+from app.schemas.gift.gift_delivery_update import GiftDeliveryUpdate
 from app.schemas.gift.gift_detail_response import GiftDetailResponse
+from app.schemas.gift.gift_followed import GiftFollowed
+from app.schemas.gift.gift_priority import GiftPriority
 from app.schemas.gift.gift_public_response import GiftPublicResponse
 from app.schemas.gift.gift_response import GiftResponse
 from app.schemas.gift.gift_shared import GiftSharedSchema
-from app.schemas.gift.gift_delivery_schema import GiftDeliverySchema
-from app.schemas.gift.gift_delivery_update import GiftDeliveryUpdate
 from app.schemas.gift.gift_status import GiftStatus
-from app.schemas.gift.gift_create import GiftCreate
 from app.schemas.gift.gift_update import GiftUpdate
-from app.schemas.gift.gift_priority import GiftPriority
-from app.schemas.gift.eligibility_response import EligibilityResponse
-
 from app.services.sharing_service import SharingService
 
 

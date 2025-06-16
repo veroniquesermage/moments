@@ -10,6 +10,13 @@ from app.services import UserGroupService
 
 router = APIRouter(prefix="/utilisateurs", tags=["utilisateurs"])
 
+@router.get("/me", response_model=UserSchema)
+async def get_user_in_group(
+        current_user: User = Depends(get_current_user) ) -> UserSchema:
+
+    user: UserSchema = UserSchema.model_validate(current_user)
+    return user
+
 @router.get("/groupe/{groupId}", response_model=list[UserSchema])
 async def get_users(
         groupId: int,

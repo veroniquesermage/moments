@@ -83,7 +83,7 @@ async def delete_gift(
         current_user: User = Depends(get_current_user) ):
 
     await GiftService.delete_gift(db, giftId, current_user)
-    return Response(status_code=204)
+    return
 
 @router.put("/{giftId}/livraison", response_model=GiftDeliveryUpdate)
 async def update_gift_delivery(
