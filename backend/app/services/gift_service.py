@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from fastapi import HTTPException
@@ -312,7 +312,7 @@ class GiftService:
         else:
             # cas PRIS ou RÉSERVÉ
             result.reserve_par = current_user
-            result.date_reservation = datetime.now()
+            result.date_reservation = datetime.now(UTC)
 
         logger.debug("Attributs de gift : %s", vars(result))
 

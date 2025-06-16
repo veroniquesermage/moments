@@ -24,7 +24,7 @@ class Gift(Base):
     statut = Column(Enum(GiftStatusEnum), nullable=False)
     reserve_par_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=True)
     reserve_par = relationship("User", foreign_keys=[reserve_par_id], back_populates="cadeaux_reserves")
-    date_reservation = Column(DateTime, nullable=True)
+    date_reservation = Column(DateTime(timezone=True), nullable=True)
     gift_idea_id = Column(Integer, ForeignKey("idees_cadeaux.id"), nullable=True)
     gift_idea = relationship("GiftIdeas", back_populates="gift", uselist=False)
 
