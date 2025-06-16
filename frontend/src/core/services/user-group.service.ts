@@ -40,6 +40,47 @@ export class UserGroupService {
     }
   }
 
+  async getUser(): Promise<ApiResponse<User>> {
+    const url = `${this.apiUrl.replace(/\/$/, '')}/me`;
+    try {
+      const user = await firstValueFrom(this.http.get<User>(url, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: user};
+    } catch (error) {
+      console.error('[UserGroupService] Erreur lors de la récupération de l\'utilisateur', error);
+      return {success: false, message: "❌ Aucun membre trouvé."};
+    }
+  }
+
+  async updateNickname(groupId: number, nickname: string): Promise<ApiResponse<any>> {
+    const url = `${this.apiUrl + environment.api.utilisateurGroupe}/${groupId}/surnom`;
+    try{
+      await firstValueFrom(this.http.patch(url, {nickname}, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: 'ok'}
+    } catch (error){
+      console.error('[UserGroupService] Erreur lors de la mise à jour du surnom', error);
+      return {success: false, message: "❌ Erreur lors de la mise à jour du surnom."};
+    }
+  }
+
+  async deleteUserInGroup(groupId: number): Promise<ApiResponse<any>> {
+    const url = `${this.apiUrl + environment.api.utilisateurGroupe}/${groupId}`;
+    try{
+      await firstValueFrom(this.http.delete(url, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: 'ok'}
+    } catch (error){
+      console.error('[UserGroupService] Erreur lors de la suppression de l\'utilisateur dans le groupe', error);
+      return {success: false, message: "❌ Erreur lors de la suppression de l\'utilisateur dans le groupe."};
+    }
+  }
 
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({

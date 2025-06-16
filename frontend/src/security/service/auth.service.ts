@@ -66,7 +66,7 @@ export class AuthService {
       .then(data => {
         console.log('[Backend] Réponse reçue :', data);
         if (data?.token) {
-          localStorage.setItem('jwt', data.token);
+          localStorage.setItem('app_kdo.jwt', data.token);
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
         }
@@ -78,7 +78,12 @@ export class AuthService {
    * Déconnecte l'utilisateur
    */
   logout(): void {
-    localStorage.removeItem('jwt');
+    for (const key in localStorage) {
+      if (key.startsWith('app_kdo.')) {
+        localStorage.removeItem(key);
+      }
+    }
+    sessionStorage.removeItem('pkce_code_verifier');
     this.profile.set(null);
     this.isLoggedIn.set(false);
     this.router.navigateByUrl('/');

@@ -21,9 +21,9 @@ export class GroupContextService{
     }
 
     const safeId = Number(id);
-    localStorage.setItem('activeGroupId', safeId.toString());
-    localStorage.setItem('groupMembers', JSON.stringify(this.memberCache));
-    localStorage.setItem('groupMembers_timestamp', Date.now().toString());
+    localStorage.setItem('app_kdo.activeGroupId', safeId.toString());
+    localStorage.setItem('app_kdo.groupMembers', JSON.stringify(this.memberCache));
+    localStorage.setItem('app_kdo.groupMembers_timestamp', Date.now().toString());
   }
 
 
@@ -62,8 +62,8 @@ export class GroupContextService{
     const result = await this.userGroupService.fetchUserGroup(groupId);
     if (result.success) {
       this.memberCache = result.data;
-      localStorage.setItem('groupMembers', JSON.stringify(this.memberCache));
-      localStorage.setItem('groupMembers_timestamp', Date.now().toString());
+      localStorage.setItem('app_kdo.groupMembers', JSON.stringify(this.memberCache));
+      localStorage.setItem('app_kdo.groupMembers_timestamp', Date.now().toString());
       return this.memberCache;
     }
 
