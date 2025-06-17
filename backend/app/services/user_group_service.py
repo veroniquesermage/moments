@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, UserGroup
-from app.schemas import UserSchema
+from app.schemas import UserSchema, UserDisplaySchema
 
 
 class UserGroupService:
@@ -14,16 +14,28 @@ class UserGroupService:
     @staticmethod
     async def get_users(db: AsyncSession,
                         current_user: User,
-                        groupId: int) -> list[UserSchema]:
+                        groupId: int) -> list[UserDisplaySchema]:
+
         results = (await db.execute(
-            select(User)
-            .join(UserGroup, User.id == UserGroup.utilisateur_id)
-            .where(
-                UserGroup.groupe_id == groupId,
-                User.id != current_user.id
+            select(UserGroup)
+            .where(UserGroup.groupe_id == groupId,
+                   UserGroup.utilisateur_id != current_user.id)
+            .options(
+                selectinload(UserGroup.utilisateur),
+                selectinload(UserGroup.groupe)
             )
         )).scalars().all()
-        return [UserSchema.model_validate(result) for result in results]
+
+        user_display_schema = [
+            UserDisplaySchema(
+            id= result.utilisateur.id,
+            nom= result.utilisateur.nom,
+            prenom= result.utilisateur.prenom,
+            surnom= result.surnom if result.surnom else None
+            )
+            for result in results ]
+
+        return user_display_schema
 
     @staticmethod
     async def get_all_my_users(db: AsyncSession,

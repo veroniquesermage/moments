@@ -1,8 +1,7 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from app.core.enum.gift_action_enum import GiftActionEnum
 from app.core.logger import logger
