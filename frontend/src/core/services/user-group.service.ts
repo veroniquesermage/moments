@@ -4,6 +4,7 @@ import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
 import {User} from 'src/security/model/user.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 @Injectable({providedIn: 'root'})
 export class UserGroupService {
@@ -13,10 +14,10 @@ export class UserGroupService {
   constructor(private http: HttpClient,) {
   }
 
-  async fetchUserGroup(idGroup: number): Promise<ApiResponse<User[]>> {
+  async fetchUserGroup(idGroup: number): Promise<ApiResponse<UserDisplay[]>> {
     try {
       const url = `${this.apiUrl + environment.api.groupes}/${idGroup}`;
-      const users = await firstValueFrom(this.http.get<User[]>(url, {
+      const users = await firstValueFrom(this.http.get<UserDisplay[]>(url, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));

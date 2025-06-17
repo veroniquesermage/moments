@@ -2,8 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {UserGroupService} from 'src/core/services/user-group.service';
-import {User} from 'src/security/model/user.model';
-import {NgForOf, NgIf, TitleCasePipe} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
@@ -12,24 +11,25 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {
   RefreshGroupMembersComponent
 } from 'src/shared/components/refresh-group-members/refresh-group-members.component';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-group-member-gifts',
   standalone: true,
   imports: [
-    NgForOf,
-    NgIf,
+    CommonModule,
     TerminalModalComponent,
-    TitleCasePipe,
-    RefreshGroupMembersComponent
+    RefreshGroupMembersComponent,
+    DisplayNamePipe
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
 })
 export class GroupMemberGiftsComponent implements OnInit {
 
-  users: User[] | undefined = [];
-  selectedMember: User | undefined = undefined;
+  users: UserDisplay[] | undefined = [];
+  selectedMember: UserDisplay | undefined = undefined;
   giftPublic: GiftPublicResponse[] = []
 
   displayedColumns = [
@@ -68,7 +68,7 @@ export class GroupMemberGiftsComponent implements OnInit {
     this.router.navigate(['/dashboard']);
   }
 
-  async selectMember(user: User) {
+  async selectMember(user: UserDisplay) {
     this.selectedMember = user;
 
     if(!user.id){
@@ -92,4 +92,6 @@ export class GroupMemberGiftsComponent implements OnInit {
     const rawValue = (gift as any)[column.key];
     return column.formatFn ? column.formatFn(rawValue, gift) : rawValue;
   }
+
+  protected readonly DisplayNamePipe = DisplayNamePipe;
 }
