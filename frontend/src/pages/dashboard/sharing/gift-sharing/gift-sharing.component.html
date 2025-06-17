@@ -13,7 +13,7 @@
   </thead>
   <tbody>
   <tr *ngFor="let partage of partages; let i = index">
-    <td>{{ partage.participant.prenom }}</td>
+    <td>{{ partage.participant | displayName }}</td>
     <td>
       <input type="number" [(ngModel)]="partages![i].montant" />
     </td>
@@ -29,7 +29,7 @@
       <select [(ngModel)]="draft.participant">
         <option [ngValue]="null">choisir</option>
         <option *ngFor="let membre of membresDisponibles" [ngValue]="membre">
-          {{ membre.prenom }}
+          {{ membre | displayName }}
         </option>
       </select>
     </td>

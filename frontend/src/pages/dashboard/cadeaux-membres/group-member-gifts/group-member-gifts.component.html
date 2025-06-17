@@ -11,7 +11,7 @@
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
     >
-      {{ user.prenom }}
+      {{ user  | displayName }}
     </button>
   </div>
 

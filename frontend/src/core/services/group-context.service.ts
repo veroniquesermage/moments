@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {User} from 'src/security/model/user.model';
 import {UserGroupService} from 'src/core/services/user-group.service';
 import {Router} from '@angular/router';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 @Injectable({ providedIn: 'root' })
 export class GroupContextService{
 
-  memberCache: User[] | undefined = undefined;
+  memberCache: UserDisplay[] | undefined = undefined;
   constructor(private userGroupService: UserGroupService,
               private router: Router) {
   }
@@ -35,15 +35,15 @@ export class GroupContextService{
     return Number(id);
   }
 
-  async getGroupMembers(): Promise<User[]> {
+  async getGroupMembers(): Promise<UserDisplay[]> {
     if (this.memberCache && !this.isMembersCacheTooOld()) {
-      return await Promise.resolve(this.memberCache);
+      return this.memberCache;
     }
 
     const raw = localStorage.getItem('app_kdo.groupMembers');
     if (raw && !this.isMembersCacheTooOld()) {
       this.memberCache = JSON.parse(raw);
-      return await Promise.resolve(this.memberCache!);
+      return this.memberCache!;
     }
     return await this.refreshMembers();
   }
@@ -57,7 +57,7 @@ export class GroupContextService{
     return age > maxAge;
   }
 
-  async refreshMembers(): Promise<User[]> {
+  async refreshMembers(): Promise<UserDisplay[]> {
     const groupId = this.getGroupId();
     const result = await this.userGroupService.fetchUserGroup(groupId);
     if (result.success) {
