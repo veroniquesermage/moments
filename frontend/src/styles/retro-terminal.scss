@@ -86,8 +86,8 @@ button:focus {
 
 .command-list button {
   background: none;
-  color: white;
-  border: 1px solid white;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 0.5rem 1rem;
   font-family: monospace;
   cursor: pointer;
@@ -95,8 +95,8 @@ button:focus {
 }
 
 .command-list button:hover {
-  background: white;
-  color: black;
+  background: var(--color-border);
+  color: var(--color-bg);
 }
 
 
