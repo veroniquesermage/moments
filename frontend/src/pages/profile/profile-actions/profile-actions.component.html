@@ -8,7 +8,7 @@
     <label class="theme-select">
       Thème&nbsp;
       <select [value]="theme.current" (change)="theme.setTheme($any($event.target).value)">
-        <option *ngFor="let t of theme.availableThemes" [value]="t">{{ t }}</option>
+        <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
       </select>
     </label>
   </div>

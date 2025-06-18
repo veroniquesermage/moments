@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {ThemeService} from 'src/core/services/theme.service';
+import {ThemeService, Theme} from 'src/core/services/theme.service';
 
 @Component({
   selector: 'app-profile-actions',
@@ -13,6 +13,13 @@ import {ThemeService} from 'src/core/services/theme.service';
 export class ProfileActionsComponent {
 
   constructor(private router: Router, public theme: ThemeService) {
+  }
+
+  get themes(): Theme[] {
+    return [
+      this.theme.current,
+      ...this.theme.availableThemes.filter(t => t !== this.theme.current)
+    ];
   }
 
   async changeGroup() {
