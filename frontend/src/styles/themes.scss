@@ -1,0 +1,25 @@
+:root {
+  --color-bg: #000;
+  --color-bg-secondary: #111;
+  --color-row-alt-bg: #1a1a1a;
+  --color-row-hover-bg: #696969;
+  --color-border: #fff;
+  --color-text: #fff;
+  --color-input-focus-bg: #333;
+  --font-family-base: 'FiraCode', monospace;
+}
+
+body.light-theme {
+  --color-bg: #f5f5dc;
+  --color-bg-secondary: #faf0e6;
+  --color-row-alt-bg: #e6dfc8;
+  --color-row-hover-bg: #dcd2be;
+  --color-border: #00008b;
+  --color-text: #00008b;
+  --color-input-focus-bg: #ddd5c3;
+  --font-family-base: 'Spectral', serif;
+}
+
+body {
+  font-family: var(--font-family-base);
+}

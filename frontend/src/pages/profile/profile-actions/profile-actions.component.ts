@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {Router} from '@angular/router';
+import {ThemeService} from 'src/core/services/theme.service';
 
 @Component({
   selector: 'app-profile-actions',
@@ -10,7 +11,7 @@ import {Router} from '@angular/router';
 })
 export class ProfileActionsComponent {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, public theme: ThemeService) {
   }
 
   async changeGroup() {

@@ -6,15 +6,15 @@
   background-color: transparent;
 
   th, td {
-    border: 1px solid #fff;
+    border: 1px solid var(--color-border);
     padding: 0.5rem 1rem;
     text-align: left;
     vertical-align: top;
   }
 
   th {
-    background-color: #111;
-    color: #fff;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
   }
 
   th.col-actions,
@@ -24,11 +24,11 @@
   }
 
   tr:nth-child(even) {
-    background-color: #1a1a1a;
+    background-color: var(--color-row-alt-bg);
   }
 
   tr:hover {
-    background-color: #696969;
+    background-color: var(--color-row-hover-bg);
     cursor: pointer;
   }
 
@@ -44,8 +44,8 @@
 }
 
 .gift-table td:focus {
-  outline: 2px dashed #fff;
-  background-color: #696969;
+  outline: 2px dashed var(--color-border);
+  background-color: var(--color-row-hover-bg);
 }
 
 .emoji-button {
@@ -65,7 +65,7 @@
   vertical-align: middle;
 
   &:hover {
-    background-color: #333; // ou rien, à toi de voir
+    background-color: var(--color-input-focus-bg); // ou rien, à toi de voir
   }
 }
 
@@ -98,8 +98,8 @@
 
 
 .modal-box {
-  background-color: #111;
-  border: 2px solid #fff;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
   padding: 2rem;
   min-width: 250px;
   max-width: 90%;
