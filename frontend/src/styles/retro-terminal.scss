@@ -8,17 +8,17 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000;
-  color: #fff;
-  font-family: 'FiraCode', monospace;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
 }
 
 .terminal {
   max-width: 900px;
   margin: 2rem auto;
   padding: 2rem;
-  border: 2px solid #fff;
-  background-color: #111;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
 }
 
 .command {
@@ -27,7 +27,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #fff;
+  color: var(--color-text);
   margin: 1rem 0;
 }
 
@@ -41,8 +41,8 @@ a {
 
 button {
   background-color: transparent;
-  border: 1px solid #fff;
-  color: #fff;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   padding: 0.5rem 1rem;
   font-family: inherit;
   cursor: pointer;
@@ -50,14 +50,14 @@ button {
 }
 
 button:hover {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-border);
+  color: var(--color-bg);
 }
 
 button:focus {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--color-border);
   outline-offset: 2px;
-  background-color: #444; // pour mieux le voir, optionnel
+  background-color: var(--color-row-hover-bg); // pour mieux le voir, optionnel
 }
 
 .options {
