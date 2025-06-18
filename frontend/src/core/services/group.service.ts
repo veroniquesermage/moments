@@ -110,9 +110,16 @@ export class GroupService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
+    const headersConfig: { [key: string]: string } = {
       'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
-    });
+    };
+
+    const currentGroupId = this.groupContextService.getGroupId();
+    if (currentGroupId) {
+      headersConfig['X-Group-Id'] = currentGroupId.toString();
+    }
+
+    return new HttpHeaders(headersConfig);
   }
 
 }

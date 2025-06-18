@@ -1,6 +1,6 @@
 <div class="gift-block" role="note">
   <hr class="block-separator" />
-  <div class="block-title">💡 Idée de cadeau pour {{ giftDetail.gift.destinataire.prenom }}</div>
-  <p *ngIf="!isMyIdea()">    proposée par <em>{{ giftDetail.ideas!.proposeePar.prenom }}</em></p>
+  <div class="block-title">💡 Idée de cadeau pour {{ giftDetail.gift.destinataire | displayName }}</div>
+  <p *ngIf="!isMyIdea()">    proposée par <em>{{ giftDetail.ideas!.proposeePar | displayName }}</em></p>
   <hr class="block-separator" />
 </div>

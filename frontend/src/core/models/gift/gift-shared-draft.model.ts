@@ -1,6 +1,6 @@
-import {User} from 'src/security/model/user.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 export interface GiftSharedDraft {
-  participant: User | null;
+  participant: UserDisplay | null;
   montant: number | null;
 }

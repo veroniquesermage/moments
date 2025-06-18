@@ -1,12 +1,14 @@
 import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-gift-idea',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    DisplayNamePipe
   ],
   templateUrl: './gift-idea.component.html',
   styleUrl: './gift-idea.component.scss'
