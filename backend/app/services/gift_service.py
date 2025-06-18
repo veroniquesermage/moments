@@ -23,6 +23,7 @@ from app.schemas.gift.gift_response import GiftResponse
 from app.schemas.gift.gift_shared import GiftSharedSchema
 from app.schemas.gift.gift_status import GiftStatus
 from app.schemas.gift.gift_update import GiftUpdate
+from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema
 from app.services.sharing_service import SharingService
 
 
@@ -45,17 +46,18 @@ class GiftService:
     @staticmethod
     async def get_gift(db: AsyncSession,
                        gift_id: int,
+                       group_id: int,
                        current_user: User) -> GiftDetailResponse:
         logger.info(f"Récupération du cadeau à l'id {gift_id}")
 
         result: Gift = await GiftService.get_gift_or_raise(db, gift_id)
-        shared_schema = await SharingService.get_all_shares_for_gift(db, gift_id=gift_id)
+        shared_schema = await SharingService.get_all_shares_for_gift(db, gift_id=gift_id, group_id=group_id)
 
         role_user = GiftService.define_user_role(current_user, result, shared_schema)
 
         logger.debug(f"Récupération du cadeau {result.id} par l'utilisateur {current_user.id} avec le rôle {role_user}")
 
-        return GiftService.set_gift_detail(result, current_user, shared_schema)
+        return await GiftService.set_gift_detail(result, current_user, group_id, db, shared_schema)
 
     @staticmethod
     async def get_visible_gifts_for_member(db: AsyncSession,
@@ -245,7 +247,8 @@ class GiftService:
     async def set_gift_delivery(db: AsyncSession,
                                 current_user: User,
                                 giftId: int,
-                                recu: bool) -> GiftDetailResponse:
+                                recu: bool,
+                                group_id: int) -> GiftDetailResponse:
         logger.debug(f"Marquage du cadeau {giftId} comme reçu : {recu}")
         gift: Gift = await GiftService.get_gift_or_raise(db, giftId)
         if gift.reserve_par_id != current_user.id:
@@ -262,7 +265,7 @@ class GiftService:
         await db.commit()
         await db.refresh(gift.gift_delivery)
 
-        return GiftService.set_gift_detail(gift, current_user)
+        return await GiftService.set_gift_detail(gift, current_user, group_id, db)
 
     @staticmethod
     async def delete_gift(db: AsyncSession,
@@ -365,10 +368,9 @@ class GiftService:
         gifts = result_gift.scalars().all()
 
         if gifts:
-            logger.debug(f"Aucun cadeau trouvé pour l'utilisateur {current_user.id} dans le groupe {group_id}.")
             gifts_followed = [
                 GiftFollowed(
-                    gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
+                    gift=await build_gift_public_response(gift, group_id, db),
                     delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
                                                                from_attributes=True) if gift.gift_delivery else None,
                     partage=None  # à remplir si tu en as besoin
@@ -396,10 +398,10 @@ class GiftService:
         if rows:
             gifts_shared = [
                 GiftFollowed(
-                    gift=GiftPublicResponse.model_validate(gift, from_attributes=True),
+                    gift=await build_gift_public_response(gift, group_id, db),
                     delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
                                                                from_attributes=True) if gift.gift_delivery else None,
-                    partage=GiftSharedSchema.model_validate(gift_shared, from_attributes=True)
+                    partage=await build_gift_shared_schema(gift_shared, group_id, db)
                 )
                 for gift, gift_shared in rows
             ]
@@ -407,14 +409,16 @@ class GiftService:
         return gifts_followed + gifts_shared
 
     @staticmethod
-    def set_gift_detail(gift: Gift,
-                        current_user: User,
-                        partage: Optional[list[GiftSharedSchema]] = None) -> GiftDetailResponse:
+    async def set_gift_detail(gift: Gift,
+                              current_user: User,
+                              group_id: int,
+                              db: AsyncSession,
+                              partage: Optional[list[GiftSharedSchema]] = None) -> GiftDetailResponse:
         return GiftDetailResponse(
-            gift=GiftPublicResponse.model_validate(gift),
+            gift=await build_gift_public_response(gift, group_id, db),
             delivery=GiftDeliverySchema.model_validate(gift.gift_delivery) if gift.gift_delivery else None,
             partage=partage,
-            ideas = gift.gift_idea,
+            ideas = await build_gift_idea_schema(gift.gift_idea, group_id, db) if gift.gift_idea else None,
             est_partage=gift.statut == GiftStatusEnum.PARTAGE,
             droits_utilisateur=GiftService.define_user_role(current_user, gift, partage)
         )
