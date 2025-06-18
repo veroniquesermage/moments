@@ -9,6 +9,7 @@ import {UserGroupService} from 'src/core/services/user-group.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 @Component({
   selector: 'app-profile-group',
@@ -25,6 +26,7 @@ export class ProfileGroupComponent implements OnInit{
 
   group: GroupDetail | undefined
   members: string[] = []
+  allMembers: UserDisplay[] = []
   showMemberModal: boolean = false;
   showNicknameModal: boolean = false;
   showConfirmModal: boolean = false;
@@ -44,10 +46,8 @@ export class ProfileGroupComponent implements OnInit{
   }
 
   async getAllMembers() {
-    const result = await this.groupContextService.getGroupMembers();
-    this.members = result.map(member => (
-      member.prenom.concat(" ", member.nom)
-    ));
+    this.allMembers = await this.groupContextService.getGroupMembers();
+
     this.showMemberModal = true;
   }
 
