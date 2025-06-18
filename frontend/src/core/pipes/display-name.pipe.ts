@@ -7,9 +7,10 @@ import {UserDisplay} from 'src/core/models/user-display.model';
 })
 export class DisplayNamePipe implements PipeTransform {
 
-  transform(value: UserDisplay, complet: boolean = false): string {
-    if (value.surnom) return value.surnom;
-    return complet && value.nom ? `${value.prenom} ${value.nom}` : value.prenom || 'Utilisateur inconnu';
+  transform(user: UserDisplay | null | undefined, complet: boolean = false): string {
+    if (!user) return '—'; // ou autre fallback si tu préfères
+    if (user.surnom) return user.surnom;
+    return complet && user.nom ? `${user.prenom} ${user.nom}` : user.prenom || 'Utilisateur inconnu';
   }
 
 

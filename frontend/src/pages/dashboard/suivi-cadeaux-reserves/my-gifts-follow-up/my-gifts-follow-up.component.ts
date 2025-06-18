@@ -10,6 +10,8 @@ import {ViewportService} from 'src/core/services/viewport.service';
 import {ColumnDefinition} from 'src/core/models/column-definition.model';
 import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {getDisplayName} from 'src/core/utils/display-name';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
@@ -32,14 +34,14 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
 
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
-    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.prenom || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: UserDisplay | null | undefined) => getDisplayName(u)},
     { key: 'nom', label: 'Nom' },
     {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     { key: 'statut', label: 'Statut' }
   ];
 
   readonly displayedColumnsDesktop:  ColumnDefinition[] = [
-    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => u?.prenom || '—' },
+    {key: 'destinataire', label: 'Destinataire', formatFn: (u: User | null | undefined) => getDisplayName(u)},
     {key: 'nom', label: 'Nom'},
     {key: 'magasin', label: 'Magasin'},
     {key: 'quantite', label: 'Quantité'},

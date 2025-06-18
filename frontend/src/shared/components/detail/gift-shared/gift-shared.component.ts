@@ -4,12 +4,14 @@ import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {RoleUser} from 'src/core/enum/role-user.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {CommonModule} from '@angular/common';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-gift-shared',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    DisplayNamePipe
   ],
   templateUrl: './gift-shared.component.html',
   styleUrl: './gift-shared.component.scss'

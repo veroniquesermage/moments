@@ -1,7 +1,7 @@
-import {User} from 'src/security/model/user.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 export interface GiftIdea {
   id: number
-  proposeePar: User
+  proposeePar: UserDisplay
   visibilite: boolean
 }

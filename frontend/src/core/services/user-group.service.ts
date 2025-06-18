@@ -28,19 +28,6 @@ export class UserGroupService {
     }
   }
 
-  async getAllUsers(): Promise<ApiResponse<User[]>> {
-    try {
-      const users = await firstValueFrom(this.http.get<User[]>(this.apiUrl, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
-      return {success: true, data: users};
-    } catch (error) {
-      console.error('[UserGroupService] Erreur lors de la récupération des membres des groupes de l\'utilisateur', error);
-      return {success: false, message: "❌ Aucun membre trouvé."};
-    }
-  }
-
   async getUser(): Promise<ApiResponse<User>> {
     const url = `${this.apiUrl.replace(/\/$/, '')}/me`;
     try {

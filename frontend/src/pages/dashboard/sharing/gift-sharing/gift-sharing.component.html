@@ -20,7 +20,7 @@
     <td>
       <button class="test-align"
               (click)="supprimerLigne(i)"
-              attr.aria-label="Enlever {{partage.participant.prenom}} des participants"
+              attr.aria-label="Enlever {{partage.participant | displayName}} des participants"
       >🗑️</button>
     </td>
   </tr>
@@ -39,7 +39,7 @@
     <td>
       <button class="test-align"
               (click)="supprimerDraft(i)"
-              attr.aria-label="Enlever {{draft.participant?.prenom}} des participants"
+              attr.aria-label="Enlever {{draft?.participant | displayName}} des participants"
       >🗑️</button>
     </td>
   </tr>
