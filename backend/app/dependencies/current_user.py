@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,3 +43,8 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+async def get_current_group_id(x_group_id: int = Header(...)) -> int:
+    if not x_group_id:
+        raise HTTPException(status_code=400, detail="Le groupe actif est requis via X-Group-Id.")
+    return x_group_id

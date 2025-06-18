@@ -9,6 +9,7 @@ from app.core.enum import RoleUtilisateur, GiftStatusEnum
 from app.core.logger import logger
 from app.models import User, GiftShared, Gift
 from app.schemas.gift import GiftSharedSchema, GiftDetailResponse, GiftStatus
+from app.services.builders import build_gift_shared_schema
 
 
 class SharingService:
@@ -18,7 +19,8 @@ class SharingService:
         db: AsyncSession,
         current_user: User,
         gift_id: int,
-        updates: list[GiftSharedSchema]
+        updates: list[GiftSharedSchema],
+            group_id: int
     ) -> GiftDetailResponse:
 
         # 1. Récupération du cadeau et vérification des droits
@@ -61,7 +63,7 @@ class SharingService:
             )
         )).scalars().all()
 
-        shared_schema = [GiftSharedSchema.model_validate(sh) for sh in shared_refresh]
+        shared_schema = [await build_gift_shared_schema(sh, group_id, db) for sh in shared_refresh]
         new_status: GiftStatus
         if gift.statut == GiftStatusEnum.PRIS and len(shared_schema) > 0:
             gift.statut = GiftStatusEnum.PARTAGE
@@ -74,7 +76,7 @@ class SharingService:
             await GiftService.change_status(db, current_user, gift_id, new_status)
 
         # 5. Retour d’un GiftDetailResponse mis à jour
-        return GiftService.set_gift_detail(gift, current_user, shared_schema)
+        return await GiftService.set_gift_detail(gift, current_user, group_id, db, shared_schema)
 
     @staticmethod
     async def get_shares_for_user(
@@ -168,10 +170,10 @@ class SharingService:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
-        return GiftService.set_gift_detail(gift, current_user, partage_schema)
+        return await GiftService.set_gift_detail(gift, current_user, partage_schema)
 
     @staticmethod
-    async def get_all_shares_for_gift(db: AsyncSession, gift_id: int) -> list[GiftSharedSchema]:
+    async def get_all_shares_for_gift(db: AsyncSession, gift_id: int, group_id: int) -> list[GiftSharedSchema]:
         query = await db.execute(
             select(GiftShared)
             .where(GiftShared.cadeau_id == gift_id)
@@ -181,7 +183,7 @@ class SharingService:
             )
         )
         shared_entries = query.scalars().all()
-        return [GiftSharedSchema.model_validate(entry) for entry in shared_entries]
+        return [await build_gift_shared_schema(entry, group_id, db) for entry in shared_entries]
 
 
 

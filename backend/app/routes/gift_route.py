@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.enum.gift_action_enum import GiftActionEnum
 from app.core.logger import logger
 from app.database import get_db
-from app.dependencies.current_user import get_current_user
+from app.dependencies.current_user import get_current_user, get_current_group_id
 from app.models import User
 from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
     GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, GiftFollowed
@@ -61,10 +61,11 @@ async def get_visible_gifts_for_member(
 @router.get("/{giftId}", response_model=GiftDetailResponse)
 async def get_gift(
         giftId: int,
+        groupId: int = Depends(get_current_group_id),
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
 
-    return await GiftService.get_gift(db, giftId, current_user)
+    return await GiftService.get_gift(db, giftId, groupId, current_user)
 
 @router.put("/{giftId}", response_model=GiftResponse)
 async def update_gift(
@@ -106,10 +107,11 @@ async def verify_eligibility(
 async def set_gift_delivery(
         giftId: int,
         payload: RecuPayload,
+        groupId: int = Depends(get_current_group_id),
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
 
-    return await GiftService.set_gift_delivery(db, current_user, giftId, payload.recu)
+    return await GiftService.set_gift_delivery(db, current_user, giftId, payload.recu, groupId)
 
 
 @router.put("/{giftId}/changer-statut", response_model=GiftResponse)

@@ -11,13 +11,15 @@ from app.schemas.gift import GiftIdeasResponse, GiftCreate
 from app.schemas.gift import GiftPublicResponse
 from app.schemas.gift import GiftIdeasSchema
 from app.schemas.gift import GiftIdeaCreate
+from app.services.builders import build_gift_public_response, build_gift_idea_schema
+
 
 class GiftIdeasService:
 
     @staticmethod
     async def get_my_ideas(db: AsyncSession,
                            current_user: User,
-                           groupId: int) -> list[GiftIdeasResponse]:
+                           group_id: int) -> list[GiftIdeasResponse]:
         logger.info(f"Récupération des idées de l'utilisateur {current_user.id}")
 
         gifts_ideas_response = []
@@ -27,7 +29,7 @@ class GiftIdeasService:
             .join(GiftIdeas, Gift.gift_idea)
             .join(UserGroup, UserGroup.utilisateur_id == Gift.destinataire_id)
             .where(GiftIdeas.proposee_par_id == current_user.id,
-                   UserGroup.groupe_id == groupId
+                   UserGroup.groupe_id == group_id
                    )
             .options(
                 selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par),
@@ -42,8 +44,8 @@ class GiftIdeasService:
 
         if result :
             gifts_ideas_response =  [GiftIdeasResponse(
-                gift= GiftPublicResponse.model_validate(gift),
-                gift_idea = GiftIdeasSchema.model_validate(gift_idea)
+                gift= await build_gift_public_response(gift, group_id, db),
+                gift_idea = await build_gift_idea_schema(gift_idea, group_id, db)
             )
             for gift, gift_idea in result]
 
@@ -79,8 +81,8 @@ class GiftIdeasService:
         await db.refresh(gift, attribute_names=["destinataire"])
 
         return GiftIdeasResponse(
-            gift=GiftPublicResponse.model_validate(gift),
-            gift_idea=GiftIdeasSchema.model_validate(idea)
+            gift=await build_gift_public_response(gift, gift.destinataire_id, db),
+            gift_idea=await build_gift_idea_schema(idea, db)
         )
 
     @staticmethod

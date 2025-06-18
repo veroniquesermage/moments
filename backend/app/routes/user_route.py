@@ -25,11 +25,3 @@ async def get_users(
 
     logger.info(f"Récupération des membres du group {groupId}")
     return await UserGroupService.get_users(db, current_user, groupId)
-
-@router.get("/", response_model=list[UserSchema])
-async def get_all_users(
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[UserSchema]:
-
-    logger.info(f"Récupération de tous les utilisateurs du groupe de l'utilisateur {current_user.id}")
-    return await UserGroupService.get_all_my_users(db, current_user)
