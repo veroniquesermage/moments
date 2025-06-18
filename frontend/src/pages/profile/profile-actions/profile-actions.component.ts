@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import {Router} from '@angular/router';
+import {CommonModule} from '@angular/common';
 import {ThemeService} from 'src/core/services/theme.service';
 
 @Component({
   selector: 'app-profile-actions',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './profile-actions.component.html',
   styleUrl: './profile-actions.component.scss'
 })
