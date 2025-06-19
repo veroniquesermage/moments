@@ -70,9 +70,9 @@
   font-weight: bold;
   font-style: italic;
   padding-top: 1rem;
-  color: var(--color-highlighting-text);
+  color: var(--color-highlight); // jaune doux pour rester dans le thème terminal
   background-color: var(--color-bg);
-  border-top: 2px solid #444;
+  border-top: 2px solid var(--color-alt-border);
 }
 
 

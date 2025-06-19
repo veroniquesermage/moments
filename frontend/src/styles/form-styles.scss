@@ -58,7 +58,7 @@ button[type="submit"]:hover {
 }
 
 .error {
-  color: #f55;
+  color: var(--color-error-form);
   font-size: 0.85rem;
   font-family: var(--font-family-base);
 }
