@@ -5,13 +5,13 @@
   --color-border: #fff;
   --color-text: #fff;
   --color-input-focus-bg: #333;
-  --font-family-base: 'FiraCode', monospace;
+  --font-family-base: 'Spectral', serif;
   --color-highlight: #ffe100;
   --color-alt-border: #444;
   --color-muted-text: #aaa;
   --color-muted-text-strong: #ccc;
-  --color-success-strong: #6baa75;
-  --color-info-strong: #7ca0b1;
+  --color-received: #6baa75;
+  --color-sharing: #7ca0b1;
   --color-focus-shadow: #8888;
   --color-border-dotted: #888;
   --color-error: #f55;
@@ -20,45 +20,67 @@
 }
 
 body.light-theme {
-  --color-bg: #f5f5dc;
-  --color-bg-secondary: #faf0e6;
-  --color-row-hover-bg: #dcd2be;
-  --color-border: #00008b;
-  --color-text: #00008b;
-  --color-input-focus-bg: #ddd5c3;
-  --font-family-base: 'Spectral', serif;
-  --color-highlight: #b8860b;
+  --color-bg: #fdfaf6;
+  --color-bg-secondary: #f5f0e6;
+  --color-row-hover-bg: #e9e0d2;
+  --color-border: #5e4b2b;
+  --color-text: #3b2e1a;
+  --color-input-focus-bg: #ede5d8;
+  --font-family-base: 'Lora', serif;
+  --color-highlight: #c59b48;
   --color-alt-border: #ccc;
   --color-muted-text: #555;
   --color-muted-text-strong: #777;
-  --color-success-strong: #3f8a55;
-  --color-info-strong: #538a9b;
+  --color-received: #d8eedc;
+  --color-sharing: #d9eaf2;
   --color-focus-shadow: #8888;
   --color-border-dotted: #888;
   --color-error: #d33;
-  --color-toast-bg: #ddd8d2;
-  --color-toast-success: #3c8c3c;
+  --color-toast-bg: #f0eae0;
+  --color-toast-success: #4d774e;
 }
 
 body.daltonien-theme {
   --color-bg: #ffffff;
-  --color-bg-secondary: #f2f2f2;
-  --color-row-hover-bg: #bdbdbd;
+  --color-bg-secondary: #f0f0f0;
+  --color-row-hover-bg: #d6d6d6;
   --color-border: #000000;
   --color-text: #000000;
   --color-input-focus-bg: #d0d0d0;
   --font-family-base: 'Arial', sans-serif;
-  --color-highlight: #ffbf00;
+  --color-highlight: #ffa500;
   --color-alt-border: #888;
   --color-muted-text: #555;
   --color-muted-text-strong: #777;
-  --color-success-strong: #6b8a00;
-  --color-info-strong: #006b8a;
+  --color-received: #1b9e77;
+  --color-sharing: #7570b3;
   --color-focus-shadow: #8888;
   --color-border-dotted: #888;
-  --color-error: #d33;
+  --color-error: #d95f02;
   --color-toast-bg: #e2e2e2;
-  --color-toast-success: #5a9500;
+  --color-toast-success: #66a61e;
+}
+
+body.neuroatypique-theme {
+  --color-bg: #f7fafd;
+  --color-bg-secondary: #edf4f7;
+  --color-row-hover-bg: #d6e6ec;
+  --color-border: #96b3c2;
+  --color-text: #263238;
+  --color-input-focus-bg: #333;
+  --font-family-base: 'Atkinson Hyperlegible', sans-serif;
+  --letter-spacing-base: 0.5px;
+  --color-highlight: #aec6cf;
+  --color-alt-border: #444;
+  --color-muted-text: #aaa;
+  --color-muted-text-strong: #ccc;
+  --color-received: #a8d5ba;
+  --color-sharing: #b5d3e7;
+  --color-focus-shadow: #8888;
+  --color-border-dotted: #888;
+  --color-error: #f6a5a5;
+  --color-toast-bg: #eef5f9;
+  --color-toast-success: #9ddbc4;
 }
 
 body {
