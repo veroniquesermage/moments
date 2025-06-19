@@ -1,22 +1,27 @@
 :root {
-  --color-bg: #000;
-  --color-bg-secondary: #111;
-  --color-row-hover-bg: #696969;
-  --color-border: #fff;
-  --color-text: #fff;
-  --color-input-focus-bg: #333;
-  --font-family-base: 'Spectral', serif;
-  --color-highlight: #ffe100;
-  --color-alt-border: #444;
-  --color-muted-text: #aaa;
-  --color-muted-text-strong: #ccc;
-  --color-received: #6baa75;
-  --color-sharing: #7ca0b1;
-  --color-focus-shadow: #8888;
+  --color-bg: #2e2e35; /* gris ardoise doux */
+  --color-bg-secondary: #3a3a42; /* légèrement plus clair */
+  --color-row-hover-bg: #444452; /* hover foncé subtil */
+
+  --color-border: #aaaaaa;
   --color-border-dotted: #888;
-  --color-error: #f55;
-  --color-toast-bg: #222;
-  --color-toast-success: #0f0;
+
+  --color-text: #e0e0e0; /* blanc cassé */
+  --color-muted-text: #b8b8c2;
+  --color-muted-text-strong: #d0d0e0;
+
+  --color-highlight: #fcb5f0; /* rose pastel */
+  --color-received: #7fa98f; /* vert menthe doux */
+  --color-sharing: #8896ba; /* bleu clair pastel */
+  --color-error: #f8a5a5; /* rouge pastel atténué */
+
+  --color-toast-bg: #393943;
+  --color-toast-success: #a3e4c2;
+
+  --color-input-focus-bg: #494957;
+
+  --font-family-base: 'Atkinson Hyperlegible', sans-serif;
+  --letter-spacing-base: 0.5px;
 }
 
 body.light-theme {
