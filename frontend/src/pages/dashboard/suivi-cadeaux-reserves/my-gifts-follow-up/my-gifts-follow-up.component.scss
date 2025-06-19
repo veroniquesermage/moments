@@ -70,14 +70,14 @@
 }
 
 .gift-table tr.recu {
-  background-color: var(--color-success-row-bg);
-  color: var(--color-success-row-text);
+  background-color: var(--color-success-strong);
+  color: var(--color-text);
   border-left: 3px solid var(--color-success-strong);
 }
 
 .gift-table tr.partage {
-  background-color: var(--color-info-row-bg);
-  color: var(--color-info-row-text);
+  background-color: var(--color-info-strong);
+  color: var(--color-text);
   border-left: 3px solid var(--color-info-strong);
 }
 
