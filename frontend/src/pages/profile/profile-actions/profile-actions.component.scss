@@ -18,10 +18,25 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .theme-select select {
   background-color: var(--color-bg-secondary);
   color: var(--color-text);
   border: 1px solid var(--color-border);
+  align-items: center;
+  gap: 0.25rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  font-size: 1rem;
+  line-height: 1.2;
+  margin-top: 0.5rem;
+}
+
+.label-theme {
+  font-weight: bold;
+  color: var(--color-text);
+  margin-top: 0.7rem;
+  font-family: var(--font-family-base);
 }
