@@ -1,9 +1,9 @@
 input[type="date"] {
-  background-color: black;
-  color: white;
-  border: 1px solid white;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 0.5rem;
-  font-family: monospace;
+  font-family: var(--font-family-base);
   font-size: 1rem;
 
   // supprime la flèche dans certains navigateurs si nécessaire
@@ -25,11 +25,11 @@ form {
 
 input[type="text"],
 input[type="date"] {
-  background-color: black;
-  color: white;
-  border: 1px solid white;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 0.5rem;
-  font-family: monospace;
+  font-family: var(--font-family-base);
   font-size: 1rem;
 }
 

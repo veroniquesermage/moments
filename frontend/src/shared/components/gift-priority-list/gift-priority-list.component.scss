@@ -5,14 +5,14 @@
 .drag-handle {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--color-text);
   cursor: grab;
   padding: 0;
   margin: 0;
   font-size: 1rem;
 
   &:focus {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--color-border);
     outline-offset: 2px;
   }
 }
@@ -26,23 +26,19 @@
   background-color: transparent;
 
   th, td {
-    border: 1px solid #fff;
+    border: 1px solid var(--color-border);
     padding: 0.5rem 1rem;
     text-align: left;
     vertical-align: top;
   }
 
   th {
-    background-color: #111;
-    color: #fff;
-  }
-
-  tr:nth-child(even) {
-    background-color: #1a1a1a;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
   }
 
   tr:hover {
-    background-color: #696969;
+    background-color: var(--color-row-hover-bg);
     cursor: pointer;
   }
 
@@ -53,8 +49,8 @@
   }
 }
   .gift-table td:focus {
-    outline: 2px dashed #fff;
-    background-color: #333;
+    outline: 2px dashed var(--color-border);
+    background-color: var(--color-input-focus-bg);
   }
 
 th.col-actions, td.col-actions {

@@ -15,8 +15,8 @@
 
 
 .modal-box {
-  background-color: #111;
-  border: 2px solid #fff;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
   padding: 2rem;
   min-width: 250px;
   max-width: 90%;
