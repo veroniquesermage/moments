@@ -58,18 +58,18 @@ input {
 input:focus {
   outline: none;
   border: 1px solid var(--color-border);
-  box-shadow: 0 0 0 2px #8888; /* doux halo */
+  box-shadow: 0 0 0 2px var(--color-focus-shadow); /* doux halo */
 }
 
 .admins {
-  color: var(--color-highlighting-text);
+  color: var(--color-admin);
   font-weight: bold;
   letter-spacing: 0.5px;
-  border-bottom: 1px dotted #888;
+  border-bottom: 1px dotted var(--color-border-dotted);
 }
 
 .alias {
   font-style: italic;
-  color: #aaa;
+  color: var(--color-muted-text);
   margin-left: 0.3rem;
 }

@@ -7,7 +7,7 @@
   font-style: italic;
   display: flex;
   align-items: center;
-  color: var(--color-text-legend);
+  color: var(--color-muted-text-strong);
 
   span {
     display: flex;
@@ -26,11 +26,11 @@
   }
 
   .recu {
-    background-color: #6baa75;
+    background-color: var(--color-success-strong);
   }
 
   .partage {
-    background-color: #7ca0b1;
+    background-color: var(--color-info-strong);
   }
 }
 
@@ -70,15 +70,15 @@
 }
 
 .gift-table tr.recu {
-  background-color: #4f5e52;
-  color: #e6ffe6;
-  border-left: 3px solid #6baa75;
+  background-color: var(--color-success-row-bg);
+  color: var(--color-success-row-text);
+  border-left: 3px solid var(--color-success-strong);
 }
 
 .gift-table tr.partage {
-  background-color: #4b5e6b;
-  color: #e6f6ff;
-  border-left: 3px solid #7ca0b1;
+  background-color: var(--color-info-row-bg);
+  color: var(--color-info-row-text);
+  border-left: 3px solid var(--color-info-strong);
 }
 
 .gift-table td:focus {
