@@ -70,7 +70,7 @@ button:focus {
 }
 
 .error {
-  color: var(--color-error-text);
+  color: var(--color-error);
   margin-top: 1rem;
   font-weight: bold;
 }
@@ -208,7 +208,7 @@ button:focus {
 }
 
 .toast-error {
-  background-color: var(--color-toast-error);
+  background-color: var(--color-error);
   color: white;
   font-weight: bold;
 }
