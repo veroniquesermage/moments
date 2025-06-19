@@ -4,9 +4,9 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #000;
-  color: #fff;
-  font-family: 'Fira Code', monospace;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
   font-size: 1.2rem;
 }
 

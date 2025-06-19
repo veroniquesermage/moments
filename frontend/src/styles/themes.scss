@@ -1,0 +1,66 @@
+:root {
+  --color-bg: #000;
+  --color-bg-secondary: #111;
+  --color-row-hover-bg: #696969;
+  --color-border: #fff;
+  --color-text: #fff;
+  --color-input-focus-bg: #333;
+  --font-family-base: 'FiraCode', monospace;
+  --color-highlight: #ffe100;
+  --color-alt-border: #444;
+  --color-muted-text: #aaa;
+  --color-muted-text-strong: #ccc;
+  --color-success-strong: #6baa75;
+  --color-info-strong: #7ca0b1;
+  --color-focus-shadow: #8888;
+  --color-border-dotted: #888;
+  --color-error: #f55;
+  --color-toast-bg: #222;
+  --color-toast-success: #0f0;
+}
+
+body.light-theme {
+  --color-bg: #f5f5dc;
+  --color-bg-secondary: #faf0e6;
+  --color-row-hover-bg: #dcd2be;
+  --color-border: #00008b;
+  --color-text: #00008b;
+  --color-input-focus-bg: #ddd5c3;
+  --font-family-base: 'Spectral', serif;
+  --color-highlight: #b8860b;
+  --color-alt-border: #ccc;
+  --color-muted-text: #555;
+  --color-muted-text-strong: #777;
+  --color-success-strong: #3f8a55;
+  --color-info-strong: #538a9b;
+  --color-focus-shadow: #8888;
+  --color-border-dotted: #888;
+  --color-error: #d33;
+  --color-toast-bg: #ddd8d2;
+  --color-toast-success: #3c8c3c;
+}
+
+body.daltonien-theme {
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f2f2f2;
+  --color-row-hover-bg: #bdbdbd;
+  --color-border: #000000;
+  --color-text: #000000;
+  --color-input-focus-bg: #d0d0d0;
+  --font-family-base: 'Arial', sans-serif;
+  --color-highlight: #ffbf00;
+  --color-alt-border: #888;
+  --color-muted-text: #555;
+  --color-muted-text-strong: #777;
+  --color-success-strong: #6b8a00;
+  --color-info-strong: #006b8a;
+  --color-focus-shadow: #8888;
+  --color-border-dotted: #888;
+  --color-error: #d33;
+  --color-toast-bg: #e2e2e2;
+  --color-toast-success: #5a9500;
+}
+
+body {
+  font-family: var(--font-family-base);
+}

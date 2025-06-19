@@ -7,16 +7,16 @@
     width: calc((100% - 2rem) / 5); // 5 par ligne, ajustable
     min-width: 100px;
     padding: 0.5rem;
-    border: 1px solid white;
-    background-color: black;
-    color: white;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    color: var(--color-text);
     cursor: pointer;
 
     &.selected {
-      background-color: white;
-      color: black ;
+      background-color: var(--color-border);
+      color: var(--color-bg) ;
       font-weight: bold;
-      border: 1px solid white;
+      border: 1px solid var(--color-border);
     }
   }
 }
@@ -29,23 +29,19 @@
   background-color: transparent;
 
   th, td {
-    border: 1px solid #fff;
+    border: 1px solid var(--color-border);
     padding: 0.5rem 1rem;
     text-align: left;
     vertical-align: top;
   }
 
   th {
-    background-color: #111;
-    color: #fff;
-  }
-
-  tr:nth-child(even) {
-    background-color: #1a1a1a;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
   }
 
   tr:hover {
-    background-color: #696969;
+    background-color: var(--color-row-hover-bg);
     cursor: pointer;
   }
 
@@ -62,17 +58,17 @@
 }
 
 .gift-table td:focus {
-  outline: 2px dashed #fff;
-  background-color: #696969;
+  outline: 2px dashed var(--color-border);
+  background-color: var(--color-row-hover-bg);
 }
 
 .separator-row {
   font-weight: bold;
   font-style: italic;
   padding-top: 1rem;
-  color: #ffe100; // jaune doux pour rester dans le thème terminal
-  background-color: #000;
-  border-top: 2px solid #444;
+  color: var(--color-highlight); // jaune doux pour rester dans le thème terminal
+  background-color: var(--color-bg);
+  border-top: 2px solid var(--color-alt-border);
 }
 
 

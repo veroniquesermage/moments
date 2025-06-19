@@ -1,0 +1,10 @@
+.command-list button {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.command-list button:hover {
+  background-color: var(--color-border);
+  color: var(--color-bg);
+}
