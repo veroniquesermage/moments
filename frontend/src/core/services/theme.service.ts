@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
-export type Theme = 'dark' | 'light' | 'daltonien';
+export type Theme = 'dark' | 'light' | 'daltonien' | 'neuroatypique';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly storageKey = 'ui-theme';
   current: Theme = 'dark';
-  readonly availableThemes: Theme[] = ['dark', 'light', 'daltonien'];
+  readonly availableThemes: Theme[] = ['dark', 'light', 'daltonien', 'neuroatypique'];
 
   constructor() {
     const stored = localStorage.getItem(this.storageKey) as Theme | null;
@@ -32,11 +32,9 @@ export class ThemeService {
 
   private applyTheme() {
     const body = document.body;
-    body.classList.remove('light-theme', 'daltonien-theme');
-    if (this.current === 'light') {
-      body.classList.add('light-theme');
-    } else if (this.current === 'daltonien') {
-      body.classList.add('daltonien-theme');
-    }
+    const themes = ['light', 'daltonien', 'neuroatypique', 'darkpastel']; // à compléter
+    themes.forEach(t => body.classList.remove(`${t}-theme`));
+    body.classList.add(`${this.current}-theme`);
+
   }
 }

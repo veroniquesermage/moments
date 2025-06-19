@@ -26,11 +26,11 @@
   }
 
   .recu {
-    background-color: var(--color-success-strong);
+    background-color: var(--color-received);
   }
 
   .partage {
-    background-color: var(--color-info-strong);
+    background-color: var(--color-sharing);
   }
 }
 
@@ -67,15 +67,13 @@
 }
 
 .gift-table tr.recu {
-  background-color: var(--color-success-strong);
+  background-color: var(--color-received);
   color: var(--color-text);
-  border-left: 3px solid var(--color-success-strong);
 }
 
 .gift-table tr.partage {
-  background-color: var(--color-info-strong);
+  background-color: var(--color-sharing);
   color: var(--color-text);
-  border-left: 3px solid var(--color-info-strong);
 }
 
 .gift-table td:focus {

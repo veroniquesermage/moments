@@ -25,4 +25,9 @@ export class ProfileActionsComponent {
   async changeGroup() {
     await this.router.navigate(['/groupe/onboarding']);
   }
+
+  async back() {
+
+    await this.router.navigate(['/dashboard']);
+  }
 }
