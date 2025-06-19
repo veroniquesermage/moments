@@ -53,9 +53,6 @@
     color: var(--color-text);
   }
 
-  tr:nth-child(even) {
-    background-color: var(--color-row-alt-bg);
-  }
 
   tr:hover {
     background-color: var(--color-row-hover-bg);
