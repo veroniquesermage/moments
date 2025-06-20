@@ -111,11 +111,8 @@ class SharingService:
         shared_entries = result.scalars().all()
         return [GiftSharedSchema.model_validate(entry) for entry in shared_entries] if shared_entries else None
 
-    from sqlalchemy.future import select
-    from sqlalchemy.orm import selectinload
-
     @staticmethod
-    async def set_gift_refund(db: AsyncSession, current_user: User, shared: GiftSharedSchema) -> GiftDetailResponse:
+    async def set_gift_refund(db: AsyncSession, current_user: User, shared: GiftSharedSchema, group_id: int) -> GiftDetailResponse:
         logger.debug(
             f"Marquage du cadeau {shared.cadeau_id} comme remboursé pour l'utilisateur : {shared.participant.id}")
 
@@ -170,7 +167,7 @@ class SharingService:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
-        return await GiftService.set_gift_detail(gift, current_user, partage_schema)
+        return await GiftService.set_gift_detail(gift, current_user, group_id,   db, partage_schema)
 
     @staticmethod
     async def get_all_shares_for_gift(db: AsyncSession, gift_id: int, group_id: int) -> list[GiftSharedSchema]:
