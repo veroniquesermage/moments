@@ -1,0 +1,65 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title">🧑🏻‍🤝‍🧑🏽 Mon groupe actuel </div>
+  <hr class="block-separator" />
+
+  <p>> Nom du groupe : {{group?.groupe?.nomGroupe}}</p>
+  <p>> Mon rôle : {{group?.role}}</p>
+  <p *ngIf="group?.surnom">> Votre surnom pour ce groupe : {{group!.surnom}} </p>
+  <p *ngIf="!group?.surnom">> Les autres membres vous voient comme : {{group!.prenom}} </p>
+  <p>> Les admins du groupe que vous pouvez contacter en cas de besoin : <span class="admins">{{ group!.admins.join(', ') }}</span></p>
+
+  <div  class="options">
+    <button (click)="getAllMembers()">Voir les membres</button>
+    <button (click)="updateNickname()">Ajouter ou modifier mon surnom</button>
+    <button (click)="leaveGroup()">Quitter définitivement le groupe</button>
+  </div>
+</div>
+
+<ng-container  *ngIf="showNicknameModal">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+      <h2 id="modal-title">Choisissez votre surnom</h2>
+      <p>Les surnoms sont propres à chaque groupe, c'est le nom que verront les autres membres du groupe.</p>
+>
+      <label for="surnom">Votre surnom : </label>
+      <input id="surnom" type="text" [(ngModel)]="nickname" />
+
+      <div class="modal-actions">
+        <button [disabled]="!nickname" (click)="confirmNickname()">Valider</button>
+        <button (click)="cancel()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container  *ngIf="showMemberModal">
+  <div class="modal-overlay">
+      <div
+        class="modal-box terminal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title">
+        <h2 id="modal-title">Liste des membres du groupe</h2>
+        <ol>
+          <li *ngFor="let member of allMembers" style="list-style: none"> {{member.prenom}} {{member.nom | uppercase }}
+            <span *ngIf="member.surnom" class="alias"> alias {{ member.surnom }}</span>
+          </li>
+        </ol>
+        <div class="modal-actions">
+        <button (click)="cancel()">Fermer</button>
+        </div>
+      </div>
+  </div>
+</ng-container>
+
+<app-terminal-modal
+  *ngIf="showConfirmModal"
+  [message]="message"
+  [actions]="modalActions"
+  (actionClicked)="handleClicked($event)">
+</app-terminal-modal>

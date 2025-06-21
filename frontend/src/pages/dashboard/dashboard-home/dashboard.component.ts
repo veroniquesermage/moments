@@ -3,7 +3,7 @@ import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {GroupeResume} from 'src/core/models/group-resume.model';
+import {GroupResume} from 'src/core/models/group-resume.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +14,7 @@ import {GroupeResume} from 'src/core/models/group-resume.model';
 })
 export class DashboardComponent implements OnInit{
 
-  selectedGroup: GroupeResume | undefined = undefined;
+  selectedGroup: GroupResume | undefined = undefined;
   estAdmin = true;
 
   constructor(
@@ -51,11 +51,13 @@ export class DashboardComponent implements OnInit{
     this.router.navigate(['dashboard', 'idees']);
   }
 
+  goToProfile() {
+
+    this.router.navigate(['profile']);
+  }
   goToGestionGroupe() {
 
   }
 
-  goToChangerGroupe() {
 
-  }
 }

@@ -5,13 +5,15 @@ import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {firstValueFrom} from 'rxjs';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Injectable({providedIn: 'root'})
 export class SharingService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.partage;
 
-  constructor(private http: HttpClient,) {
+  constructor(private http: HttpClient,
+              private groupContextService: GroupContextService) {
   }
 
   async setGiftRefunded(shared: GiftShared): Promise<ApiResponse<GiftDetailResponse>>{
@@ -53,9 +55,16 @@ export class SharingService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    });
+    const headersConfig: { [key: string]: string } = {
+      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
+    };
+
+    const currentGroupId = this.groupContextService.getGroupId();
+    if (currentGroupId) {
+      headersConfig['X-Group-Id'] = currentGroupId.toString();
+    }
+
+    return new HttpHeaders(headersConfig);
   }
 
 }

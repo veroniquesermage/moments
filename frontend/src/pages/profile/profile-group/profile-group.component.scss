@@ -1,0 +1,75 @@
+.gift-block {
+  margin: 2rem 0;
+}
+
+.block-title {
+  font-weight: bold;
+  margin-top: -0.5rem;
+  font-size: 1.1rem;
+}
+
+.block-separator {
+  border: none;
+  border-top: 2px solid var(--color-border);
+  margin: 0.5rem 0 1rem 0;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.75); // Si tu veux un fond sombre temporaire
+  z-index: 10;
+}
+
+.modal-box {
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  padding: 2rem;
+  min-width: 250px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+ol, ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+input {
+  padding: 0.4rem 0.6rem;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 0 2px var(--color-focus-shadow); /* doux halo */
+}
+
+.admins {
+  color: var(--color-highlight);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border-bottom: 1px dotted var(--color-border-dotted);
+}
+
+.alias {
+  font-style: italic;
+  color: var(--color-muted-text);
+  margin-left: 0.3rem;
+}

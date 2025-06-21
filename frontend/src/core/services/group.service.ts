@@ -1,30 +1,31 @@
 import {Injectable, signal} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
-import {GroupeResume} from 'src/core/models/group-resume.model';
+import {GroupResume} from 'src/core/models/group-resume.model';
 import {firstValueFrom} from 'rxjs';
-import {GroupeDTO} from 'src/core/models/groupe-dto.model';
+import {GroupDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {GroupDetail} from 'src/core/models/group-detail.model';
 
 @Injectable({providedIn: 'root'})
 export class GroupService {
   private apiUrl = environment.backendBaseUrl + environment.api.groupes;
 
-  groupes = signal<GroupeResume[]>([]);
+  groupes = signal<GroupResume[]>([]);
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
               private groupContextService: GroupContextService) {
   }
 
-  async fetchGroups(): Promise<ApiResponse<GroupeResume[]>> {
+  async fetchGroups(): Promise<ApiResponse<GroupResume[]>> {
     this.isLoading.set(true);
 
     try {
       this.isLoading.set(true);
-      const groupes = await firstValueFrom(this.http.get<GroupeResume[]>(this.apiUrl, {
+      const groupes = await firstValueFrom(this.http.get<GroupResume[]>(this.apiUrl, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -38,9 +39,9 @@ export class GroupService {
     }
   }
 
-  async createGroup(groupDTO: GroupeDTO): Promise<ApiResponse<GroupeResume>> {
+  async createGroup(groupDTO: GroupDTO): Promise<ApiResponse<GroupResume>> {
     try {
-      const groupeCreated = await firstValueFrom(this.http.post<GroupeResume>(this.apiUrl, groupDTO, {
+      const groupeCreated = await firstValueFrom(this.http.post<GroupResume>(this.apiUrl, groupDTO, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -52,12 +53,12 @@ export class GroupService {
     }
   }
 
-  async joinGroup(code: string): Promise<ApiResponse<GroupeResume>> {
+  async joinGroup(code: string): Promise<ApiResponse<GroupResume>> {
     try {
       const codeEnc = encodeURIComponent(code);
       const url = `${this.apiUrl + environment.api.rejoindre}/${codeEnc}`;
 
-      const groupeJoined = await firstValueFrom(this.http.post<GroupeResume>(url, {}, {
+      const groupeJoined = await firstValueFrom(this.http.post<GroupResume>(url, {}, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -69,11 +70,11 @@ export class GroupService {
     }
   }
 
-  async getGroup(groupId: number): Promise<ApiResponse<GroupeResume>> {
+  async getGroup(groupId: number): Promise<ApiResponse<GroupResume>> {
     const codeEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${codeEnc}`;
     try {
-      const result = await firstValueFrom(this.http.get<GroupeResume>(url, {
+      const result = await firstValueFrom(this.http.get<GroupResume>(url, {
         headers: this.getAuthHeaders(),
         withCredentials: true
       }));
@@ -84,8 +85,24 @@ export class GroupService {
     }
   }
 
+  async getGroupDetail(groupId: number): Promise<ApiResponse<GroupDetail>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}/details`;
+    try {
+      const result = await firstValueFrom(this.http.get<GroupDetail>(url, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la récupération du groupe', error);
+      return {success: false, message: "❌ Aucun groupe trouvé."};
+    }
 
-  loadGroupesIfEmpty(): Promise<Result<GroupeResume[]>> {
+  }
+
+
+  loadGroupesIfEmpty(): Promise<Result<GroupResume[]>> {
     if (this.groupes().length > 0) {
       return Promise.resolve({success: true, data: this.groupes()});
     }
@@ -93,9 +110,16 @@ export class GroupService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    });
+    const headersConfig: { [key: string]: string } = {
+      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
+    };
+
+    const currentGroupId = this.groupContextService.getGroupId();
+    if (currentGroupId) {
+      headersConfig['X-Group-Id'] = currentGroupId.toString();
+    }
+
+    return new HttpHeaders(headersConfig);
   }
 
 }

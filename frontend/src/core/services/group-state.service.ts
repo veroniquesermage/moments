@@ -1,16 +1,16 @@
 import {Injectable, signal} from '@angular/core';
-import {GroupeResume} from 'src/core/models/group-resume.model';
+import {GroupResume} from 'src/core/models/group-resume.model';
 
 @Injectable({providedIn: 'root'})
 export class GroupStateService {
 
-  public selectedGroup = signal<GroupeResume | null>(null);
+  public selectedGroup = signal<GroupResume | null>(null);
 
-  setSelectedGroup(group: GroupeResume) {
+  setSelectedGroup(group: GroupResume) {
     this.selectedGroup.set(group);
   }
 
-  getSelectedGroup(): GroupeResume | null {
+  getSelectedGroup(): GroupResume | null {
     return this.selectedGroup();
   }
 }
