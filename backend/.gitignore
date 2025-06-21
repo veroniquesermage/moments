@@ -31,3 +31,5 @@ env/
 
 # ▶️ Variables d'environnement
 .env
+
+*.iml

@@ -1,5 +1,3 @@
-from typing import Any, Coroutine
-
 from fastapi import HTTPException
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +6,8 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, Group, UserGroup
-from app.schemas.group import GroupCreate, GroupResponse
+from app.schemas.group import GroupCreate, GroupResponse, GroupDetails
+from app.services.user_group_service import UserGroupService
 from app.utils.code_generator import generate_random_code
 
 
@@ -129,3 +128,35 @@ class GroupService:
         await db.commit()
 
         return GroupResponse.model_validate(existing)
+
+    @staticmethod
+    async def get_group_details(
+        db: AsyncSession,
+        current_user: User,
+        group_id: int
+    ) -> GroupDetails:
+
+        user = await UserGroupService.get_user_group(db, current_user.id, group_id)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé dans le groupe.")
+        if user.groupe.id != group_id:
+            raise HTTPException(status_code=403, detail="❌ Accès interdit à ce groupe.")
+
+        admins: list[UserGroup] = await UserGroupService.get_group_admins(db, group_id)
+
+        if not admins:
+            raise HTTPException(status_code=404, detail="Groupe non trouvé.")
+
+        if not user.role:
+            raise HTTPException(status_code=500, detail="Role non défini.")
+
+
+        return GroupDetails(
+            groupe= GroupResponse.model_validate(user.groupe),
+            admins=[admin.surnom if admin.surnom else admin.utilisateur.prenom
+                    for admin in admins],
+            surnom=user.surnom,
+            role= RoleEnum(user.role),
+            prenom= current_user.prenom
+        )

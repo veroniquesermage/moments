@@ -1,12 +1,9 @@
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
-
 from app.database import get_db
 from app.dependencies.current_user import get_current_user
 from app.models import User
-from app.schemas.group import GroupResponse, GroupCreate
+from app.schemas.group import GroupResponse, GroupCreate, GroupDetails
 from app.services.group_service import GroupService
 
 router = APIRouter(prefix="/groupe", tags=["groupe"])
@@ -45,4 +42,11 @@ async def get_groups(
 ) -> GroupResponse:
     return await GroupService.get_group(db, current_user, groupId )
 
+@router.get("/{groupId}/details", response_model=GroupDetails)
+async def get_group_details(
+        groupId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+) -> GroupDetails:
+    return await GroupService.get_group_details(db, current_user, groupId)
 

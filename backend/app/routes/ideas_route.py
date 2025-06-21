@@ -41,7 +41,7 @@ async def change_visibility(
         raise HTTPException(status_code=422, detail="❌ Le champ 'visibility' est requis.")
 
     await GiftIdeasService.change_visibility(db, current_user, ideaId, visibility)
-    return Response(status_code=204)
+    return
 
 @router.post("/{ideaId}", response_model=GiftIdeasResponse)
 async def duplicate_gift_idea(
@@ -59,4 +59,4 @@ async def delete_gift_idea(
         current_user: User = Depends(get_current_user)):
 
     await GiftIdeasService.delete_gift_idea(db, current_user, ideaId)
-    return Response(status_code=204)
+    return

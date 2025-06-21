@@ -1,10 +1,10 @@
-from app.schemas import CamelModel, UserSchema
+from app.schemas import CamelModel, UserDisplaySchema
 
 
 class GiftSharedSchema(CamelModel):
     id: int
-    preneur: UserSchema
+    preneur: UserDisplaySchema
     cadeau_id: int
-    participant: UserSchema
+    participant: UserDisplaySchema
     montant: float
     rembourse: bool

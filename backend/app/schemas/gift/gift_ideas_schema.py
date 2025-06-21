@@ -1,7 +1,7 @@
-from app.schemas import CamelModel, UserSchema
+from app.schemas import CamelModel, UserDisplaySchema
 
 
 class GiftIdeasSchema(CamelModel):
     id: int
-    proposee_par: UserSchema
+    proposee_par: UserDisplaySchema
     visibilite: bool = False
