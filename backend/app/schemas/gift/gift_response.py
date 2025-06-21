@@ -1,11 +1,11 @@
 from typing import Optional
 
-from app.schemas import CamelModel, UserSchema
+from app.schemas import CamelModel, UserDisplaySchema
 
 
 class GiftResponse(CamelModel):
     id: int
-    destinataire: UserSchema
+    destinataire: UserDisplaySchema
     nom: str
     description: Optional[str] = None
     marque: Optional[str] = None

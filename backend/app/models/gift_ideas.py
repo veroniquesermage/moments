@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, Boolean, Index
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -14,4 +14,6 @@ class GiftIdeas(Base):
 
     gift = relationship("Gift", back_populates="gift_idea", uselist=False)
 
-
+    __table_args__ = (
+        Index("ix_gift_ideas_propose", "proposee_par_id"),
+    )

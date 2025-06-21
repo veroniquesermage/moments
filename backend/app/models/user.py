@@ -9,11 +9,11 @@ class User(Base):
     __tablename__ = "utilisateur"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    email = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False, index=True)
     prenom = Column(String(255), nullable=False)
     nom = Column(String(255), nullable=False)
     google_id = Column(String(255), nullable=False)
-    date_creation = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    date_creation = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
     groupes = relationship("UserGroup", back_populates="utilisateur")
     cadeaux_crees = relationship("Gift", foreign_keys="Gift.destinataire_id", back_populates="destinataire")
