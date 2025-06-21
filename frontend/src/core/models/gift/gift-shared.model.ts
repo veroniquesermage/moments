@@ -1,10 +1,10 @@
-import {User} from 'src/security/model/user.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 export interface GiftShared {
   id: number
-  preneur: User
+  preneur: UserDisplay
   cadeauId: number | undefined;
-  participant: User
+  participant: UserDisplay
   montant: number
   rembourse: boolean
 }

@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {GroupService} from 'src/core/services/group.service';
-import {GroupeDTO} from 'src/core/models/groupe-dto.model';
+import {GroupDTO} from 'src/core/models/groupe-dto.model';
 import {Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
@@ -31,7 +31,7 @@ export class GroupCreateComponent {
     if (this.groupeForm.valid) {
       const formData = this.groupeForm.value;
       console.log('🧾 Données du formulaire :', formData);
-      const group: GroupeDTO = {
+      const group: GroupDTO = {
         nomGroupe: formData.nomGroupe,
         description: formData.description,
       };

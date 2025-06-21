@@ -12,6 +12,7 @@ export const environment = {
     cadeaux: '/cadeaux',
     utilisateur: '/utilisateurs',
     partage: '/partage',
-    idees: '/idees'
+    idees: '/idees',
+    utilisateurGroupe: '/utilisateur-groupe'
   }
 };

@@ -10,10 +10,11 @@ import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
-import {User} from 'src/security/model/user.model';
 import {FormsModule} from '@angular/forms';
-import {UserGroupService} from 'src/core/services/user-group.service';
 import {ToastrService} from 'ngx-toastr';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -22,7 +23,8 @@ import {ToastrService} from 'ngx-toastr';
     NgForOf,
     NgIf,
     TerminalModalComponent,
-    FormsModule
+    FormsModule,
+    DisplayNamePipe
   ],
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'
@@ -37,12 +39,12 @@ export class MyGiftsIdeasComponent implements OnInit {
   ideaId: number | undefined;
   selectedDestId?: number;
   showDuplicationModal = false;
-  allUsers: User[] = [];
+  allUsers: UserDisplay[] = [];
 
 
   constructor(private ideaService: IdeaService,
               private giftService: GiftService,
-              private usersGroupService : UserGroupService,
+              private groupContextService : GroupContextService,
               private router: Router,
               public errorService: ErrorService,
               private toastr: ToastrService) {
@@ -64,15 +66,8 @@ export class MyGiftsIdeasComponent implements OnInit {
 
   async duplicateIdea(ideaId: number) {
     this.ideaId = ideaId;
-    const result = await this.usersGroupService.getAllUsers();
-
-    if(result.success){
-      this.allUsers = result.data;
-      this.showDuplicationModal = true;
-    } else {
-      this.showModal = true;
-      this.errorService.showError(result.message);
-    }
+    this.allUsers = await this.groupContextService.getGroupMembers();
+    this.showDuplicationModal = true;
   }
 
   async handleClicked(eventName: string) {

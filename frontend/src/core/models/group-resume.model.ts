@@ -1,4 +1,4 @@
-export interface GroupeResume {
+export interface GroupResume {
   id: number;
   nomGroupe: string;
   description: string;

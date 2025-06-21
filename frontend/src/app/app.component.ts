@@ -6,6 +6,7 @@ import {Router, RouterOutlet} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {ThemeService} from 'src/core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,9 @@ export class AppComponent {
     private groupService: GroupService,
     private router: Router,
     private groupContext: GroupContextService,
-    public errorService: ErrorService
+    public errorService: ErrorService,
+    // ensure theme is initialized on app startup
+    private _theme: ThemeService
   ) {
     const injector = inject(Injector);
     runInInjectionContext(injector, () => this.initEffects());

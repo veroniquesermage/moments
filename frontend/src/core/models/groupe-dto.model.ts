@@ -1,4 +1,4 @@
-export interface GroupeDTO {
+export interface GroupDTO {
   nomGroupe: string;
   description: string;
 }

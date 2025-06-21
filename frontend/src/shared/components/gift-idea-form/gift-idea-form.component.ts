@@ -3,8 +3,9 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
 import {CommonModule} from '@angular/common';
-import {User} from 'src/security/model/user.model';
 import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-gift-idea-form',
@@ -12,14 +13,15 @@ import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
+    DisplayNamePipe
   ],
   templateUrl: './gift-idea-form.component.html',
   styleUrl: './gift-idea-form.component.scss'
 })
 export class GiftIdeaFormComponent implements OnChanges {
   @Input() giftIdeasResponse: GiftIdeasResponse | undefined;
-  @Input() membersGroup: User[] = [];
+  @Input() membersGroup: UserDisplay[] = [];
 
   @Output() formSubmitted = new EventEmitter<GiftIdeaFormData>();
   @Output() cancel = new EventEmitter<void>();

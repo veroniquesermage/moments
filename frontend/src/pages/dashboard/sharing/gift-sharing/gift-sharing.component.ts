@@ -7,12 +7,13 @@ import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {FormsModule} from '@angular/forms';
 import {GiftSharedDraft} from 'src/core/models/gift/gift-shared-draft.model';
 import {CommonModule} from '@angular/common';
-import {User} from 'src/security/model/user.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {
   RefreshGroupMembersComponent
 } from 'src/shared/components/refresh-group-members/refresh-group-members.component';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-gift-sharing',
@@ -20,7 +21,8 @@ import {
   imports: [
     FormsModule,
     CommonModule,
-    RefreshGroupMembersComponent
+    RefreshGroupMembersComponent,
+    DisplayNamePipe
   ],
   templateUrl: './gift-sharing.component.html',
   styleUrl: './gift-sharing.component.scss'
@@ -32,7 +34,7 @@ export class GiftSharingComponent implements OnInit {
   partages: GiftShared[] | undefined = [];
   partagesDraft: GiftSharedDraft[] = [];
   gift: GiftPublicResponse | undefined = undefined;
-  membresDisponibles: User[] = [];
+  membresDisponibles: UserDisplay[] = [];
   contextBrut: string | null = null;
 
   constructor(private sharingService: SharingService,

@@ -3,7 +3,6 @@ import {TerminalModalComponent} from "src/shared/components/terminal-modal/termi
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
 import {GiftIdeaFormComponent} from 'src/shared/components/gift-idea-form/gift-idea-form.component';
-import {User} from 'src/security/model/user.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GiftIdeaCreate} from 'src/core/models/gift/gift-idea-create.model';
@@ -12,6 +11,7 @@ import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {IdeaService} from 'src/core/services/idea.service';
 import {CommonModule} from '@angular/common';
 import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
+import {UserDisplay} from 'src/core/models/user-display.model';
 
 @Component({
   selector: 'app-ideas-create',
@@ -29,7 +29,7 @@ export class IdeasCreateComponent implements OnInit {
   message = 'Souhaitez-vous rendre cette idée visible aux membres du groupe ?\n'
   modalActions: TerminalModalAction[] = [{ label: 'Privé', eventName: 'PRIVATE', style: 'primary' },
                                           { label: 'Public', eventName: 'PUBLIC', style: 'primary' }];
-  membersGroup: User[] = [];
+  membersGroup: UserDisplay[] = [];
   giftIdeaCreate: GiftIdeaCreate | undefined;
   showModal = false;
 
