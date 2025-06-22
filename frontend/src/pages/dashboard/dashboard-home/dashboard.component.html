@@ -1,6 +1,6 @@
 <div class="terminal" aria-labelledby="Menu principal">
-  <h1>> Bienvenue dans le groupe : {{ selectedGroup?.nomGroupe }}</h1>
-  <h2 *ngIf="selectedGroup?.description">> Description du groupe : </h2> <em> {{selectedGroup?.description}}</em>
+  <h1>> Bienvenue dans le groupe : {{ selectedGroup!.groupe.nomGroupe }}</h1>
+  <h2 *ngIf="selectedGroup!.groupe.description">> Description du groupe : </h2> <em> {{selectedGroup!.groupe.description}}</em>
 
   <section class="intro-bloc" aria-label="Introduction pour la page Menu principal">
   <p>> Que souhaitez-vous faire ?</p>
@@ -13,16 +13,16 @@
     <li>
       <button (click)="goToListesMembres()">[2] Voir les listes des autres membres</button>
     </li>
-    <li *ngIf="estAdmin">
+    <li>
       <button (click)="goToSuiviCadeaux()">[3] Suivi des cadeaux réservés/pris</button>
     </li>
-    <li *ngIf="estAdmin">
+    <li>
       <button (click)="goToIdeeCadeaux()">[4] Mes idées de cadeaux pour autrui</button>
     </li>
     <li>
       <button (click)="goToProfile()">[5] Mon profil, mes groupes, déconnexion</button>
     </li>
-    <li *ngIf="estAdmin">
+    <li *ngIf="isAdmin">
       <button (click)="goToGestionGroupe()">[*] Gérer le groupe</button>
     </li>
   </ul>

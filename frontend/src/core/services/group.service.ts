@@ -1,13 +1,13 @@
 import {Injectable, signal} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
-import {GroupResume} from 'src/core/models/group-resume.model';
 import {firstValueFrom} from 'rxjs';
-import {GroupDTO} from 'src/core/models/groupe-dto.model';
 import {Result} from 'src/core/models/result.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {GroupDetail} from 'src/core/models/group-detail.model';
+import {GroupResume} from 'src/core/models/group/group-resume.model';
+import {GroupDTO} from 'src/core/models/group/groupe-dto.model';
+import {GroupDetail} from 'src/core/models/group/group-detail.model';
 
 @Injectable({providedIn: 'root'})
 export class GroupService {
@@ -99,6 +99,21 @@ export class GroupService {
       return {success: false, message: "❌ Aucun groupe trouvé."};
     }
 
+  }
+
+  async updateGroup(group: GroupDTO, groupId: number): Promise<ApiResponse<GroupResume>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}`;
+    try {
+      const result = await firstValueFrom(this.http.patch<GroupResume>(url,group, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la mise à jour du groupe', error);
+      return {success: false, message: "❌ Impossible de mettre à jour le groupe. veuillez réessayer."};
+    }
   }
 
 

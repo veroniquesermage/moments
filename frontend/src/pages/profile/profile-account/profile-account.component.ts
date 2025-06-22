@@ -16,7 +16,7 @@ import {AuthService} from 'src/security/service/auth.service';
 })
 export class ProfileAccountComponent implements OnInit{
 
-  user: User | undefined
+  user: User | undefined ;
   profile = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
 

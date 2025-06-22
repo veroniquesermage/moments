@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {GroupDetail} from 'src/core/models/group-detail.model';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {UserGroupService} from 'src/core/services/user-group.service';
@@ -10,6 +9,7 @@ import {TerminalModalComponent} from 'src/shared/components/terminal-modal/termi
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
 import {UserDisplay} from 'src/core/models/user-display.model';
+import {GroupDetail} from 'src/core/models/group/group-detail.model';
 
 @Component({
   selector: 'app-profile-group',

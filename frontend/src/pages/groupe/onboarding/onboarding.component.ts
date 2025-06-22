@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {GroupResume} from 'src/core/models/group-resume.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {GroupResume} from 'src/core/models/group/group-resume.model';
 
 @Component({
   selector: 'app-onboarding',

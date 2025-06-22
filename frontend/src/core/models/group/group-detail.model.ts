@@ -1,5 +1,5 @@
-import {GroupResume} from 'src/core/models/group-resume.model';
 import {User} from 'src/security/model/user.model';
+import {GroupResume} from 'src/core/models/group/group-resume.model';
 
 export interface GroupDetail {
   groupe: GroupResume,
