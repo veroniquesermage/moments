@@ -26,6 +26,35 @@ pip install -r requirements.txt
 Swagger : http://127.0.0.1:8000/docs
 Localhost: http://127.0.0.1:8000/
 
+
+### ⚙️ Configuration Run (mode classique)
+
+
+| Champ                   | Valeur                             |
+|-------------------------|------------------------------------|
+| **Type**                | Python                             |
+| **Script path**         | `./.venv/Scripts/uvicorn.exe`      |
+| **Parameters**          | `app.main:app --reload`            |
+| **Working directory**   | `./list2wish-back`                 |
+| **Environment variables** | `PYTHONUNBUFFERED=1`             |
+| **.env file**           | `./list2wish-back/.env`            |
+
+### 🐞 Configuration Debug (mode débogage)
+
+| Champ                   | Valeur                             |
+|-------------------------|------------------------------------|
+| **Type**                | Python                             |
+| **Module name**         | `uvicorn`                          |
+| **Parameters**          | `app.main:app`                     |
+| **Working directory**   | `./list2wish-back`                 |
+| **Environment variables** | `PYTHONUNBUFFERED=1`             |
+| **.env file**           | `./list2wish-back/.env`            |
+
+> 🧠 **Important :** ne pas utiliser `--reload` ici, sinon les breakpoints ne fonctionneront pas.  
+> ✅ Cette configuration permet à IntelliJ/PyCharm de déboguer FastAPI sans erreurs de subprocess ni UnicodeDecodeError.
+
+## Base de données
+
 ### 🛢️ Mise à jour base de données (Alembic)
 
 On génère d'abord la version avec un message d'upgrade:
