@@ -2,25 +2,25 @@
   <h2>> Détail du cadeau</h2>
 
   <div *ngIf="gift">
-    <p>> <strong>Destinataire :</strong> {{ gift.utilisateur.name }}</p>
-    <p>> <strong>Nom :</strong> {{ gift.nom }}</p>
-    <p>> <strong>Description :</strong> {{ gift.description }}</p>
-    <p>> <strong>Marque :</strong> {{ gift.marque }}</p>
-    <p>> <strong>Magasin :</strong> {{ gift.magasin }}</p>
-    <p *ngIf="gift.url">> <strong>URL : </strong>
-      <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
+    <p>> <strong>Destinataire :</strong> {{ gift.gift.destinataire | displayName  }}</p>
+    <p>> <strong>Nom :</strong> {{ gift.gift.nom }}</p>
+    <p>> <strong>Description :</strong> {{ gift.gift.description }}</p>
+    <p>> <strong>Marque :</strong> {{ gift.gift.marque }}</p>
+    <p>> <strong>Magasin :</strong> {{ gift.gift.magasin }}</p>
+    <p *ngIf="gift.gift.url">> <strong>URL : </strong>
+      <a [href]="gift.gift.url" target="_blank">{{ gift.gift.url }}</a>
     </p>
-    <p>> <strong>Commentaire :</strong> {{ gift.commentaire }}</p>
-    <p>> <strong>Quantité :</strong> {{ gift.quantite }}</p>
-    <p>> <strong>Prix réel :</strong> {{ gift.prixReel }} €</p>
-    <p>> <strong>Statut :</strong> {{ gift.statut }}</p>
+    <p>> <strong>Commentaire :</strong> {{ gift.gift.commentaire }}</p>
+    <p>> <strong>Quantité :</strong> {{ gift.gift.quantite }}</p>
+    <p>> <strong>Prix réel :</strong> {{ gift.delivery?.prixReel }} €</p>
+    <p>> <strong>Statut :</strong> {{ gift.gift.statut }}</p>
   </div>
   <div class="options">
     <button (click)="back()">↩ Retour à la liste</button>
     <button (click)="confirmReception()">🎁 Cadeau reçu</button>
     <button (click)="addDeliver()">🚚 Suivi livraison & prix réel</button>
-    <button *ngIf="gift?.statut === 'RESERVE'" (click)="changeStatus()">⏎ Annuler la réservation</button>
-    <button *ngIf="gift?.statut === 'PRIS'" (click)="changeStatus()">🚫 Retirer de mes cadeaux</button>
+    <button *ngIf="gift!.gift?.statut === 'RESERVE'" (click)="changeStatus()">⏎ Annuler la réservation</button>
+    <button *ngIf="gift!.gift?.statut === 'PRIS'" (click)="changeStatus()">🚫 Retirer de mes cadeaux</button>
   </div>
   <app-terminal-modal
     *ngIf="errorService.errorMessage()"
@@ -29,3 +29,6 @@
     (actionClicked)="errorService.clearError()"
   ></app-terminal-modal>
 </div>
+<app-feedback-test
+  [composant]="composant">
+</app-feedback-test>

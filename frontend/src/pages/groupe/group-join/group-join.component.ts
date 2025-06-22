@@ -5,17 +5,19 @@ import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-group-join',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FeedbackTestComponent],
   templateUrl: './group-join.component.html',
   styleUrl: './group-join.component.scss'
 })
 export class GroupJoinComponent {
 
   groupeForm: FormGroup;
+  composant: string = "GroupJoinComponent";
 
   constructor(private fb: FormBuilder,
               private groupeService: GroupService,

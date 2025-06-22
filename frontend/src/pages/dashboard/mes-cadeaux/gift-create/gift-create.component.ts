@@ -9,15 +9,17 @@ import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {GiftCreate} from 'src/core/models/gift/gift-create.model';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-gift-create',
   standalone: true,
-  imports: [CommonModule, GiftFormComponent, TerminalModalComponent],
+  imports: [CommonModule, GiftFormComponent, TerminalModalComponent, FeedbackTestComponent],
   templateUrl: './gift-create.component.html',
   styleUrl: './gift-create.component.scss'
 })
 export class GiftCreateComponent {
+  composant: string = "GiftCreateComponent";
 
   constructor(private giftService: GiftService,
               public router: Router,
