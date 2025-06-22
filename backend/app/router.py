@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.routes import auth_route, group_route, gift_route, user_route, sharing_route, ideas_route, user_group_route
+from app.routes import auth_route, group_route, gift_route, user_route, sharing_route, ideas_route, user_group_route, mail_route
 
 router = APIRouter()
 router.include_router(auth_route.router)
@@ -10,3 +10,4 @@ router.include_router(user_route.router)
 router.include_router(sharing_route.router)
 router.include_router(ideas_route.router)
 router.include_router(user_group_route.router)
+router.include_router(mail_route.router)

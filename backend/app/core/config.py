@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     database_url: str  # URL principale (async pour FastAPI)
     sync_database_url: str = Field(..., alias="SYNC_DB_URL")  # URL sync pour Alembic
 
+    # Mailing
+    mj_apikey_public:str
+    mj_apikey_private:str
+    mj_sender_email:str
+    mj_feedback_email:str
+
     class Config:
         env_file = ".env"
 
