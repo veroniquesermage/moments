@@ -6,17 +6,19 @@ import {GroupDTO} from 'src/core/models/groupe-dto.model';
 import {Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-group-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FeedbackTestComponent],
   templateUrl: './group-create.component.html',
   styleUrl: './group-create.component.scss'
 })
 export class GroupCreateComponent {
 
   groupeForm: FormGroup;
+  composant: string = "GroupCreateComponent";
   constructor(private fb: FormBuilder,
               private groupeService: GroupService,
               public router: Router,

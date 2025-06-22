@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {ThemeService, Theme} from 'src/core/services/theme.service';
+import {Theme, ThemeService} from 'src/core/services/theme.service';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-profile-actions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeedbackTestComponent],
   templateUrl: './profile-actions.component.html',
   styleUrl: './profile-actions.component.scss'
 })
 export class ProfileActionsComponent {
+  composant: string = "ProfileActionsComponent";
 
   constructor(private router: Router, public theme: ThemeService) {
   }
@@ -27,7 +29,7 @@ export class ProfileActionsComponent {
   }
 
   async back() {
-
     await this.router.navigate(['/dashboard']);
   }
+
 }

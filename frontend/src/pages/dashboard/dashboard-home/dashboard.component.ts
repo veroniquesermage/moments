@@ -4,16 +4,18 @@ import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {GroupResume} from 'src/core/models/group-resume.model';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeedbackTestComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit{
 
+  composant: string = "DashboardComponent";
   selectedGroup: GroupResume | undefined = undefined;
   estAdmin = true;
 

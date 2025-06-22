@@ -8,6 +8,7 @@ import {GiftService} from 'src/core/services/gift.service';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
 import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
 import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-ideas-update',
@@ -15,7 +16,8 @@ import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
   imports: [
     GiftIdeaFormComponent,
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    FeedbackTestComponent
   ],
   templateUrl: './ideas-update.component.html',
   styleUrl: './ideas-update.component.scss'
@@ -26,6 +28,7 @@ export class IdeasUpdateComponent implements OnInit{
   private route = inject(ActivatedRoute);
   id: number | undefined = undefined;
   giftIdeaResponse: GiftIdeasResponse | undefined = undefined;
+  composant: string = "IdeasUpdateComponent";
 
   constructor(public router: Router,
               private giftService: GiftService,

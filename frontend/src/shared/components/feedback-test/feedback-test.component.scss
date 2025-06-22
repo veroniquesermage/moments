@@ -1,0 +1,121 @@
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.75); // Si tu veux un fond sombre temporaire
+  z-index: 10;
+}
+
+.modal-box {
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  padding: 2rem;
+  min-width: 250px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+input {
+  padding: 0.4rem 0.6rem;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 0 2px var(--color-focus-shadow); /* doux halo */
+}
+
+::view-transition-group quill-editor {
+  display: block;
+  width: 100%;
+}
+
+.ql-toolbar {
+  background-color: #333;
+  border: 1px solid #666;
+  padding: 0.5rem;
+}
+
+.ql-container {
+  color: white;
+  border: 1px solid #666;
+  min-height: 10rem;
+  font-size: 1rem;
+}
+
+.ql-editor {
+  color: white;
+}
+
+.ql-stroke {
+  stroke: white !important;
+}
+
+.ql-fill {
+  fill: white !important;
+}
+
+.ql-picker {
+  color: white !important;
+}
+
+quill-editor {
+  display: inline !important;
+}
+.ql-editor.ql-blank::before {
+  color: #ccc !important; // ou une autre couleur claire selon ton thème
+  font-style: italic;
+  opacity: 1; // parfois Quill met une opacité trop faible
+}
+
+
+.feedback {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+
+  background-color: #ff4081; // rose flashy ou #00c8ff pour un bleu vif
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #ff1c65;
+    transform: scale(1.05);
+  }
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: #444;
+  background-color: #f0f0f0;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid #007BFF;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+
+
+
+
