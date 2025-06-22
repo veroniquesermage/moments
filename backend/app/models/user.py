@@ -1,9 +1,10 @@
 from datetime import datetime, UTC
 
-from sqlalchemy import Column, Integer, String, Date, DateTime
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+
 
 class User(Base):
     __tablename__ = "utilisateur"
@@ -19,15 +20,5 @@ class User(Base):
     cadeaux_crees = relationship("Gift", foreign_keys="Gift.destinataire_id", back_populates="destinataire")
     cadeaux_reserves = relationship("Gift", foreign_keys="Gift.reserve_par_id", back_populates="reserve_par")
     gift_ideas_created = relationship("GiftIdeas", foreign_keys="GiftIdeas.proposee_par_id", back_populates="proposee_par")
-
-    cadeaux_partages = relationship(
-        "GiftShared",
-        foreign_keys="[GiftShared.preneur_id]",
-        back_populates="preneur"
-    )
-
-    cadeaux_participes = relationship(
-        "GiftShared",
-        foreign_keys="[GiftShared.participant_id]",
-        back_populates="participant"
-    )
+    cadeaux_partages = relationship("GiftShared", foreign_keys="[GiftShared.preneur_id]",  back_populates="preneur")
+    cadeaux_participes = relationship("GiftShared", foreign_keys="[GiftShared.participant_id]", back_populates="participant")
