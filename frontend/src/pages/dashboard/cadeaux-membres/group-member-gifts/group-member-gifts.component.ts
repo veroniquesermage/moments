@@ -13,6 +13,7 @@ import {
 } from 'src/shared/components/refresh-group-members/refresh-group-members.component';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-group-member-gifts',
@@ -21,13 +22,16 @@ import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
     CommonModule,
     TerminalModalComponent,
     RefreshGroupMembersComponent,
-    DisplayNamePipe
+    DisplayNamePipe,
+    FeedbackTestComponent
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
 })
 export class GroupMemberGiftsComponent implements OnInit {
 
+  protected readonly DisplayNamePipe = DisplayNamePipe;
+  composant: string = "GroupMemberGiftsComponent";
   users: UserDisplay[] | undefined = [];
   selectedMember: UserDisplay | undefined = undefined;
   giftPublic: GiftPublicResponse[] = []
@@ -93,5 +97,4 @@ export class GroupMemberGiftsComponent implements OnInit {
     return column.formatFn ? column.formatFn(rawValue, gift) : rawValue;
   }
 
-  protected readonly DisplayNamePipe = DisplayNamePipe;
 }
