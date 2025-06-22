@@ -15,6 +15,7 @@ import {ToastrService} from 'ngx-toastr';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -24,7 +25,8 @@ import {GroupContextService} from 'src/core/services/group-context.service';
     NgIf,
     TerminalModalComponent,
     FormsModule,
-    DisplayNamePipe
+    DisplayNamePipe,
+    FeedbackTestComponent
   ],
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'
@@ -40,6 +42,7 @@ export class MyGiftsIdeasComponent implements OnInit {
   selectedDestId?: number;
   showDuplicationModal = false;
   allUsers: UserDisplay[] = [];
+  composant: string = "MyGiftsIdeasComponent";
 
 
   constructor(private ideaService: IdeaService,

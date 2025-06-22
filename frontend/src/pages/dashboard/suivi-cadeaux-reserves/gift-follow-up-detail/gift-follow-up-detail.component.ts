@@ -6,25 +6,30 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftStatutDTO} from "src/core/models/gift/gift-statut.model";
-import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
+import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 
 @Component({
   selector: 'app-gift-follow-up-table',
   standalone: true,
   imports: [
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    FeedbackTestComponent,
+    DisplayNamePipe
   ],
   templateUrl: './gift-follow-up-detail.component.html',
   styleUrl: './gift-follow-up-detail.component.scss'
 })
 export class GiftFollowUpDetailComponent implements OnInit{
 
-  gift: GiftPublicResponse | undefined = undefined;
+  gift: GiftDetailResponse | undefined;
   private route = inject(ActivatedRoute);
   private giftId: number | undefined;
   protected readonly GiftStatus = GiftStatus;
+  composant: string = "GiftFollowUpDetailComponent";
 
   constructor(public giftService: GiftService,
               public errorService: ErrorService,
@@ -41,7 +46,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
     } else {
       const result = await this.giftService.getGift(this.giftId);
       if (result.success) {
-        this.gift = result.data.gift;
+        this.gift = result.data;
       } else {
         this.errorService.showError(result.message);
       }

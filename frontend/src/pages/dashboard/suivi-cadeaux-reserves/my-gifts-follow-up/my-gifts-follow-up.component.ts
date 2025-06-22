@@ -12,6 +12,7 @@ import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {getDisplayName} from 'src/core/utils/display-name';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
@@ -21,6 +22,7 @@ import {getDisplayName} from 'src/core/utils/display-name';
     TerminalModalComponent,
     NgForOf,
     TitleCasePipe,
+    FeedbackTestComponent,
   ],
   templateUrl: './my-gifts-follow-up.component.html',
   styleUrl: './my-gifts-follow-up.component.scss'
@@ -137,4 +139,5 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
 
   protected readonly Number = Number;
+  composant: string = "MyGiftsFollowUpComponent";
 }

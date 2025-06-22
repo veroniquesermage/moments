@@ -14,6 +14,7 @@ import {
 } from 'src/shared/components/refresh-group-members/refresh-group-members.component';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-gift-sharing',
@@ -22,7 +23,8 @@ import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
     FormsModule,
     CommonModule,
     RefreshGroupMembersComponent,
-    DisplayNamePipe
+    DisplayNamePipe,
+    FeedbackTestComponent
   ],
   templateUrl: './gift-sharing.component.html',
   styleUrl: './gift-sharing.component.scss'
@@ -36,6 +38,7 @@ export class GiftSharingComponent implements OnInit {
   gift: GiftPublicResponse | undefined = undefined;
   membresDisponibles: UserDisplay[] = [];
   contextBrut: string | null = null;
+  composant: string = "GiftSharingComponent";
 
   constructor(private sharingService: SharingService,
               private giftService: GiftService,

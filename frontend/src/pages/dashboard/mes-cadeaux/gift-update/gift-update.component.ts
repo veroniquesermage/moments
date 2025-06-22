@@ -8,13 +8,15 @@ import {TerminalModalComponent} from 'src/shared/components/terminal-modal/termi
 import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-gift-update',
   imports: [
     GiftFormComponent,
     NgIf,
-    TerminalModalComponent
+    TerminalModalComponent,
+    FeedbackTestComponent
   ],
   templateUrl: './gift-update.component.html',
   styleUrl: './gift-update.component.scss'
@@ -24,6 +26,7 @@ export class GiftUpdateComponent implements OnInit{
   private route = inject(ActivatedRoute);
   id: number | undefined = undefined;
   gift: GiftPublicResponse | undefined = undefined;
+  composant: string = "GiftUpdateComponent";
 
   constructor(private giftService: GiftService,
               public router: Router,

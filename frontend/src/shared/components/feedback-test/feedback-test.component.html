@@ -1,0 +1,37 @@
+<button class="feedback" (click)="clickOn()"  aria-label="Donner un avis">💬 Donner mon avis</button>
+
+<ng-container  *ngIf="showFeedbackModal">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+      <h2 id="modal-title">Laisser un commentaire pour améliorer cette page</h2>
+      <p> Soyez précis dans votre commentaire s'il-vous-plaît.</p>
+      <p>Le nom de la page sur laquelle vous faites le commentaire sera automatiquement envoyé, aisni que votre nom.</p>
+      <p class="info-text">
+        🗒️ <strong>Astuce :</strong> Si vous envoyez un commentaire depuis une fenêtre pop-up ou une page de détail
+        (comme un cadeau ou une idée), pensez à préciser dans votre message depuis quelle section vous êtes arrivé(e).
+        Cela nous aidera à mieux comprendre le contexte de votre retour.
+      </p>
+
+      <label for="commentaire">Votre commentaire : </label>
+      <quill-editor
+        [(ngModel)]="commentaire"
+        [modules]="editorModules"
+        [placeholder]="placeholder"
+        [theme]="'snow'"
+      ></quill-editor>
+
+
+
+
+      <div class="modal-actions">
+        <button (click)="cancelTemporary()">❌ Fermer (conserver le texte)</button>
+        <button (click)="clear()">🗑 Vider le commentaire et fermer</button>
+        <button (click)="sendFeedback()">📤 Envoyer votre commentaire</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

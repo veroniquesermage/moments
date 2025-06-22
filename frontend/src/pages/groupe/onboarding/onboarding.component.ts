@@ -4,17 +4,19 @@ import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupResume} from 'src/core/models/group-resume.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeedbackTestComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss'
 })
 export class OnboardingComponent implements OnInit {
 
   errorMessage: string | null = null;
+  composant: string = "OnboardingComponent";
 
   constructor(
     public groupService: GroupService,
