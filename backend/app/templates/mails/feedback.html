@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau feedback</title>
+</head>
+<body style="font-family: sans-serif; color: #333; line-height: 1.6;">
+<h2 style="color: #444;">✅ Nouveau feedback reçu</h2>
+
+<p><strong>🧩 Composant concerné :</strong> {{ feedback_request.composant }}</p>
+<p><strong>📅 Envoyé le :</strong> {{ date_envoi }}</p>
+
+<h3 style="margin-top: 1.5rem;">👤 Utilisateur</h3>
+<ul>
+    <li><strong>Prénom :</strong> {{ user.prenom }}</li>
+    <li><strong>Nom :</strong> {{ user.nom }}</li>
+    <li><strong>ID :</strong> {{ user.id }}</li>
+</ul>
+
+<h3 style="margin-top: 1.5rem;">💬 Commentaire</h3>
+<div style="border:1px solid #ccc; padding:1rem; background:#f9f9f9;">
+    {{ feedback_request.commentaire }}
+</div>
+</body>
+</html>

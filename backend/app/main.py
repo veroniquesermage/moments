@@ -1,12 +1,11 @@
 from fastapi import FastAPI, Request
-from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from starlette.middleware.cors import CORSMiddleware
 
 from app.core.logger import logger
 from app.database import get_db
 from app.router import router
-
 
 app = FastAPI()
 app.title = "Liste2Wish API"
