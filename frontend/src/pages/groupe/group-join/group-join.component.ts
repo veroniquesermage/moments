@@ -1,47 +1,50 @@
-import {Component} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {GroupService} from 'src/core/services/group.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {AuthService} from 'src/security/service/auth.service';
 
 @Component({
   selector: 'app-group-join',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FeedbackTestComponent],
+  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FeedbackTestComponent, FormsModule],
   templateUrl: './group-join.component.html',
   styleUrl: './group-join.component.scss'
 })
-export class GroupJoinComponent {
+export class GroupJoinComponent implements OnInit{
 
-  groupeForm: FormGroup;
   composant: string = "GroupJoinComponent";
+  codeInvitation: string = '';
+  private route = inject(ActivatedRoute);
 
-  constructor(private fb: FormBuilder,
-              private groupeService: GroupService,
+  constructor(private groupeService: GroupService,
               public router: Router,
-              public errorService: ErrorService) {
-    this.groupeForm = this.fb.group({
-      code: ['', Validators.required]
-    })
+              public errorService: ErrorService,
+              private authService: AuthService) {
   }
 
-  async onSubmit() {
-    if (this.groupeForm.valid) {
-      let value = this.groupeForm.value;
-      const result = await this.groupeService.joinGroup(value.code);
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.codeInvitation = params['inviteCode'] ?? '';
+      if (!this.authService.isLoggedIn()) {
+        localStorage.setItem('app_kdo.codeInvit', this.codeInvitation);
+        this.authService.login();
+      } else {
+        localStorage.removeItem('app_kdo.codeInvit');
+      }
+    });
+  }
 
+  async rejoindre() {
+      const result = await this.groupeService.joinGroup(this.codeInvitation);
       if (result.success) {
         await this.router.navigate(['/dashboard']);
       } else {
         this.errorService.showError(result.message);
       }
-
-    } else {
-      console.warn('❌ Formulaire invalide');
-      this.errorService.showError('❌ Formulaire invalide');
-    }
   }
 }

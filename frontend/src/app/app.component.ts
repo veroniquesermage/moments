@@ -45,9 +45,13 @@ export class AppComponent {
 
   private async loadGroupsAfterLogin() {
     this.groupService.isLoading.set(true);
+    const inviteCode = localStorage.getItem('app_kdo.codeInvit');
 
+    if(inviteCode){
+      await this.router.navigateByUrl(`/groupe/onboarding/rejoindre?inviteCode=${inviteCode}`);
+      return;
+    }
     const result = await this.groupService.fetchGroups();
-
     if (result.success) {
       if (result.data.length === 1) {
         this.groupContext.setGroupContext(result.data.at(0)?.id!)
