@@ -6,7 +6,8 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, UserGroup
-from app.schemas import UserSchema, UserDisplaySchema
+from app.schemas import UserDisplaySchema
+from app.schemas.mailing.invite_request import InviteRequest
 
 
 class UserGroupService:
@@ -14,11 +15,11 @@ class UserGroupService:
     @staticmethod
     async def get_users(db: AsyncSession,
                         current_user: User,
-                        groupId: int) -> list[UserDisplaySchema]:
+                        group_id: int) -> list[UserDisplaySchema]:
 
         results = (await db.execute(
             select(UserGroup)
-            .where(UserGroup.groupe_id == groupId,
+            .where(UserGroup.groupe_id == group_id,
                    UserGroup.utilisateur_id != current_user.id)
             .options(
                 selectinload(UserGroup.utilisateur),
@@ -111,3 +112,18 @@ class UserGroupService:
         await db.commit()
 
         logger.info(f"Utilisateur {current_user.id} retiré du groupe {group_id}")
+
+    @staticmethod
+    async def get_existing_users_in_group(db: AsyncSession, group_id: int, invite_request: InviteRequest) -> list[str]:
+        stmt = (
+            select(User.email)
+            .join(UserGroup, User.id == UserGroup.utilisateur_id)
+            .where(
+                UserGroup.groupe_id == group_id,
+                User.email.in_(invite_request.emails)
+            )
+        )
+        result = await db.execute(stmt)
+        return [row[0] for row in result.fetchall()]
+
+

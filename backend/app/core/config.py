@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     mj_sender_email:str
     mj_feedback_email:str
 
+    invitation_link:str
+
     class Config:
         env_file = ".env"
 
