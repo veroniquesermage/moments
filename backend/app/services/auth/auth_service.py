@@ -18,11 +18,12 @@ class AuthService:
 
         payload = await verify_google_id_token(token_data["id_token"])
 
+        # TODO : gérer le cas ou le prénom ou nom est vide autrement que par string vide
         user = await UserService.get_or_create_user(
             db=db,
             email=payload["email"],
-            prenom=payload["given_name"],
-            nom=payload["family_name"],
+            prenom=payload.get("given_name", ""),
+            nom=payload.get("family_name", ""),
             google_id=payload["sub"]
         )
 
