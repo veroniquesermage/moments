@@ -1,0 +1,33 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title">📩 Invitations </div>
+  <hr class="block-separator" />
+
+  <div>
+    <p>> Saisissez une adresse mail par ligne. Virgules et espaces seront convertis en retours à la ligne.</p>
+    <textarea
+      [(ngModel)]="mails"
+      (input)="normalizeMails()"
+      rows="4"
+    ></textarea>
+
+  </div>
+
+  <button (click)="checkMail()">Vérifier les mails</button>
+
+  <div *ngIf="validMails?.emails!.length > 0">
+    <p>✅ Mails valides :</p>
+    <ul>
+      <li *ngFor="let mail of validMails?.emails">{{ mail }}</li>
+    </ul>
+  </div>
+
+  <div *ngIf="invalidMails.length > 0">
+    <p>❌ Mails invalides :</p>
+    <ul>
+      <li *ngFor="let mail of invalidMails">{{ mail }}</li>
+    </ul>
+  </div>
+
+  <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">Envoyer les invitations</button>
+</div>

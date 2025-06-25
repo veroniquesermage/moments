@@ -4,7 +4,8 @@ import {firstValueFrom} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {environment} from 'src/environments/environment';
-import {FeedbackRequest} from 'src/core/models/feedback-request.model';
+import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
+import {FeedbackRequest} from 'src/core/models/mailing/feedback-request.model';
 
 @Injectable({providedIn: 'root'})
 export class MailingService {
@@ -15,10 +16,10 @@ export class MailingService {
   }
 
   async sendFeedbackMail(feedbackRequest: FeedbackRequest): Promise<ApiResponse<void>> {
-
+    const url = `${this.apiUrl}/feedback/`;
     try {
       await firstValueFrom(
-        this.http.post<void>(this.apiUrl, feedbackRequest, {
+        this.http.post<void>(url, feedbackRequest, {
           headers: this.getAuthHeaders(),
           withCredentials: true
         })
@@ -28,6 +29,23 @@ export class MailingService {
     } catch (error) {
       console.error('[MailingService] Erreur lors de l\'envoi du feedback', error);
       return {success: false, message: "❌ Erreur lors de l\'envoi du feedback."};
+    }
+  }
+
+  async sendinvitesMail(inviteRequest: InviteRequest): Promise<ApiResponse<void>> {
+    const url = `${this.apiUrl}/invitation/`;
+    try {
+      await firstValueFrom(
+        this.http.post<void>(url, inviteRequest, {
+          headers: this.getAuthHeaders(),
+          withCredentials: true
+        })
+      );
+      return {success: true, data: undefined};
+
+    } catch (error) {
+      console.error('[MailingService] Erreur lors de l\'envoi des invitations', error);
+      return {success: false, message: "❌ Erreur lors de l\'envoi des invitations."};
     }
   }
 
