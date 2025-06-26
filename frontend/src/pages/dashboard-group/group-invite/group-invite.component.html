@@ -31,3 +31,10 @@
 
   <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">Envoyer les invitations</button>
 </div>
+
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>

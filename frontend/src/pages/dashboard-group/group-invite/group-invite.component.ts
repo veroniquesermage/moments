@@ -4,13 +4,15 @@ import {CommonModule} from '@angular/common';
 import {MailingService} from 'src/core/services/mailing.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-group-invite',
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    TerminalModalComponent
   ],
   templateUrl: './group-invite.component.html',
   styleUrl: './group-invite.component.scss'
@@ -21,7 +23,7 @@ export class GroupInviteComponent {
   invalidMails: string[] = [];
 
   constructor(private mailingService: MailingService,
-              private errorService: ErrorService) {
+              public errorService: ErrorService) {
   }
 
   private isValidEmail(email: string): boolean {

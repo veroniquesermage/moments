@@ -74,4 +74,11 @@ export class GroupContextService{
     return [];
   }
 
+  updateMemberCache(members: UserDisplay[]) {
+    this.memberCache = members;
+    localStorage.setItem('app_kdo.groupMembers', JSON.stringify(members));
+    localStorage.setItem('app_kdo.groupMembers_timestamp', Date.now().toString());
+  }
+
+
 }

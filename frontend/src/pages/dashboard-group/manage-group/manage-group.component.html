@@ -3,6 +3,11 @@
   <app-group-info
   [groupId] = "groupId"></app-group-info>
   <app-group-invite/>
+  <app-group-roles
+    [membersOriginal]="members"
+    [groupId]="groupId">
+  </app-group-roles>
+
 </div>
 
 <app-feedback-test

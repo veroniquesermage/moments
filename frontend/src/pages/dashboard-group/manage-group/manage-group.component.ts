@@ -3,6 +3,8 @@ import {GroupInfoComponent} from 'src/pages/dashboard-group/group-info/group-inf
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {GroupInviteComponent} from 'src/pages/dashboard-group/group-invite/group-invite.component';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {UserDisplay} from 'src/core/models/user-display.model';
+import {GroupRolesComponent} from 'src/pages/dashboard-group/group-roles/group-roles.component';
 
 @Component({
   selector: 'app-manage-group',
@@ -10,7 +12,8 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
   imports: [
     GroupInfoComponent,
     GroupInviteComponent,
-    FeedbackTestComponent
+    FeedbackTestComponent,
+    GroupRolesComponent
   ],
   templateUrl: './manage-group.component.html',
   styleUrl: './manage-group.component.scss'
@@ -19,11 +22,13 @@ export class ManageGroupComponent implements OnInit{
 
   composant: string = 'ManageGroupComponent';
   groupId: number | undefined;
+  members: UserDisplay[] = [];
 
   constructor(private groupServiceContext: GroupContextService) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.groupId = this.groupServiceContext.getGroupId();
+    this.members = await this.groupServiceContext.getGroupMembers();
   }
 }
