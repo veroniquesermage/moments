@@ -6,13 +6,15 @@ import {ErrorService} from 'src/core/services/error.service';
 import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
 import {UserInteractionService} from 'src/core/services/user-interaction.service';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-gift-priority-list',
   standalone: true,
   imports: [
     CommonModule,
-    DragDropModule
+    DragDropModule,
+    TerminalModalComponent
   ],
   templateUrl: './gift-priority-list.component.html',
   styleUrl: './gift-priority-list.component.scss'
@@ -24,7 +26,7 @@ export class GiftPriorityListComponent {
   hasOrderChanged: boolean = false;
 
   constructor(private giftService: GiftService,
-              private errorService: ErrorService,
+              public errorService: ErrorService,
               private userInteractionService: UserInteractionService) {
   }
 

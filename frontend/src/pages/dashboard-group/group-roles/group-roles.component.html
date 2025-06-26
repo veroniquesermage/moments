@@ -1,1 +1,38 @@
-<p>group-roles works!</p>
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title"> 🛡️ Rôles </div>
+  <hr class="block-separator" />
+
+  <div class="members-grid">
+    <div *ngFor="let member of membersEdition" class="member-cell">
+      <span>{{ member | displayName }}</span>
+      <select [(ngModel)]="member.role">
+        <option *ngFor="let role of roles" [ngValue]="role">{{ role }}</option>
+      </select>
+    </div>
+  </div>
+
+  <button (click)="confirmRole()">Confirmer les nouveaux rôles</button>
+</div>
+
+<ng-container  *ngIf="showMemberModal">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+      <h2 id="modal-title">Liste des modifications qui seront appliquées</h2>
+      <p *ngIf="changes.length == 0">Aucune modification n'a été apportée.</p>
+      <ol *ngIf="changes.length>0">
+        <li *ngFor="let member of changes" style="list-style: none"> {{member.prenom}} {{member.nom | uppercase }}
+          <span> : {{ member.role }}</span>
+        </li>
+      </ol>
+      <div class="modal-actions">
+        <button (click)="cancel()">Fermer</button>
+        <button *ngIf="changes.length>0" (click)="validation()">Valider les nouveaux rôles</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

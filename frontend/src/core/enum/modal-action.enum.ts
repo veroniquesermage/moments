@@ -11,6 +11,7 @@ export enum ModalActionType {
   PARTAGE = 'PARTAGE',
   BACK_TO_LIST = 'BACK_TO_LIST',
   PRIVATE = 'PRIVATE',
-  PUBLIC = 'PUBLIC'
+  PUBLIC = 'PUBLIC',
+  UPDATE_ROLES = 'UPDATE_ROLES'
 
 }
