@@ -189,3 +189,22 @@ class GroupService:
             logger.info(f"Refresh failed, but update was successful: {e}")
 
         return GroupResponse.model_validate(group_existing)
+
+    @staticmethod
+    async def delete_group(db: AsyncSession, current_user, group_id: int):
+        result = await db.execute(select(Group).where(Group.id == group_id))
+        group = result.scalars().first()
+        if not group:
+            raise HTTPException(status_code=400, detail="❌ Ce groupe n'existe pas.")
+
+        me = await UserGroupService.get_user_group(db, current_user.id, group_id)
+        if me.role != RoleEnum.ADMIN:
+            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas les droits pour supprimer ce groupe.")
+
+        try:
+            await UserGroupService.delete_all_users_from_group(db, group_id)
+            await db.delete(group)
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail="❌ Une erreur est survenue pendant la suppression.")

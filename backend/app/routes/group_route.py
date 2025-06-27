@@ -51,6 +51,14 @@ async def update_group(
 ) -> GroupResponse:
     return await GroupService.update_group(db, current_user, group, groupId )
 
+@router.delete("/{groupId}", status_code=204 )
+async def delete_group(
+        groupId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
+    return await GroupService.delete_group(db, current_user, groupId)
+
 @router.get("/{groupId}/details", response_model=GroupDetails)
 async def get_group_details(
         groupId: int,
@@ -58,4 +66,3 @@ async def get_group_details(
         current_user: User = Depends(get_current_user)
 ) -> GroupDetails:
     return await GroupService.get_group_details(db, current_user, groupId)
-
