@@ -116,6 +116,22 @@ export class GroupService {
     }
   }
 
+  async deleteGroup(groupId: number): Promise<ApiResponse<any>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}`;
+    try {
+      const result = await firstValueFrom(this.http.delete<GroupDetail>(url, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la suppression du groupe', error);
+      return {success: false, message: "❌ Suppression impossible. Veuillez réessayer plus tard."};
+    }
+
+  }
+
 
   loadGroupesIfEmpty(): Promise<Result<GroupResume[]>> {
     if (this.groupes().length > 0) {
