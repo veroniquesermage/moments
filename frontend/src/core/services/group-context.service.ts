@@ -80,5 +80,12 @@ export class GroupContextService{
     localStorage.setItem('app_kdo.groupMembers_timestamp', Date.now().toString());
   }
 
+  clearGroupCache(){
+    this.memberCache = [];
+    localStorage.removeItem('app_kdo.activeGroupId');
+    localStorage.removeItem('app_kdo.groupMembers');
+    localStorage.removeItem('app_kdo.groupMembers_timestamp');
+  }
+
 
 }

@@ -5,6 +5,7 @@ import {GroupInviteComponent} from 'src/pages/dashboard-group/group-invite/group
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupRolesComponent} from 'src/pages/dashboard-group/group-roles/group-roles.component';
+import {GroupActionsComponent} from 'src/pages/dashboard-group/group-actions/group-actions.component';
 
 @Component({
   selector: 'app-manage-group',
@@ -13,7 +14,8 @@ import {GroupRolesComponent} from 'src/pages/dashboard-group/group-roles/group-r
     GroupInfoComponent,
     GroupInviteComponent,
     FeedbackTestComponent,
-    GroupRolesComponent
+    GroupRolesComponent,
+    GroupActionsComponent
   ],
   templateUrl: './manage-group.component.html',
   styleUrl: './manage-group.component.scss'
