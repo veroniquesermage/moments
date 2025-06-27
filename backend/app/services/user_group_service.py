@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import select, Sequence
+from sqlalchemy import select, Sequence, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -13,9 +13,9 @@ from app.schemas.mailing.invite_request import InviteRequest
 class UserGroupService:
 
     @staticmethod
-    async def get_users(db: AsyncSession,
-                        current_user: User,
-                        group_id: int) -> list[UserDisplaySchema]:
+    async def get_users_except_current_user(db: AsyncSession,
+                                            current_user: User,
+                                            group_id: int) -> list[UserDisplaySchema]:
 
         results = (await db.execute(
             select(UserGroup)
@@ -32,7 +32,34 @@ class UserGroupService:
             id= result.utilisateur.id,
             nom= result.utilisateur.nom,
             prenom= result.utilisateur.prenom,
-            surnom= result.surnom if result.surnom else None
+            surnom= result.surnom if result.surnom else None,
+            role= result.role
+            )
+            for result in results ]
+
+        return user_display_schema
+
+    @staticmethod
+    async def get_users(
+            db: AsyncSession,
+            group_id: int) -> list[UserDisplaySchema]:
+
+        results = (await db.execute(
+            select(UserGroup)
+            .where(UserGroup.groupe_id == group_id)
+            .options(
+                selectinload(UserGroup.utilisateur),
+                selectinload(UserGroup.groupe)
+            )
+        )).scalars().all()
+
+        user_display_schema = [
+            UserDisplaySchema(
+                id= result.utilisateur.id,
+                nom= result.utilisateur.nom,
+                prenom= result.utilisateur.prenom,
+                surnom= result.surnom if result.surnom else None,
+                role= result.role
             )
             for result in results ]
 
@@ -112,6 +139,35 @@ class UserGroupService:
         await db.commit()
 
         logger.info(f"Utilisateur {current_user.id} retiré du groupe {group_id}")
+
+    @staticmethod
+    async def update_role(db: AsyncSession, group_id: int, current_user: User, groupRoleUpdate: list[UserDisplaySchema]) -> list[UserDisplaySchema]:
+
+        me = await UserGroupService.get_user_group(db, current_user.id, group_id)
+
+        if me.role != RoleEnum.ADMIN:
+            raise HTTPException(status_code=403, detail="❌ Cet utilisateur n'a pas le droit de modifier les rôles des membres.")
+
+        user_ids = [item.id for item in groupRoleUpdate]
+
+        result = await db.execute(select(UserGroup).where(UserGroup.groupe_id == group_id)
+                                            .where(UserGroup.utilisateur_id.in_(user_ids)))
+
+        user_groups_to_update = result.scalars().all()
+
+        for user_group in user_groups_to_update:
+            new_data = next((u for u in groupRoleUpdate if u.id == user_group.utilisateur_id), None)
+            if new_data:
+                user_group.role = new_data.role
+
+        await db.commit()
+
+        return await UserGroupService.get_users_except_current_user(db, current_user, group_id)
+
+    @staticmethod
+    async def delete_all_users_from_group(db: AsyncSession, group_id: int):
+        stmt = delete(UserGroup).where(UserGroup.groupe_id == group_id)
+        await db.execute(stmt)
 
     @staticmethod
     async def get_existing_users_in_group(db: AsyncSession, group_id: int, invite_request: InviteRequest) -> list[str]:

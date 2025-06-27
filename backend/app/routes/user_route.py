@@ -24,4 +24,4 @@ async def get_users(
         current_user: User = Depends(get_current_user) ) -> list[UserDisplaySchema]:
 
     logger.info(f"Récupération des membres du group {groupId}")
-    return await UserGroupService.get_users(db, current_user, groupId)
+    return await UserGroupService.get_users_except_current_user(db, current_user, groupId)
