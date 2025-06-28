@@ -14,5 +14,19 @@ services:
     ports:
       - "5432:5432"
 
+  backend:
+    build:
+      context: .  # car Dockerfile est dans list2wish-back
+    container_name: liste2wish-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://liste2wish:liste2wish@postgres:5432/liste2wish
+    volumes:
+      - .:/app
+
 volumes:
   pgdata:
