@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, Group, UserGroup
-from app.schemas.group import GroupCreate, GroupResponse, GroupDetails
+from app.schemas.group import GroupCreate, GroupResponse, GroupDetails, GroupUpdate
 from app.services.user_group_service import UserGroupService
 from app.utils.code_generator import generate_random_code
 
@@ -160,3 +160,51 @@ class GroupService:
             role= RoleEnum(user.role),
             prenom= current_user.prenom
         )
+
+    @staticmethod
+    async def update_group(
+            db: AsyncSession,
+            current_user: User,
+            group: GroupUpdate,
+            group_id: int
+    ) -> GroupResponse :
+
+        group_user: UserGroup = await UserGroupService.get_user_group(db, current_user.id, group_id)
+
+        if group_user is None or  group_user.role != RoleEnum.ADMIN :
+            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas le droit de modifier ce groupe.")
+
+        group_existing: Group = (await db.execute(select(Group).where(Group.id == group_id))).scalars().first()
+
+        if not group_existing:
+            raise HTTPException(status_code=404, detail="Groupe non trouvé.")
+
+        group_existing.nom_groupe = group.nom_groupe
+        group_existing.description = group.description
+
+        await db.commit()
+        try:
+            await db.refresh(group_existing)
+        except Exception as e:
+            logger.info(f"Refresh failed, but update was successful: {e}")
+
+        return GroupResponse.model_validate(group_existing)
+
+    @staticmethod
+    async def delete_group(db: AsyncSession, current_user, group_id: int):
+        result = await db.execute(select(Group).where(Group.id == group_id))
+        group = result.scalars().first()
+        if not group:
+            raise HTTPException(status_code=400, detail="❌ Ce groupe n'existe pas.")
+
+        me = await UserGroupService.get_user_group(db, current_user.id, group_id)
+        if me.role != RoleEnum.ADMIN:
+            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas les droits pour supprimer ce groupe.")
+
+        try:
+            await UserGroupService.delete_all_users_from_group(db, group_id)
+            await db.delete(group)
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail="❌ Une erreur est survenue pendant la suppression.")

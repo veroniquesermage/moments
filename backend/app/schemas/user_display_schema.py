@@ -8,3 +8,4 @@ class UserDisplaySchema(CamelModel):
     nom: str
     prenom: str
     surnom: Optional[str] = None
+    role: Optional[str] = None
