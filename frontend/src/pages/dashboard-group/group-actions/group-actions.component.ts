@@ -30,4 +30,8 @@ export class GroupActionsComponent {
         }
     }
   }
+
+  async back() {
+    await this.router.navigate(['/dashboard']);
+  }
 }
