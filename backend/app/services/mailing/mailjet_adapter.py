@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from jinja2 import Template
 from mailjet_rest import Client
@@ -31,7 +32,7 @@ class MailjetAdapter:
         html_rendered = template.render(
             feedback_request=feedback_request,
             user=user,
-            date_envoi=datetime.now().strftime("%d/%m/%Y à %Hh%M"),
+            date_envoi=datetime.now(ZoneInfo("Europe/Paris")).strftime("%d/%m/%Y à %Hh%M"),
             user_id=user.id
         )
 
