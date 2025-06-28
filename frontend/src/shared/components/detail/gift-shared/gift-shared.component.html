@@ -7,6 +7,10 @@
   <p *ngIf="giftDetailResponse.gift.statut !== GiftStatus.DISPONIBLE">
     > {{ getLabelPreneur(giftDetailResponse.gift.statut) }} : {{ giftDetailResponse.gift.reservePar | displayName }}</p>
 
+  <p *ngIf="giftDetailResponse.gift.statut == GiftStatus.RESERVE">
+    > Date d'expiration de la réservation : {{giftDetailResponse.gift.expirationReservation | date: "d MMMM y 'à' HH'h'" }}
+  </p>
+
   <ng-container *ngIf="context === 'suivi'">
     <ng-container *ngIf="isPreneur">
       <p class="legend-icon"> Cliquez sur les icônes pour changer le statut.</p>

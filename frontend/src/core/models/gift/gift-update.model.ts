@@ -16,6 +16,7 @@ export interface GiftUpdate{
 
   id: number;
   dateReservation?: string;
+  expirationReservation?: string;
   lieuLivraison?: string;
   dateLivraison?: string;
   prixReel?: number;
