@@ -36,9 +36,9 @@ export class OnboardingComponent implements OnInit {
     });
   }
 
-  choisirGroupe(groupe: GroupResume): void {
-    this.groupContextService.setGroupContext(groupe.id);
-        this.router.navigate(['/dashboard']);
+  async choisirGroupe(groupe: GroupResume): Promise<void> {
+    await this.groupContextService.setGroupContext(groupe.id);
+    this.router.navigate(['/dashboard']);
   }
 
 }
