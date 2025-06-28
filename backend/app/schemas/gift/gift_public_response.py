@@ -11,4 +11,5 @@ class GiftPublicResponse(GiftResponse):
     statut: GiftStatusEnum = GiftStatusEnum.DISPONIBLE
     reserve_par: Optional[UserDisplaySchema] = None
     date_reservation: Optional[datetime] = None
+    expiration_reservation: Optional[datetime] = None
     gift_idea: Optional[GiftIdeasSchema] = None

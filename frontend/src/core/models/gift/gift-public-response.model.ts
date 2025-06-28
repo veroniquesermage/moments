@@ -18,4 +18,5 @@ export interface GiftPublicResponse {
   statut: GiftStatus;
   reservePar?: UserDisplay;
   dateReservation?: string;
+  expirationReservation?: string;
 }

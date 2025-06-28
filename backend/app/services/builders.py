@@ -47,6 +47,7 @@ async def build_gift_public_response(gift: Gift, group_id: int, db: AsyncSession
         statut=gift.statut,
         reserve_par=await build_user_display(gift.reserve_par_id, group_id, db) if gift.reserve_par_id else None,
         date_reservation=gift.date_reservation,
+        expiration_reservation=gift.expiration_reservation,
         gift_idea=await build_gift_idea_schema(gift.gift_idea, group_id, db) if gift.gift_idea else None
     )
 

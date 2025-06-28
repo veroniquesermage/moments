@@ -7,3 +7,4 @@ from .gift_create import GiftCreate
 class GiftUpdate(GiftCreate):
     id: int
     date_reservation: Optional[datetime] = None
+    expiration_reservation: Optional[datetime] = None
