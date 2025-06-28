@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    container_name: liste2wish-postgres
+    environment:
+      POSTGRES_USER: liste2wish
+      POSTGRES_PASSWORD: liste2wish
+      POSTGRES_DB: liste2wish
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
