@@ -2,11 +2,11 @@ import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {GroupService} from 'src/core/services/group.service';
-import {GroupDTO} from 'src/core/models/groupe-dto.model';
 import {Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {GroupDTO} from 'src/core/models/group/groupe-dto.model';
 
 @Component({
   selector: 'app-group-create',

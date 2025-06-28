@@ -2,12 +2,13 @@
   <h1>> Rejoindre un groupe </h1>
   <p class="command">> Pour rejoindre un groupe avec un code d'invitation, indiquez votre code ci-dessous.</p>
 
-  <form [formGroup]="groupeForm" (ngSubmit)="onSubmit()">
-    <label>Code d'invitation</label>
-    <input formControlName="code" type="text"/>
+    <div>
+    <label for="codeInvitation">Code d'invitation</label>
+    <input id="codeInvitation" type="text" [(ngModel)]="codeInvitation" />
+    </div>
 
-    <button type="submit">Rejoindre</button>
-  </form>
+    <button (click)="rejoindre()">Rejoindre</button>
+
 
   <app-terminal-modal
     *ngIf="errorService.errorMessage()"
