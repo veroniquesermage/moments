@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Invitation (Moments)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #222;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .cta {
+            display: inline-block;
+            margin: 1rem 0;
+            padding: 0.75rem 1.5rem;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>✨ {{user.prenom}} vous invite sur (Moments)</h1>
+
+    <p>
+        Bonjour,<br /><br />
+        <strong>{{user.prenom}}</strong> vous propose de rejoindre le groupe
+        <strong>“{{groupe.nom_groupe}}”</strong> sur <strong>(Moments)</strong>.
+    </p>
+
+    <p>
+        (Moments) est un espace privé pour organiser des événements, préparer des surprises et créer de beaux souvenirs avec vos proches.
+    </p>
+
+    <p>
+        👉 Cliquez sur le lien ci-dessous pour rejoindre le groupe :
+    </p>
+
+    <p>
+        <a class="cta" href="{{url_avec_code}}">Rejoindre le groupe</a>
+    </p>
+
+    <p>
+        Vous pourrez vous connecter avec votre compte Google ou votre adresse mail.
+    </p>
+
+    <div class="footer">
+        — L’équipe (Moments)<br />
+        <em>Parce que les plus beaux moments méritent une parenthèse</em>
+    </div>
+</div>
+</body>
+</html>
+

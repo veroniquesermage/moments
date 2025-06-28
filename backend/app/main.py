@@ -22,21 +22,27 @@ app.add_middleware(
 
 @app.middleware("http")
 async def db_rollback_middleware(request: Request, call_next):
-    # on attache la session async
-    async for session in get_db():
-        request.state.db = session
-        break
+    # On récupère proprement le générateur async (get_db est un async generator)
+    gen = get_db()
+
+    # anext() = on récupère le premier yield du générateur
+    request.state.db = await anext(gen)
+
     try:
+        # On laisse FastAPI faire son taf avec la requête en cours
         response = await call_next(request)
+        return response
     except SQLAlchemyError:
+        # Si erreur SQLAlchemy → rollback de la session
         await request.state.db.rollback()
         return JSONResponse(
             status_code=500,
             content={"detail": "Erreur interne de la base de données (rollback)."}
         )
     finally:
-        await request.state.db.close()
-    return response
+        # Fermeture propre du générateur (équivaut à session.close())
+        await gen.aclose()
+
 
 # ==== Exception handlers globaux ====
 @app.exception_handler(IntegrityError)
