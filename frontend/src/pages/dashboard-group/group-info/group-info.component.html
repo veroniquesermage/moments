@@ -1,0 +1,38 @@
+<div class="gift-block">
+  <hr class="block-separator" />
+  <div class="block-title"> 🎯 Infos du groupe </div>
+  <hr class="block-separator" />
+
+  <p>> Nom : {{currentGroup?.nomGroupe}}</p>
+  <p>> Description : {{currentGroup?.description}}</p>
+
+  <button (click)="modify()">Modifier</button>
+</div>
+
+<ng-container *ngIf="showModal">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+
+      <h2 id="modal-title">Modifier les éléments du groupe</h2>
+
+      <div class="modal-field">
+        <label for="nomGroupe">Nom du groupe :</label>
+        <input id="nomGroupe" type="text" [(ngModel)]="nomGroupe" />
+      </div>
+
+      <div class="modal-field">
+        <label for="description">Description du groupe :</label>
+        <input id="description" type="text" [(ngModel)]="description" />
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="confirmGroupinfo()">Valider</button>
+        <button (click)="cancel()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

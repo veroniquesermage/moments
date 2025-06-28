@@ -2,8 +2,8 @@ import {Component, Input, ViewEncapsulation} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MailingService} from 'src/core/services/mailing.service';
-import {FeedbackRequest} from 'src/core/models/feedback-request.model';
 import {QuillModule} from 'ngx-quill';
+import {FeedbackRequest} from 'src/core/models/mailing/feedback-request.model';
 
 
 @Component({

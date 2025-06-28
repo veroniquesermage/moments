@@ -70,6 +70,20 @@ export class UserGroupService {
     }
   }
 
+  async updateRoleUsers(groupId: number, rolesUpdate: UserDisplay[]): Promise<ApiResponse<UserDisplay[]>> {
+    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}/update`;
+    try {
+      const result = await firstValueFrom(this.http.patch<UserDisplay[]>(url, rolesUpdate, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true
+      }));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[UserGroupService] Erreur lors de la mise à jour des rôles', error);
+      return {success: false, message: "❌ Impossible de mettre à jour les rôles. Veuillez réessayer."};
+    }
+  }
+
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
