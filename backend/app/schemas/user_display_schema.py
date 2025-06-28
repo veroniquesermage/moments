@@ -1,6 +1,5 @@
 from typing import Optional
 
-from app.core.enum import RoleEnum
 from app.schemas import CamelModel
 
 
