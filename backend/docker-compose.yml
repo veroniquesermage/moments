@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:16
     restart: unless-stopped
+    container_name: liste2wish
     environment:
       POSTGRES_USER: liste2wish
       POSTGRES_PASSWORD: liste2wish
@@ -13,16 +14,6 @@ services:
     ports:
       - "5432:5432"
 
-  backend:
-    build:
-      context: ./backend
-    depends_on:
-      - postgres
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://liste2wish:liste2wish@postgres:5432/liste2wish
-
   frontend:
     build:
       context: ./frontend
@@ -30,6 +21,20 @@ services:
       - "4200:80"
     depends_on:
       - backend
+
+  backend:
+    build:
+      context: .  # car Dockerfile est dans list2wish-back
+    container_name: liste2wish-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://liste2wish:liste2wish@postgres:5432/liste2wish
+    volumes:
+      - .:/app
 
 volumes:
   pgdata:

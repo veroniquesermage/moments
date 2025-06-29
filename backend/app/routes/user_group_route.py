@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
+from typing import Optional
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -13,12 +15,12 @@ router = APIRouter(prefix="/utilisateur-groupe", tags=["Utilisateur & Groupe"])
 @router.delete("/{groupId}", status_code=204)
 async def delete_user_group(
         groupId: int,
+        userId: Optional[int] = None,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    await UserGroupService.delete_user_group(db, current_user, groupId)
+    await UserGroupService.delete_user_group(db, current_user, groupId, userId)
     return
-
 
 @router.patch("/{groupId}/surnom", status_code=204)
 async def update_nickname(

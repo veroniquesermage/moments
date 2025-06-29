@@ -33,4 +33,8 @@ export class ManageGroupComponent implements OnInit{
     this.groupId = this.groupServiceContext.getGroupId();
     this.members = await this.groupServiceContext.getGroupMembers();
   }
+
+  async reloadMembers() {
+    this.members = await this.groupServiceContext.refreshMembers();
+  }
 }

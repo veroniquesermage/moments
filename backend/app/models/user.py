@@ -1,4 +1,5 @@
 from datetime import datetime, UTC
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
@@ -14,7 +15,7 @@ class User(Base):
     prenom = Column(String(255), nullable=False)
     nom = Column(String(255), nullable=False)
     google_id = Column(String(255), nullable=False)
-    date_creation = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    date_creation = Column(DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("Europe/Paris")))
 
     groupes = relationship("UserGroup", back_populates="utilisateur")
     cadeaux_crees = relationship("Gift", foreign_keys="Gift.destinataire_id", back_populates="destinataire")
