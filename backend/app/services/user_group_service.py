@@ -11,6 +11,7 @@ from app.core.logger import logger
 from app.models import User, UserGroup
 from app.schemas import UserDisplaySchema
 from app.schemas.mailing.invite_request import InviteRequest
+from app.services.trace_service import TraceService
 
 
 class UserGroupService:
@@ -119,6 +120,14 @@ class UserGroupService:
 
         logger.info(f"Surnom mis à jour pour l'utilisateur {current_user.id} dans le groupe {group_id}")
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "NICKNAME_UPDATED",
+            f"Surnom mis a jour dans le groupe {group_id}",
+            {"group_id": group_id, "user_id": current_user.id},
+        )
+
     @staticmethod
     async def delete_user_group(
             db: AsyncSession,
@@ -143,6 +152,13 @@ class UserGroupService:
         if user_id_to_delete is None:
             await db.delete(user_group)
             await db.commit()
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "GROUP_LEFT",
+                f"{current_user.prenom} a quitté le groupe {group_id}",
+                {"group_id": group_id, "user_id": current_user.id},
+            )
             return
 
         # Cas : tentative d’exclure quelqu’un → faut être admin
@@ -163,6 +179,14 @@ class UserGroupService:
 
         await db.delete(to_exclude)
         await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "MEMBER_REMOVED",
+            f"Membre {user_id_to_delete} exclu du groupe {group_id}",
+            {"group_id": group_id, "user_id": current_user.id, "target_id": user_id_to_delete},
+        )
 
     @staticmethod
     async def update_role(db: AsyncSession, group_id: int, current_user: User, groupRoleUpdate: list[UserDisplaySchema]) -> list[UserDisplaySchema]:
@@ -185,6 +209,14 @@ class UserGroupService:
                 user_group.role = new_data.role
 
         await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "ROLE_UPDATED",
+            f"Roles mis a jour dans le groupe {group_id}",
+            {"group_id": group_id, "user_id": current_user.id},
+        )
 
         return await UserGroupService.get_users_except_current_user(db, current_user, group_id)
 

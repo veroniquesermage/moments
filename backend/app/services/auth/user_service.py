@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.models.user import User
+from app.services.trace_service import TraceService
 
 
 class UserService:
@@ -18,6 +19,14 @@ class UserService:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
+
+        await TraceService.record_trace(
+            db,
+            f"{prenom} {nom}",
+            "USER_CREATED",
+            "Creation d'un nouvel utilisateur",
+            {"user_id": new_user.id, "email": email},
+        )
 
         return new_user
 
