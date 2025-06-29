@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
-import {UserGroupService} from 'src/core/services/user-group.service';
 import {CommonModule} from '@angular/common';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
@@ -45,7 +44,6 @@ export class GroupMemberGiftsComponent implements OnInit {
   ];
 
   constructor(public giftService: GiftService,
-              public userGroupService: UserGroupService,
               public router: Router,
               private groupContextService: GroupContextService,
               public errorService: ErrorService) {
@@ -53,11 +51,7 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   async ngOnInit() {
     this.giftService.clearGifts();
-    try {
-      this.users = await this.groupContextService.getGroupMembers();
-    }  catch (err) {
-      this.errorService.showError("❌ Impossible de récupérer les membres du groupe. Veuillez réessayer plus tard.");
-    }
+    await this.reloadMembers();
   }
 
   onGiftClicked(gift: GiftPublicResponse): void {
@@ -95,6 +89,16 @@ export class GroupMemberGiftsComponent implements OnInit {
   getGiftValue(gift: GiftPublicResponse, column: GiftTableColumn): any {
     const rawValue = (gift as any)[column.key];
     return column.formatFn ? column.formatFn(rawValue, gift) : rawValue;
+  }
+
+  async reloadMembers() {
+    try {
+      this.users = await this.groupContextService.getGroupMembers();
+      this.selectedMember = undefined;
+      this.giftService.clearGifts(); // tu peux aussi décider de garder les cadeaux du membre précédemment sélectionné
+    } catch (err) {
+      this.errorService.showError("❌ Impossible de récupérer les membres du groupe. Veuillez réessayer plus tard.");
+    }
   }
 
 }

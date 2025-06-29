@@ -1,6 +1,6 @@
 <div class="terminal">
 <h2>> Gestion du partage pour le cadeau {{this.gift?.nom}}</h2>
-  <app-refresh-group-members/>
+  <app-refresh-group-members (refreshed)="reloadMembers()" />
 
 
 <table class="gift-table">
