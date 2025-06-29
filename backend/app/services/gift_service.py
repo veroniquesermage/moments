@@ -1,5 +1,6 @@
-from datetime import datetime, UTC
+from datetime import datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 from sqlalchemy import select, or_, and_
@@ -299,6 +300,9 @@ class GiftService:
 
         result.statut = gift_status.status
 
+        today = datetime.now(ZoneInfo("Europe/Paris")) + timedelta(days=4)
+        date_expiration = today.replace(hour=1, minute=00, second=00, microsecond=00)
+
         if gift_status.status == GiftStatusEnum.DISPONIBLE:
             logger.debug(f"Le statut du cadeau est {gift_status.status}")
             if result.gift_delivery:
@@ -309,13 +313,15 @@ class GiftService:
             result.reserve_par_id = None
             result.reserve_par = None
             result.date_reservation = None
+            result.expiration_reservation = None
         elif gift_status.status == GiftStatusEnum.PARTAGE:
             # ne rien toucher de plus que le statut
             logger.debug("Passage en PARTAGE, pas de changement de réservation.")
         else:
             # cas PRIS ou RÉSERVÉ
             result.reserve_par = current_user
-            result.date_reservation = datetime.now(UTC)
+            result.date_reservation = datetime.now(ZoneInfo("Europe/Paris"))
+            result.expiration_reservation = date_expiration
 
         logger.debug("Attributs de gift : %s", vars(result))
 

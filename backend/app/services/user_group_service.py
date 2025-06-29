@@ -1,3 +1,6 @@
+from operator import and_
+from typing import Optional
+
 from fastapi import HTTPException
 from sqlalchemy import select, Sequence, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -120,25 +123,46 @@ class UserGroupService:
     async def delete_user_group(
             db: AsyncSession,
             current_user: User,
-            group_id: int
+            group_id: int,
+            user_id_to_delete: Optional[int]
     ):
+        # Vérifie que current_user fait partie du groupe
         result = await db.execute(
             select(UserGroup)
-            .where(
+            .where(and_(
                 UserGroup.utilisateur_id == current_user.id,
                 UserGroup.groupe_id == group_id
-            )
+            ))
         )
-
         user_group = result.scalars().first()
 
         if not user_group:
             raise HTTPException(status_code=404, detail="Utilisateur non trouvé dans le groupe.")
 
-        await db.delete(user_group)
-        await db.commit()
+        # Cas : l'utilisateur quitte le groupe
+        if user_id_to_delete is None:
+            await db.delete(user_group)
+            await db.commit()
+            return
 
-        logger.info(f"Utilisateur {current_user.id} retiré du groupe {group_id}")
+        # Cas : tentative d’exclure quelqu’un → faut être admin
+        if user_group.role != "ADMIN":
+            raise HTTPException(status_code=403, detail="Vous n'avez pas les droits pour exclure un membre.")
+
+        # Vérifie que le membre à exclure existe dans le groupe
+        result_exclude = await db.execute(
+            select(UserGroup)
+            .where(and_(
+                UserGroup.utilisateur_id == user_id_to_delete,
+                UserGroup.groupe_id == group_id
+            ))
+        )
+        to_exclude = result_exclude.scalars().first()
+        if not to_exclude:
+            raise HTTPException(status_code=404, detail="Membre à exclure introuvable dans ce groupe.")
+
+        await db.delete(to_exclude)
+        await db.commit()
 
     @staticmethod
     async def update_role(db: AsyncSession, group_id: int, current_user: User, groupRoleUpdate: list[UserDisplaySchema]) -> list[UserDisplaySchema]:
