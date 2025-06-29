@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:16
     restart: unless-stopped
-    container_name: liste2wish
+    container_name: moments-postgres
     env_file:
       - .env
     volumes:
@@ -15,7 +15,7 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: liste2wish-backend
+    container_name: moments-backend
     restart: unless-stopped
     depends_on:
       - postgres
@@ -27,7 +27,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: liste2wish-frontend
+    container_name: moments-frontend
     ports:
       - "4200:80"
     depends_on:
