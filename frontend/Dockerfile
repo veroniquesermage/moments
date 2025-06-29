@@ -7,5 +7,5 @@ RUN npm run build --prod
 
 # Étape 2 : Nginx pour servir le frontend
 FROM nginx:alpine
-COPY --from=build /app/dist/liste2wish-front /usr/share/nginx/html
+COPY --from=build /app/dist/liste2wish-front/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
