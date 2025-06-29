@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
 import {User} from 'src/security/model/user.model';
@@ -56,11 +56,18 @@ export class UserGroupService {
     }
   }
 
-  async deleteUserInGroup(groupId: number): Promise<ApiResponse<any>> {
+  async deleteUserInGroup(groupId: number, userId?: number): Promise<ApiResponse<any>> {
     const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}`;
+
+    let params = new HttpParams();
+    if (userId != null) {
+      params = params.set('userId', userId.toString());
+    }
+
     try{
       await firstValueFrom(this.http.delete(url, {
         headers: this.getAuthHeaders(),
+        params: params,
         withCredentials: true
       }));
       return {success: true, data: 'ok'}
