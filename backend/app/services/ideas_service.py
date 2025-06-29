@@ -12,6 +12,7 @@ from app.schemas.gift import GiftPublicResponse
 from app.schemas.gift import GiftIdeasSchema
 from app.schemas.gift import GiftIdeaCreate
 from app.services.builders import build_gift_public_response, build_gift_idea_schema
+from app.services.trace_service import TraceService
 
 
 class GiftIdeasService:
@@ -80,6 +81,14 @@ class GiftIdeasService:
         await db.refresh(idea)
         await db.refresh(gift, attribute_names=["destinataire"])
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_IDEA_CREATED",
+            f"Idee de cadeau {idea.id} creee",
+            {"idea_id": idea.id, "gift_id": gift.id, "user_id": current_user.id},
+        )
+
         return GiftIdeasResponse(
             gift=await build_gift_public_response(gift, gift.destinataire_id, db),
             gift_idea=await build_gift_idea_schema(idea, db)
@@ -111,6 +120,14 @@ class GiftIdeasService:
 
         await db.commit()
         await db.refresh(existing)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "IDEA_VISIBILITY_CHANGED",
+            f"Visibilite idee {ideaId} -> {visibility}",
+            {"idea_id": ideaId, "user_id": current_user.id, "visible": visibility},
+        )
 
 
     @staticmethod
@@ -146,6 +163,14 @@ class GiftIdeasService:
                 visibilite=existing.gift_idea.visibilite
             )
 
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "IDEA_DUPLICATED",
+                f"Duplication de l'idee {ideaId}",
+                {"idea_id": ideaId, "new_dest_id": new_dest_id, "user_id": current_user.id},
+            )
+
             return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
 
     @staticmethod
@@ -174,4 +199,12 @@ class GiftIdeasService:
         await db.delete(existing.gift_idea)
         await db.delete(existing)
         await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_IDEA_DELETED",
+            f"Suppression idee {ideaId}",
+            {"idea_id": ideaId, "user_id": current_user.id},
+        )
 
