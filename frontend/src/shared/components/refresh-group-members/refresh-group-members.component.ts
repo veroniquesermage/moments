@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {ToastrService} from 'ngx-toastr';
 
@@ -11,6 +11,8 @@ import {ToastrService} from 'ngx-toastr';
 })
 export class RefreshGroupMembersComponent {
 
+  @Output()
+  refreshed = new EventEmitter<void>();
   loading = false;
 
   constructor(private groupContext: GroupContextService,
@@ -26,6 +28,7 @@ export class RefreshGroupMembersComponent {
       this.toastr.error('Échec du rafraîchissement des membres 😕');
     } finally {
       this.loading = false;
+      this.refreshed.emit();
     }
   }
 }

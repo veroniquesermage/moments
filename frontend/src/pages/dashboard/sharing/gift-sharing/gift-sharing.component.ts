@@ -64,7 +64,15 @@ export class GiftSharingComponent implements OnInit {
       this.errorService.showError("❌ Impossible de modifier le partage.");
     }
 
-    this.membresDisponibles = await this.groupContextService.getGroupMembers();
+    await this.reloadMembers()
+  }
+
+  async reloadMembers() {
+    try {
+      this.membresDisponibles = await this.groupContextService.getGroupMembers();
+    } catch (err) {
+      this.errorService.showError("❌ Impossible de récupérer les membres du groupe. Veuillez réessayer plus tard.");
+    }
   }
 
   supprimerLigne(index: number) {
