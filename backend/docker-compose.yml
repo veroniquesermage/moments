@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:16
     restart: unless-stopped
-    container_name: liste2wish-postgres
+    container_name: liste2wish
     environment:
       POSTGRES_USER: liste2wish
       POSTGRES_PASSWORD: liste2wish
@@ -13,6 +13,14 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
 
   backend:
     build:
