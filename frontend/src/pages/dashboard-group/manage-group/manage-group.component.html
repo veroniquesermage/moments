@@ -8,7 +8,9 @@
     [groupId]="groupId">
   </app-group-roles>
   <app-group-actions
-    [groupId]="groupId">
+    [groupId]="groupId"
+    [members]="members"
+    (membersUpdated)="reloadMembers()">
   </app-group-actions>
 </div>
 
