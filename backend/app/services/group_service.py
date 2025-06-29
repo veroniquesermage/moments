@@ -8,6 +8,7 @@ from app.core.logger import logger
 from app.models import User, Group, UserGroup
 from app.schemas.group import GroupCreate, GroupResponse, GroupDetails, GroupUpdate
 from app.services.user_group_service import UserGroupService
+from app.services.trace_service import TraceService
 from app.utils.code_generator import generate_random_code
 
 
@@ -49,6 +50,14 @@ class GroupService:
         )
         db.add(link)
         await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GROUP_CREATED",
+            f"Creation du groupe {db_group.nom_groupe}",
+            {"group_id": db_group.id, "user_id": current_user.id},
+        )
 
         return GroupResponse.model_validate(db_group)
 
@@ -127,6 +136,14 @@ class GroupService:
         db.add(link)
         await db.commit()
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GROUP_JOINED",
+            f"{current_user.prenom} a rejoint le groupe {existing.id}",
+            {"group_id": existing.id, "user_id": current_user.id},
+        )
+
         return GroupResponse.model_validate(existing)
 
     @staticmethod
@@ -188,6 +205,14 @@ class GroupService:
         except Exception as e:
             logger.info(f"Refresh failed, but update was successful: {e}")
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GROUP_UPDATED",
+            f"Mise a jour du groupe {group_existing.id}",
+            {"group_id": group_existing.id, "user_id": current_user.id},
+        )
+
         return GroupResponse.model_validate(group_existing)
 
     @staticmethod
@@ -208,3 +233,11 @@ class GroupService:
         except Exception:
             await db.rollback()
             raise HTTPException(status_code=500, detail="❌ Une erreur est survenue pendant la suppression.")
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GROUP_DELETED",
+            f"Suppression du groupe {group_id}",
+            {"group_id": group_id, "user_id": current_user.id},
+        )

@@ -48,7 +48,7 @@ async def override_get_db():
         yield session
 
 async def override_get_current_user():
-    return User(id=1, email="user@example.com", name="Test", google_id="1")
+    return User(id=1, email="user@example.com", prenom="Test", nom="User", google_id="1")
 
 app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user

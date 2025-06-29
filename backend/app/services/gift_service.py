@@ -26,6 +26,7 @@ from app.schemas.gift.gift_status import GiftStatus
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema
 from app.services.sharing_service import SharingService
+from app.services.trace_service import TraceService
 
 
 class GiftService:
@@ -172,6 +173,14 @@ class GiftService:
         await db.commit()
         await db.refresh(existing)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_UPDATED",
+            f"Mise a jour du cadeau {existing.id}",
+            {"gift_id": existing.id, "user_id": current_user.id},
+        )
+
         # 5. Retourner l’instance ORM (FastAPI la convertira en GiftResponse si response_model est défini)
         return GiftResponse.model_validate(existing)
 
@@ -242,6 +251,14 @@ class GiftService:
         await db.commit()
         await db.refresh(delivery)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_DELIVERY_UPDATED",
+            f"Livraison du cadeau {giftId} mise a jour",
+            {"gift_id": giftId, "user_id": current_user.id},
+        )
+
         return GiftDeliveryUpdate.model_validate(delivery)
 
     @staticmethod
@@ -266,6 +283,14 @@ class GiftService:
         await db.commit()
         await db.refresh(gift.gift_delivery)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_MARKED_RECEIVED",
+            f"Cadeau {giftId} marque comme recu : {recu}",
+            {"gift_id": giftId, "user_id": current_user.id, "recu": recu},
+        )
+
         return await GiftService.set_gift_detail(gift, current_user, group_id, db)
 
     @staticmethod
@@ -289,6 +314,14 @@ class GiftService:
 
         await db.delete(result)
         await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_DELETED",
+            f"Suppression du cadeau {giftId}",
+            {"gift_id": giftId, "user_id": current_user.id},
+        )
 
     @staticmethod
     async def change_status(db: AsyncSession,
@@ -328,6 +361,14 @@ class GiftService:
         db.add(result)
         await db.commit()
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_STATUS_CHANGED",
+            f"Statut du cadeau {giftId} -> {gift_status.status}",
+            {"gift_id": giftId, "user_id": current_user.id, "status": gift_status.status},
+        )
+
         return GiftResponse.model_validate(result)
 
     @staticmethod
@@ -345,6 +386,14 @@ class GiftService:
         db.add(gift)
         await db.commit()
         await db.refresh(gift)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_CREATED",
+            f"Creation du cadeau {gift.id}",
+            {"gift_id": gift.id, "user_id": current_user.id},
+        )
 
         return GiftResponse.model_validate(gift)
 

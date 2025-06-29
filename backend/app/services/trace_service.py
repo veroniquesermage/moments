@@ -1,15 +1,21 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.trace import Trace
 
 class TraceService:
 
     @staticmethod
-    def record_trace(db: Session, utilisateur: str, trace_type: str, message: str, payload: dict = None):
+    async def record_trace(
+        db: AsyncSession,
+        utilisateur: str,
+        trace_type: str,
+        message: str,
+        payload: dict | None = None,
+    ):
         trace = Trace(
-            utilisateur= utilisateur,
+            utilisateur=utilisateur,
             type=trace_type,
             message=message,
             payload=payload or {},
         )
         db.add(trace)
-        db.commit()
+        await db.commit()
