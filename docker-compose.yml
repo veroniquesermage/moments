@@ -20,7 +20,7 @@ services:
     depends_on:
       - postgres
     env_file:
-      - .env
+      - .env  # Ce fichier contient APP_ENV=dev (ou prod)
     ports:
       - "8000:8000"
 
