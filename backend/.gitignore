@@ -20,6 +20,9 @@ __pycache__/
 .idea/tasks.xml
 .idea/dictionaries
 
+# Secrets
+.env*
+!.env.example
 
 # ▶️ Venv
 .venv/
@@ -34,3 +37,6 @@ env/
 .env.prod
 
 *.iml
+
+# Logs éventuels
+*.log
