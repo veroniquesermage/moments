@@ -1,0 +1,24 @@
+# IDE / éditeurs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+docker-compose.yml
+.env
+.env.*
+
+# Global cache
+*.pyc
+*.pyo
+*.swp
+
+# Python envs globaux éventuels
+venv/
+.env/
