@@ -14,7 +14,8 @@ app.version = "1.0.0"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # ou ["*"] pour tester
+    allow_origins=["http://localhost:4200",
+                   "https://moments-ep.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

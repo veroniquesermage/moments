@@ -27,6 +27,7 @@ async def get_groups(
 ):
     return await GroupService.get_groups(db, current_user )
 
+@router.post("/rejoindre/{code}", response_model=GroupResponse)
 @router.post("/rejoindre/{code}/", response_model=GroupResponse)
 async def get_groups(
         code: str,
@@ -36,6 +37,7 @@ async def get_groups(
 ):
     return await GroupService.join_group(db, current_user, code)
 
+@router.get("/{groupId}", response_model=GroupResponse)
 @router.get("/{groupId}/", response_model=GroupResponse)
 async def get_group(
         groupId: int,
@@ -44,6 +46,7 @@ async def get_group(
 ) -> GroupResponse:
     return await GroupService.get_group(db, current_user, groupId )
 
+@router.patch("/{groupId}", response_model=GroupResponse)
 @router.patch("/{groupId}/", response_model=GroupResponse)
 async def update_group(
         groupId: int,
@@ -53,6 +56,7 @@ async def update_group(
 ) -> GroupResponse:
     return await GroupService.update_group(db, current_user, group, groupId )
 
+@router.delete("/{groupId}", status_code=204 )
 @router.delete("/{groupId}/", status_code=204 )
 async def delete_group(
         groupId: int,
@@ -61,6 +65,7 @@ async def delete_group(
 ):
     return await GroupService.delete_group(db, current_user, groupId)
 
+@router.get("/{groupId}/details", response_model=GroupDetails)
 @router.get("/{groupId}/details/", response_model=GroupDetails)
 async def get_group_details(
         groupId: int,

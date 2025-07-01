@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Body, Response
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
@@ -21,6 +21,7 @@ async def create_gift_idea(
 
     return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea)
 
+@router.get("/{groupId}", response_model=list[GiftIdeasResponse])
 @router.get("/{groupId}/", response_model=list[GiftIdeasResponse])
 async def get_my_ideas(
         groupId: int,
@@ -31,6 +32,7 @@ async def get_my_ideas(
     return await GiftIdeasService.get_my_ideas(db, current_user, groupId)
 
 
+@router.patch("/{ideaId}", status_code=204)
 @router.patch("/{ideaId}/", status_code=204)
 async def change_visibility(
         ideaId: int,
@@ -44,6 +46,7 @@ async def change_visibility(
     await GiftIdeasService.change_visibility(db, current_user, ideaId, visibility)
     return
 
+@router.post("/{ideaId}", response_model=GiftIdeasResponse)
 @router.post("/{ideaId}/", response_model=GiftIdeasResponse)
 async def duplicate_gift_idea(
         ideaId: int,
@@ -53,6 +56,7 @@ async def duplicate_gift_idea(
 
     return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, payload.new_dest_id)
 
+@router.delete("/{ideaId}", status_code=204)
 @router.delete("/{ideaId}/", status_code=204)
 async def delete_gift_idea(
         ideaId: int,
