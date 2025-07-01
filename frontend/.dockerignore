@@ -1,0 +1,12 @@
+# Répertoires de build et dépendances
+node_modules/
+dist/
+
+# Config éditeur inutile
+.idea/
+.vscode/
+.angular/
+
+# Fichiers spécifiques Angular ou temporaires
+*.iml
+*.log

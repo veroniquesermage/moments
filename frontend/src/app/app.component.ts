@@ -47,17 +47,25 @@ export class AppComponent {
     this.groupService.isLoading.set(true);
     const inviteCode = localStorage.getItem('app_kdo.codeInvit');
 
-    if(inviteCode){
-      await this.router.navigateByUrl(`/groupe/onboarding/rejoindre?inviteCode=${inviteCode}`);
+    if (inviteCode) {
+      if (!this.router.url.startsWith('/groupe/onboarding/rejoindre')) {
+        await this.router.navigateByUrl(`/groupe/onboarding/rejoindre?inviteCode=${inviteCode}`);
+      }
       return;
     }
+
     const result = await this.groupService.fetchGroups();
+
     if (result.success) {
       if (result.data.length === 1) {
-        this.groupContext.setGroupContext(result.data.at(0)?.id!)
-        await this.router.navigate(['/dashboard']);
+        this.groupContext.setGroupContext(result.data.at(0)?.id!);
+        if (!this.router.url.startsWith('/dashboard')) {
+          await this.router.navigate(['/dashboard']);
+        }
       } else {
-        await this.router.navigate(['/groupe/onboarding']);
+        if (!this.router.url.startsWith('/groupe/onboarding')) {
+          await this.router.navigate(['/groupe/onboarding']);
+        }
       }
     } else {
       console.warn('⚠️ Impossible de charger les groupes :', result.message);
@@ -66,5 +74,6 @@ export class AppComponent {
 
     this.groupService.isLoading.set(false);
   }
+
 }
 

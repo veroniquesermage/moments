@@ -7,9 +7,10 @@ from app.models import User
 from app.schemas.gift import GiftDetailResponse, GiftSharedSchema
 from app.services.sharing_service import SharingService
 
-router = APIRouter(prefix="/partage", tags=["partage"])
+router = APIRouter(prefix="/api/partage", tags=["partage"])
 
 @router.patch("/rembourse", response_model=GiftDetailResponse)
+@router.patch("/rembourse/", response_model=GiftDetailResponse)
 async def verify_eligibility(
         shared: GiftSharedSchema,
         db: AsyncSession = Depends(get_db),
@@ -18,6 +19,7 @@ async def verify_eligibility(
     return await SharingService.set_gift_refund(db, current_user, shared, group_id)
 
 @router.put("/{gift_id}", response_model=GiftDetailResponse)
+@router.put("/{gift_id}/", response_model=GiftDetailResponse)
 async def update_partage(
     gift_id: int,
     updates: list[GiftSharedSchema],

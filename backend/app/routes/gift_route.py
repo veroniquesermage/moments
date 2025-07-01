@@ -13,8 +13,9 @@ from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
-router = APIRouter(prefix="/cadeaux", tags=["cadeaux"])
+router = APIRouter(prefix="/api/cadeaux", tags=["cadeaux"])
 
+@router.get("", response_model=list[GiftResponse])
 @router.get("/", response_model=list[GiftResponse])
 async def get_gifts(
         userId: Optional[int] = None,
@@ -25,6 +26,7 @@ async def get_gifts(
     logger.info(f"L'utilisateur concerné est {effective_user_id}")
     return await GiftService.get_my_gifts(db, effective_user_id)
 
+@router.post("", response_model=GiftResponse)
 @router.post("/", response_model=GiftResponse)
 async def create_gift(
         gift: GiftCreate,
@@ -33,6 +35,7 @@ async def create_gift(
 
     return await GiftService.create_gift(db, current_user, gift)
 
+@router.put("", response_model=list[GiftResponse])
 @router.put("/", response_model=list[GiftResponse])
 async def update_all_gifts(
         gifts: list[GiftPriority],
@@ -43,6 +46,7 @@ async def update_all_gifts(
 
 
 @router.get("/suivis/{groupId}", response_model=list[GiftFollowed])
+@router.get("/suivis/{groupId}/", response_model=list[GiftFollowed])
 async def get_followed_gifts(
         groupId: int,
         db: AsyncSession = Depends(get_db),
@@ -51,6 +55,7 @@ async def get_followed_gifts(
     return await GiftService.get_followed_gifts(db, current_user, groupId)
 
 @router.get("/membre/{user_id}", response_model=list[GiftPublicResponse])
+@router.get("/membre/{user_id}/", response_model=list[GiftPublicResponse])
 async def get_visible_gifts_for_member(
         user_id: int,
         db: AsyncSession = Depends(get_db),
@@ -59,6 +64,7 @@ async def get_visible_gifts_for_member(
     return await GiftService.get_visible_gifts_for_member(db, user_id)
 
 @router.get("/{giftId}", response_model=GiftDetailResponse)
+@router.get("/{giftId}/", response_model=GiftDetailResponse)
 async def get_gift(
         giftId: int,
         groupId: int = Depends(get_current_group_id),
@@ -68,6 +74,7 @@ async def get_gift(
     return await GiftService.get_gift(db, giftId, groupId, current_user)
 
 @router.put("/{giftId}", response_model=GiftResponse)
+@router.put("/{giftId}/", response_model=GiftResponse)
 async def update_gift(
         giftId: int,
         giftUpdate: GiftUpdate,
@@ -77,6 +84,7 @@ async def update_gift(
     return await GiftService.update_gift(db, current_user, giftId, giftUpdate)
 
 @router.delete("/{giftId}", status_code=204)
+@router.delete("/{giftId}/", status_code=204)
 async def delete_gift(
         giftId: int,
         db: AsyncSession = Depends(get_db),
@@ -86,6 +94,7 @@ async def delete_gift(
     return
 
 @router.put("/{giftId}/livraison", response_model=GiftDeliveryUpdate)
+@router.put("/{giftId}/livraison/", response_model=GiftDeliveryUpdate)
 async def update_gift_delivery(
         giftId: int,
         giftDeliveryUpdate: GiftDeliveryUpdate,
@@ -95,6 +104,7 @@ async def update_gift_delivery(
     return await GiftService.update_gift_delivery(db, current_user, giftId, giftDeliveryUpdate)
 
 @router.get("/{giftId}/eligibilite", response_model=EligibilityResponse)
+@router.get("/{giftId}/eligibilite/", response_model=EligibilityResponse)
 async def verify_eligibility(
         giftId: int,
         action: Optional[GiftActionEnum] = None,
@@ -104,6 +114,7 @@ async def verify_eligibility(
     return await GiftService.verify_eligibility(db, giftId, current_user, action)
 
 @router.patch("/{giftId}/recu", response_model=GiftDetailResponse)
+@router.patch("/{giftId}/recu/", response_model=GiftDetailResponse)
 async def set_gift_delivery(
         giftId: int,
         payload: RecuPayload,
@@ -115,6 +126,7 @@ async def set_gift_delivery(
 
 
 @router.put("/{giftId}/changer-statut", response_model=GiftResponse)
+@router.put("/{giftId}/changer-statut/", response_model=GiftResponse)
 async def change_status(
         giftId: int,
         gift_status: GiftStatus,
