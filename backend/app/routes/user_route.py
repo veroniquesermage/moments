@@ -8,7 +8,7 @@ from app.models.user import User
 from app.schemas import UserSchema, UserDisplaySchema
 from app.services import UserGroupService
 
-router = APIRouter(prefix="/utilisateurs", tags=["utilisateurs"])
+router = APIRouter(prefix="/api/utilisateurs", tags=["utilisateurs"])
 
 @router.get("/me", response_model=UserSchema)
 async def get_user_in_group(

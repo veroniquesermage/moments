@@ -7,7 +7,7 @@ from app.models import User
 from app.schemas.gift import GiftDetailResponse, GiftSharedSchema
 from app.services.sharing_service import SharingService
 
-router = APIRouter(prefix="/partage", tags=["partage"])
+router = APIRouter(prefix="/api/partage", tags=["partage"])
 
 @router.patch("/rembourse", response_model=GiftDetailResponse)
 async def verify_eligibility(
