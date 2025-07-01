@@ -12,7 +12,7 @@ from app.services import UserGroupService
 router = APIRouter(prefix="/api/utilisateur-groupe", tags=["Utilisateur & Groupe"])
 
 
-@router.delete("/{groupId}", status_code=204)
+@router.delete("/{groupId}/", status_code=204)
 async def delete_user_group(
         groupId: int,
         userId: Optional[int] = None,
@@ -22,7 +22,7 @@ async def delete_user_group(
     await UserGroupService.delete_user_group(db, current_user, groupId, userId)
     return
 
-@router.patch("/{groupId}/surnom", status_code=204)
+@router.patch("/{groupId}/surnom/", status_code=204)
 async def update_nickname(
         groupId: int,
         payload: dict = Body(...),
@@ -36,7 +36,7 @@ async def update_nickname(
     await UserGroupService.update_nickname(db, current_user, groupId, nickname)
     return
 
-@router.patch("/{groupId}/update", response_model=list[UserDisplaySchema])
+@router.patch("/{groupId}/update/", response_model=list[UserDisplaySchema])
 async def update_roles(
         groupId: int,
         payload: list[UserDisplaySchema],

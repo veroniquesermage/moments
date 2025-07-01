@@ -10,14 +10,14 @@ from app.services import UserGroupService
 
 router = APIRouter(prefix="/api/utilisateurs", tags=["utilisateurs"])
 
-@router.get("/me", response_model=UserSchema)
+@router.get("/me/", response_model=UserSchema)
 async def get_user_in_group(
         current_user: User = Depends(get_current_user) ) -> UserSchema:
 
     user: UserSchema = UserSchema.model_validate(current_user)
     return user
 
-@router.get("/groupe/{groupId}", response_model=list[UserDisplaySchema])
+@router.get("/groupe/{groupId}/", response_model=list[UserDisplaySchema])
 async def get_users(
         groupId: int,
         db: AsyncSession = Depends(get_db),
