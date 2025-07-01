@@ -9,7 +9,7 @@ from app.models import User
 from app.schemas import UserDisplaySchema
 from app.services import UserGroupService
 
-router = APIRouter(prefix="/utilisateur-groupe", tags=["Utilisateur & Groupe"])
+router = APIRouter(prefix="/api/utilisateur-groupe", tags=["Utilisateur & Groupe"])
 
 
 @router.delete("/{groupId}", status_code=204)

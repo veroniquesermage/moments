@@ -1,0 +1,14 @@
+# Éditeurs & fichiers inutiles
+.idea/
+.vscode/
+*.iml
+
+# Fichier env local (à ne jamais envoyer en prod)
+.env.dev
+
+# Scripts temporaires ou de test
+test.py
+
+# Logs ou fichiers temporaires éventuels
+*.log
+__pycache__/

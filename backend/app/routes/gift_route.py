@@ -13,8 +13,9 @@ from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
-router = APIRouter(prefix="/cadeaux", tags=["cadeaux"])
+router = APIRouter(prefix="/api/cadeaux", tags=["cadeaux"])
 
+@router.get("", response_model=list[GiftResponse])
 @router.get("/", response_model=list[GiftResponse])
 async def get_gifts(
         userId: Optional[int] = None,
@@ -25,6 +26,7 @@ async def get_gifts(
     logger.info(f"L'utilisateur concerné est {effective_user_id}")
     return await GiftService.get_my_gifts(db, effective_user_id)
 
+@router.post("", response_model=GiftResponse)
 @router.post("/", response_model=GiftResponse)
 async def create_gift(
         gift: GiftCreate,
@@ -33,6 +35,7 @@ async def create_gift(
 
     return await GiftService.create_gift(db, current_user, gift)
 
+@router.put("", response_model=list[GiftResponse])
 @router.put("/", response_model=list[GiftResponse])
 async def update_all_gifts(
         gifts: list[GiftPriority],

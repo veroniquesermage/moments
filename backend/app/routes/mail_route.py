@@ -8,7 +8,7 @@ from app.schemas.mailing import FeedbackRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.mailing.mail_service import MailService
 
-router = APIRouter(prefix="/email", tags=["email"])
+router = APIRouter(prefix="/api/email", tags=["email"])
 
 @router.post("/feedback", status_code=204)
 async def send_feedback_mail(

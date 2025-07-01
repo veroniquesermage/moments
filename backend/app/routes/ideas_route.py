@@ -10,8 +10,9 @@ from app.schemas.gift.gift_idea_create import GiftIdeaCreate
 from app.schemas.gift.gift_ideas_response import GiftIdeasResponse
 from app.services import GiftIdeasService
 
-router = APIRouter(prefix="/idees", tags=["idees"])
+router = APIRouter(prefix="/api/idees", tags=["idees"])
 
+@router.post("", response_model=GiftIdeasResponse)
 @router.post("/", response_model=GiftIdeasResponse)
 async def create_gift_idea(
         gift_idea: GiftIdeaCreate,
