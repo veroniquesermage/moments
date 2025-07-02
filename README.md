@@ -58,3 +58,9 @@ alembic upgrade head
 docker exec -it moments-postgres psql -U Mom3ntsAdm1n moments
 \dt
 ```
+
+### pour entrer dans le container du back et vérifier qu'il y a bien un cron qui tourne par exemple :
+```bash
+docker exec -it moments-backend bash
+crontab -l
+```
