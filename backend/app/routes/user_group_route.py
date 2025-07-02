@@ -13,7 +13,6 @@ router = APIRouter(prefix="/api/utilisateur-groupe", tags=["Utilisateur & Groupe
 
 
 @router.delete("/{groupId}", status_code=204)
-@router.delete("/{groupId}/", status_code=204)
 async def delete_user_group(
         groupId: int,
         userId: Optional[int] = None,
@@ -24,7 +23,6 @@ async def delete_user_group(
     return
 
 @router.patch("/{groupId}/surnom", status_code=204)
-@router.patch("/{groupId}/surnom/", status_code=204)
 async def update_nickname(
         groupId: int,
         payload: dict = Body(...),
@@ -39,7 +37,6 @@ async def update_nickname(
     return
 
 @router.patch("/{groupId}/update", response_model=list[UserDisplaySchema])
-@router.patch("/{groupId}/update/", response_model=list[UserDisplaySchema])
 async def update_roles(
         groupId: int,
         payload: list[UserDisplaySchema],

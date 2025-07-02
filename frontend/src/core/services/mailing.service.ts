@@ -16,7 +16,7 @@ export class MailingService {
   }
 
   async sendFeedbackMail(feedbackRequest: FeedbackRequest): Promise<ApiResponse<void>> {
-    const url = `${this.apiUrl}/feedback/`;
+    const url = `${this.apiUrl}/feedback`;
     try {
       await firstValueFrom(
         this.http.post<void>(url, feedbackRequest, {
@@ -33,7 +33,7 @@ export class MailingService {
   }
 
   async sendinvitesMail(inviteRequest: InviteRequest): Promise<ApiResponse<void>> {
-    const url = `${this.apiUrl}/invitation/`;
+    const url = `${this.apiUrl}/invitation`;
     try {
       await firstValueFrom(
         this.http.post<void>(url, inviteRequest, {
