@@ -25,6 +25,7 @@ from app.schemas.gift.gift_shared import GiftSharedSchema
 from app.schemas.gift.gift_status import GiftStatus
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema
+from app.services.mailing.mail_service import MailService
 from app.services.sharing_service import SharingService
 from app.services.trace_service import TraceService
 
@@ -163,6 +164,9 @@ class GiftService:
             )
 
         logger.info(f"Modification du cadeau {gift_id} : champs modifiés → {updates.model_fields_set}")
+
+        if existing.statut != GiftStatusEnum.DISPONIBLE:
+            await MailService.send_alert_update(existing, current_user)
 
         # 3. Appliquer les mises à jour dynamiquement
         for field in updates.model_fields_set:
