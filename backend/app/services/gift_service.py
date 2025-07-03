@@ -166,7 +166,7 @@ class GiftService:
         logger.info(f"Modification du cadeau {gift_id} : champs modifiés → {updates.model_fields_set}")
 
         if existing.statut != GiftStatusEnum.DISPONIBLE:
-            await MailService.send_alert_update(existing, current_user)
+            await MailService.send_alert_update(existing, current_user, db)
 
         # 3. Appliquer les mises à jour dynamiquement
         for field in updates.model_fields_set:

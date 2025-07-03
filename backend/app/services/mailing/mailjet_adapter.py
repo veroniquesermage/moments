@@ -57,7 +57,7 @@ class MailjetAdapter:
             ]
         }
 
-        mailjet.send.create(data=data)
+        return mailjet.send.create(data=data)
 
 
     @staticmethod
@@ -105,7 +105,8 @@ class MailjetAdapter:
             ]
         }
 
-        mailjet.send.create(data=data)
+        return mailjet.send.create(data=data)
+
 
     @staticmethod
     async def send_alert_update(
