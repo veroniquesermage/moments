@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <title>Invitation (Moments)</title>
+    <title>(Moments) Un cadeau que vous avez pris ou réservé a été modifié par son destinataire </title>
     <style>
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
@@ -53,28 +53,16 @@
 </head>
 <body>
 <div class="container">
-    <h1>✨ {{user.prenom}} vous invite sur (Moments)</h1>
+    <h1>🎁 {{destinataire.prenom}} a mis à jour un cadeau que vous aviez {{statut}} !</h1>
 
     <p>
-        Bonjour,<br /><br />
-        <strong>{{user.prenom}}</strong> vous propose de rejoindre le groupe
-        <strong>“{{groupe.nom_groupe}}”</strong> sur <strong>(Moments)</strong>.
+        Bonjour {{gift.reserve_par.prenom}},<br /><br />
+        Vous aviez {{statut}} le cadeau <strong>"{{gift.nom}}"</strong> dans la liste de {{destinataire.prenom}}.<br />
+        Ce cadeau vient d’être modifié  ✏️. Ce n'est peut-être rien ! Mais pour vous en assurer, connectez-vous à (Moments) et consultez le cadeau.
     </p>
 
     <p>
-        (Moments) est un espace privé pour organiser des événements, préparer des surprises et créer de beaux souvenirs avec vos proches.
-    </p>
-
-    <p>
-        👉 Cliquez sur le lien ci-dessous pour rejoindre le groupe :
-    </p>
-
-    <p>
-        <a class="cta" href="{{url_avec_code}}">Rejoindre le groupe</a>
-    </p>
-
-    <p>
-        Vous pourrez vous connecter avec votre compte Google ou votre adresse mail.
+        <a class="cta" href="{{url}}">Accéder à (Moments)</a>
     </p>
 
     <div class="footer">

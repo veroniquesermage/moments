@@ -13,10 +13,11 @@ router = APIRouter(prefix="/api/email", tags=["email"])
 @router.post("/feedback", status_code=204)
 async def send_feedback_mail(
         feedbackRequest: FeedbackRequest,
+        db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user) ) :
 
 
-    return await MailService.send_feedback(feedbackRequest, current_user)
+    return await MailService.send_feedback(feedbackRequest, current_user, db)
 
 @router.post("/invitation", status_code=204)
 async def send_feedback_mail(
