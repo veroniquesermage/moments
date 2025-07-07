@@ -19,7 +19,8 @@ COPY start.sh /app/start.sh
 # Droits pour cron et le start.sh
 RUN chmod 0644 /etc/cron.d/cleanup-cron && \
     crontab /etc/cron.d/cleanup-cron && \
-    chmod +x /app/start.sh
+    chmod +x /app/script/start.sh && \
+    chmod +x /app/script/run_cleanup.sh
 
 # Port FastAPI
 EXPOSE 8000
