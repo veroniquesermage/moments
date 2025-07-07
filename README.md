@@ -33,7 +33,7 @@ mkdir moments
 tar xzf moments.tar.gz -C moments
 ```
 
-### penser à remettre d'querre l'environnement du front:
+### penser à remettre d'équerre l'environnement du front:
 ```bash
 cd frontend/src/environments
 rm environment.ts
@@ -63,4 +63,9 @@ docker exec -it moments-postgres psql -U Mom3ntsAdm1n moments
 ```bash
 docker exec -it moments-backend bash
 crontab -l
+```
+
+### s'assurer que le fichier cron est bien en LF :
+```bash
+dos2unix cleanup.cron
 ```
