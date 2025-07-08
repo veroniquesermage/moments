@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Signal} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
@@ -26,7 +26,7 @@ export class ProfileGroupComponent implements OnInit{
 
   group: GroupDetail | undefined
   members: string[] = []
-  allMembers: UserDisplay[] = []
+  membersSignal: Signal<UserDisplay[]>;
   showMemberModal: boolean = false;
   showNicknameModal: boolean = false;
   showConfirmModal: boolean = false;
@@ -39,15 +39,15 @@ export class ProfileGroupComponent implements OnInit{
               private userGroupService: UserGroupService,
               public errorService: ErrorService,
               private router: Router,
-              private groupContextService: GroupContextService) {}
+              private groupContextService: GroupContextService) {
+    this.membersSignal = this.groupContextService.getMembersSignal();
+  }
 
   async ngOnInit(){
       await this.loadGroupDetail();
   }
 
   async getAllMembers() {
-    this.allMembers = await this.groupContextService.getGroupMembers();
-
     this.showMemberModal = true;
   }
 
@@ -92,6 +92,7 @@ export class ProfileGroupComponent implements OnInit{
     }
     try {
       await this.userGroupService.deleteUserInGroup(this.groupContextService.getGroupId());
+      await this.groupContextService.updateMemberSignal();
       await this.router.navigate(['/groupe/onboarding']);
       this.showConfirmModal = false;
     } catch (err) {

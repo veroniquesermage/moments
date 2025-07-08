@@ -4,12 +4,12 @@
   [groupId] = "groupId"></app-group-info>
   <app-group-invite/>
   <app-group-roles
-    [membersOriginal]="members"
+    [membersSignal]="membersSignal"
     [groupId]="groupId">
   </app-group-roles>
   <app-group-actions
     [groupId]="groupId"
-    [members]="members"
+    [membersSignal]="membersSignal"
     (membersUpdated)="reloadMembers()">
   </app-group-actions>
 </div>

@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, effect, Input, Signal} from '@angular/core';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {CommonModule} from '@angular/common';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
@@ -18,10 +18,10 @@ import {GroupContextService} from 'src/core/services/group-context.service';
   templateUrl: './group-roles.component.html',
   styleUrl: './group-roles.component.scss'
 })
-export class GroupRolesComponent implements OnChanges {
+export class GroupRolesComponent {
 
   @Input()
-  membersOriginal: UserDisplay[] = [];
+  membersSignal!: Signal<UserDisplay[]>;
   @Input()
   groupId: number | undefined;
 
@@ -35,16 +35,15 @@ export class GroupRolesComponent implements OnChanges {
               private groupContextService: GroupContextService) {
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['membersOriginal']?.currentValue) {
-      const original: UserDisplay[] = changes['membersOriginal'].currentValue;
-      this.membersEdition = original.map(m => ({ ...m }));
+  private _syncMembersEffect = effect(() => {
+    if (this.membersSignal) {
+      this.membersEdition = this.membersSignal().map(m => ({ ...m }));
     }
-  }
+  });
 
   private buildRoleChanges(): void {
      for (const edited of this.membersEdition) {
-      const original = this.membersOriginal.find(o => o.id === edited.id);
+      const original = this.membersSignal().find(o => o.id === edited.id);
       if (original && original.role !== edited.role) {
         this.changes.push(edited);
       }
@@ -62,10 +61,9 @@ export class GroupRolesComponent implements OnChanges {
   }
 
   async validation() {
-    this.membersOriginal = this.membersEdition.map(m => ({ ...m }));
     const result = await this.userGroupService.updateRoleUsers(this.groupId!, this.changes);
     if(result.success){
-      this.groupContextService.updateMemberCache(result.data);
+      await this.groupContextService.updateMemberSignal();
       this.cancel()
     } else {
       this.errorService.showError(result.message);
