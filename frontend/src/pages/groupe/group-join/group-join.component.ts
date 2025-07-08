@@ -7,6 +7,7 @@ import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {AuthService} from 'src/security/service/auth.service';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-group-join',
@@ -24,7 +25,8 @@ export class GroupJoinComponent implements OnInit{
   constructor(private groupeService: GroupService,
               public router: Router,
               public errorService: ErrorService,
-              private authService: AuthService) {
+              private authService: AuthService,
+              private groupServiceContext: GroupContextService) {
   }
 
   ngOnInit() {
@@ -42,6 +44,7 @@ export class GroupJoinComponent implements OnInit{
   async rejoindre() {
       const result = await this.groupeService.joinGroup(this.codeInvitation);
       if (result.success) {
+        await this.groupServiceContext.updateMemberSignal();
         await this.router.navigate(['/dashboard']);
       } else {
         this.errorService.showError(result.message);

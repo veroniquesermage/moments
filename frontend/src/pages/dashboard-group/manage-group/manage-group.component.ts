@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Signal} from '@angular/core';
 import {GroupInfoComponent} from 'src/pages/dashboard-group/group-info/group-info.component';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {GroupInviteComponent} from 'src/pages/dashboard-group/group-invite/group-invite.component';
@@ -22,19 +22,19 @@ import {GroupActionsComponent} from 'src/pages/dashboard-group/group-actions/gro
 })
 export class ManageGroupComponent implements OnInit{
 
+  membersSignal: Signal<UserDisplay[]>;
   composant: string = 'ManageGroupComponent';
   groupId: number | undefined;
-  members: UserDisplay[] = [];
 
   constructor(private groupServiceContext: GroupContextService) {
+    this.membersSignal = this.groupServiceContext.getMembersSignal();
   }
 
   async ngOnInit() {
     this.groupId = this.groupServiceContext.getGroupId();
-    this.members = await this.groupServiceContext.getGroupMembers();
   }
 
-  async reloadMembers() {
-    this.members = await this.groupServiceContext.refreshMembers();
+  reloadMembers() {
+    this.groupServiceContext.updateMemberSignal();
   }
 }

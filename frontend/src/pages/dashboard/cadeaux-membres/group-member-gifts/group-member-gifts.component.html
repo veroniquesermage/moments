@@ -4,10 +4,9 @@
   <section class="intro-bloc" aria-label="Introduction pour la page Listes des autres membres">
   <p>> Cliquez sur un membre pour obtenir sa liste de cadeaux</p>
   </section>
-  <app-refresh-group-members (refreshed)="reloadMembers()" />
   <div class="user-buttons">
     <button
-      *ngFor="let user of users"
+      *ngFor="let user of membersSignal()"
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
     >
