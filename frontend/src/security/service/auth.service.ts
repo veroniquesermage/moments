@@ -60,13 +60,13 @@ export class AuthService {
     fetch(`${environment.backendBaseUrl}${environment.api.auth}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({code, codeVerifier})
+      body: JSON.stringify({code, codeVerifier, remember_me: false}),
+      credentials: 'include'
     })
       .then(res => res.json() as Promise<JwtResponse>) // 👈 typage ici
       .then(data => {
         console.log('[Backend] Réponse reçue :', data);
-        if (data?.token) {
-          localStorage.setItem('app_kdo.jwt', data.token);
+        if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
         }
@@ -108,4 +108,8 @@ export class AuthService {
     return btoa(String.fromCharCode(...new Uint8Array(digest)))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
+
+
+
+
 }
