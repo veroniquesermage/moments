@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
 from app.database import get_db
-from app.dependencies.current_user import get_current_user
+from app.dependencies.current_user import get_current_user_from_cookie
 from app.models import User
 from app.schemas.gift import DuplicationPayload
 from app.schemas.gift.gift_idea_create import GiftIdeaCreate
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/idees", tags=["idees"])
 async def create_gift_idea(
         gift_idea: GiftIdeaCreate,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftIdeasResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftIdeasResponse:
 
     return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea)
 
@@ -24,7 +24,7 @@ async def create_gift_idea(
 async def get_my_ideas(
         groupId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftIdeasResponse]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftIdeasResponse]:
 
     logger.info(f"L'utilisateur concerné est {current_user}")
     return await GiftIdeasService.get_my_ideas(db, current_user, groupId)
@@ -35,7 +35,7 @@ async def change_visibility(
         ideaId: int,
         payload: dict = Body(...),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)):
+        current_user: User = Depends(get_current_user_from_cookie)):
     visibility = payload.get("visibility")
     if visibility is None:
         raise HTTPException(status_code=422, detail="❌ Le champ 'visibility' est requis.")
@@ -48,7 +48,7 @@ async def duplicate_gift_idea(
         ideaId: int,
         payload: DuplicationPayload,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)) -> GiftIdeasResponse:
+        current_user: User = Depends(get_current_user_from_cookie)) -> GiftIdeasResponse:
 
     return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, payload.new_dest_id)
 
@@ -56,7 +56,7 @@ async def duplicate_gift_idea(
 async def delete_gift_idea(
         ideaId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)):
+        current_user: User = Depends(get_current_user_from_cookie)):
 
     await GiftIdeasService.delete_gift_idea(db, current_user, ideaId)
     return
