@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.current_user import get_current_user
+from app.dependencies.current_user import get_current_user_from_cookie
 from app.models import User
 from app.schemas import UserDisplaySchema
 from app.services import UserGroupService
@@ -17,7 +17,7 @@ async def delete_user_group(
         groupId: int,
         userId: Optional[int] = None,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(get_current_user_from_cookie)
 ):
     await UserGroupService.delete_user_group(db, current_user, groupId, userId)
     return
@@ -27,7 +27,7 @@ async def update_nickname(
         groupId: int,
         payload: dict = Body(...),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(get_current_user_from_cookie)
 ):
     nickname = payload.get("nickname")
     if nickname is None:
@@ -41,6 +41,6 @@ async def update_roles(
         groupId: int,
         payload: list[UserDisplaySchema],
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(get_current_user_from_cookie)
 ) -> list[UserDisplaySchema] :
     return await UserGroupService.update_role(db, groupId, current_user, payload)

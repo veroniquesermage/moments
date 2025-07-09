@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 from sqlalchemy import select, or_, and_
@@ -28,6 +27,7 @@ from app.services.builders import build_gift_public_response, build_gift_shared_
 from app.services.mailing.mail_service import MailService
 from app.services.sharing_service import SharingService
 from app.services.trace_service import TraceService
+from app.utils.date_helper import now_paris
 
 
 class GiftService:
@@ -337,7 +337,7 @@ class GiftService:
 
         result.statut = gift_status.status
 
-        today = datetime.now(ZoneInfo("Europe/Paris")) + timedelta(days=4)
+        today = now_paris() + timedelta(days=4)
         date_expiration = today.replace(hour=1, minute=00, second=00, microsecond=00)
 
         if gift_status.status == GiftStatusEnum.DISPONIBLE:
@@ -357,7 +357,7 @@ class GiftService:
         else:
             # cas PRIS ou RÉSERVÉ
             result.reserve_par = current_user
-            result.date_reservation = datetime.now(ZoneInfo("Europe/Paris"))
+            result.date_reservation = now_paris()
             result.expiration_reservation = date_expiration
 
         logger.debug("Attributs de gift : %s", vars(result))

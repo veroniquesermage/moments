@@ -259,9 +259,7 @@ export class GiftService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    const headersConfig: { [key: string]: string } = {
-      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
-    };
+    const headersConfig: { [key: string]: string } = {};
 
     const currentGroupId = this.groupContextService.getGroupId();
     if (currentGroupId) {

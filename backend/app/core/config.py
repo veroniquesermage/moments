@@ -28,8 +28,9 @@ class Settings(BaseSettings):
     mj_feedback_email: str
     invitation_link: str
 
+    @property
+    def is_prod(self) -> bool:
+        return self.env.lower() == "prod"
+
 settings = Settings()
 
-if env == "prod":
-    print("[CONFIG] ENV:", settings.env)
-    print("[CONFIG] Google Client ID:", settings.google_client_id)
