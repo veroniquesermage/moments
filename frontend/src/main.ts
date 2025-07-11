@@ -9,7 +9,7 @@ import {registerLocaleData} from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {provideToastr} from 'ngx-toastr';
-import {StartupService} from 'src/core/services/stratup.service';
+import {StartupService} from 'src/core/services/startup.service';
 import {AuthInterceptor} from 'src/core/interceptors/auth.interceptor';
 
 registerLocaleData(localeFr);

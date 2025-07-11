@@ -4,7 +4,7 @@ import {environment} from 'src/environments/environment';
 import {authConfig} from 'src/security/config/auth.config';
 import {User} from 'src/security/model/user.model';
 import {JwtResponse} from 'src/security/model/jwt-response.model';
-import {Observable} from 'rxjs';
+import {firstValueFrom, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 
 @Injectable({providedIn: 'root'})
@@ -81,13 +81,15 @@ export class AuthService {
   /**
    * Déconnecte l'utilisateur
    */
-  logout(): void {
+  async logout(): Promise<void> {
+
     for (const key in localStorage) {
       if (key.startsWith('app_kdo.')) {
         localStorage.removeItem(key);
       }
     }
     sessionStorage.removeItem('pkce_code_verifier');
+    await firstValueFrom(this.logoutRefreshToken());
     this.profile.set(null);
     this.isLoggedIn.set(false);
     this.router.navigateByUrl('/');
@@ -114,9 +116,10 @@ export class AuthService {
   }
 
   refreshToken(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/refresh`, null, {
-      withCredentials: true
-    });
+    return this.http.post<void>(`${this.baseUrl}/refresh`, null);
   }
 
+  logoutRefreshToken(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/logout`, null);
+  }
 }
