@@ -3,7 +3,9 @@ import {Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {authConfig} from 'src/security/config/auth.config';
 import {User} from 'src/security/model/user.model';
-import {JwtResponse} from 'src/security/model/jwt-response.model'; // DTO miroir backend
+import {JwtResponse} from 'src/security/model/jwt-response.model';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -12,8 +14,9 @@ export class AuthService {
   // Signals centralisés
   profile = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
+  private baseUrl = `${environment.backendBaseUrl}${environment.api.auth}`;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.handleGoogleCodeRedirect();
   }
 
@@ -56,8 +59,9 @@ export class AuthService {
    */
   private sendCodeToBackend(code: string): void {
     const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+    const url = this.baseUrl + environment.api.google
 
-    fetch(`${environment.backendBaseUrl}${environment.api.auth}`, {
+    fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({code, codeVerifier, remember_me: false}),
@@ -110,6 +114,10 @@ export class AuthService {
   }
 
 
-
+  refreshToken(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/refresh`, null, {
+      withCredentials: true
+    });
+  }
 
 }
