@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 from app.core.config import settings
 from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
+from app.models import RefreshToken
 from app.core.logger import logger
 from app.models import RefreshToken
 from app.schemas import UserSchema
