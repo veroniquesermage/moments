@@ -21,3 +21,10 @@ async def refresh_token(
         db: AsyncSession = Depends(get_db)
 ):
     return await AuthService.refresh_access_token(db, request)
+
+@router.post("/logout", status_code=200)
+async def logout(
+        request: Request,
+        db: AsyncSession = Depends(get_db)
+):
+    return await AuthService.logout(db, request)

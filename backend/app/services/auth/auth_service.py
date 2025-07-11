@@ -9,7 +9,6 @@ from starlette.responses import JSONResponse
 from app.core.config import settings
 from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
-from app.models import RefreshToken
 from app.core.logger import logger
 from app.models import RefreshToken
 from app.schemas import UserSchema
@@ -111,3 +110,20 @@ class AuthService:
         else:
             logger.info(f"Refresh invalide pour le jti {jti} et l'utilisateur {user_id}")
             raise HTTPException(status_code=401, detail="Refresh token invalide.")
+
+    @staticmethod
+    async def logout(db: AsyncSession, request: Request) -> JSONResponse:
+        token = request.cookies.get("refresh_token")
+        if token:
+            try:
+                payload = RefreshTokenService.decode_refresh_token(token)
+                user_id: int = int(payload.get("sub"))
+                jti: str = payload.get("jti")
+                await RefreshTokenService.revoke_refresh_token(db, jti, user_id)
+            except Exception:
+                pass
+
+        response = JSONResponse(content={"message": "Déconnexion réussie"})
+        response.delete_cookie(key="access_token", path="/")
+        response.delete_cookie(key="refresh_token", path="/")
+        return response
