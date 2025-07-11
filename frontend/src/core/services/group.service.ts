@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
 import {Result} from 'src/core/models/result.model';
@@ -25,10 +25,7 @@ export class GroupService {
 
     try {
       this.isLoading.set(true);
-      const groupes = await firstValueFrom(this.http.get<GroupResume[]>(this.apiUrl, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const groupes = await firstValueFrom(this.http.get<GroupResume[]>(this.apiUrl));
       this.groupes.set(groupes);
       return {success: true, data: groupes};
     } catch (error) {
@@ -41,10 +38,7 @@ export class GroupService {
 
   async createGroup(groupDTO: GroupDTO): Promise<ApiResponse<GroupResume>> {
     try {
-      const groupeCreated = await firstValueFrom(this.http.post<GroupResume>(this.apiUrl, groupDTO, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const groupeCreated = await firstValueFrom(this.http.post<GroupResume>(this.apiUrl, groupDTO));
       await this.groupContextService.setGroupContext(groupeCreated.id);
       return {success: true, data: groupeCreated};
     } catch (error) {
@@ -58,10 +52,7 @@ export class GroupService {
       const codeEnc = encodeURIComponent(code);
       const url = `${this.apiUrl + environment.api.rejoindre}/${codeEnc}`;
 
-      const groupeJoined = await firstValueFrom(this.http.post<GroupResume>(url, {}, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const groupeJoined = await firstValueFrom(this.http.post<GroupResume>(url, {}));
       await this.groupContextService.setGroupContext(groupeJoined.id);
       return {success: true, data: groupeJoined};
     } catch (error) {
@@ -74,10 +65,7 @@ export class GroupService {
     const codeEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${codeEnc}`;
     try {
-      const result = await firstValueFrom(this.http.get<GroupResume>(url, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.get<GroupResume>(url));
       return {success: true, data: result};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la récupération du groupe', error);
@@ -89,10 +77,7 @@ export class GroupService {
     const codeEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${codeEnc}/details`;
     try {
-      const result = await firstValueFrom(this.http.get<GroupDetail>(url, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.get<GroupDetail>(url));
       return {success: true, data: result};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la récupération du groupe', error);
@@ -105,10 +90,7 @@ export class GroupService {
     const codeEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${codeEnc}`;
     try {
-      const result = await firstValueFrom(this.http.patch<GroupResume>(url,group, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.patch<GroupResume>(url,group));
       return {success: true, data: result};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la mise à jour du groupe', error);
@@ -120,10 +102,7 @@ export class GroupService {
     const codeEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${codeEnc}`;
     try {
-      const result = await firstValueFrom(this.http.delete<GroupDetail>(url, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.delete<GroupDetail>(url));
       return {success: true, data: result};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la suppression du groupe', error);
@@ -139,16 +118,4 @@ export class GroupService {
     }
     return this.fetchGroups();
   }
-
-  private getAuthHeaders(): HttpHeaders {
-    const headersConfig: { [key: string]: string } = {};
-
-    const currentGroupId = this.groupContextService.getGroupId();
-    if (currentGroupId) {
-      headersConfig['X-Group-Id'] = currentGroupId.toString();
-    }
-
-    return new HttpHeaders(headersConfig);
-  }
-
 }

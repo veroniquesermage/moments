@@ -1,6 +1,6 @@
 import {Injectable, signal} from '@angular/core';
 import {environment} from 'src/environments/environment';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {GiftAction} from 'src/core/enum/gift-action.enum';
 import {EligibilityResponseDto} from 'src/core/models/eligibility-response-dto.model';
@@ -40,9 +40,7 @@ export class GiftService {
     try {
       const giftsResponse = await firstValueFrom(
         this.http.get<GiftResponse[]>(this.apiUrl, {
-          headers: this.getAuthHeaders(),
-          params: params,
-          withCredentials: true
+          params: params
         })
       );
 
@@ -64,10 +62,7 @@ export class GiftService {
     const url = `${this.apiUrl}/membre/${idEnc}`;
     try {
       const giftsResponse = await firstValueFrom(
-        this.http.get<GiftPublicResponse[]>(url, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.get<GiftPublicResponse[]>(url)
       );
       return {success: true, data: giftsResponse};
     } catch (error) {
@@ -78,10 +73,7 @@ export class GiftService {
 
   async createGift(gift: GiftCreate): Promise<ApiResponse<GiftResponse>> {
     try {
-      const giftResponse = await firstValueFrom(this.http.post<GiftResponse>(this.apiUrl, gift, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const giftResponse = await firstValueFrom(this.http.post<GiftResponse>(this.apiUrl, gift));
       return {success: true, data: giftResponse};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la création du cadeau', error);
@@ -96,10 +88,7 @@ export class GiftService {
     const url = `${this.apiUrl}/${idEnc}`;
     try {
       const gift = await firstValueFrom(
-        this.http.get<GiftDetailResponse>(url, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.get<GiftDetailResponse>(url)
       );
       return {success: true, data: gift};
 
@@ -115,10 +104,7 @@ export class GiftService {
 
     try {
       await firstValueFrom(
-        this.http.delete<GiftResponse>(url, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.delete<GiftResponse>(url)
       );
       return {success: true, data: undefined};
     } catch (error) {
@@ -131,10 +117,7 @@ export class GiftService {
 
     const url = `${this.apiUrl}/${gift.id}`;
     try {
-      const result = await firstValueFrom(this.http.put<GiftResponse>(url, gift, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.put<GiftResponse>(url, gift));
 
       return {success: true, data: result};
     } catch (error) {
@@ -149,10 +132,7 @@ export class GiftService {
     const url = `${this.apiUrl}/${idEnc}/livraison`;
 
     try {
-      const result = await firstValueFrom(this.http.put<GiftDeliveryUpdate>(url, giftUpdate, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.put<GiftDeliveryUpdate>(url, giftUpdate));
 
       return {success: true, data: result};
     } catch (error) {
@@ -167,10 +147,7 @@ export class GiftService {
     const url = `${this.apiUrl}/${idEnc}/eligibilite?action=${action}`;
     try {
       const eligibilityResponseDto = await firstValueFrom(
-        this.http.get<EligibilityResponseDto>(url, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.get<EligibilityResponseDto>(url)
       );
       return {success: true, data: eligibilityResponseDto};
 
@@ -186,10 +163,7 @@ export class GiftService {
     const url = `${this.apiUrl}/${idEnc}/changer-statut`;
     try {
       const giftResponse = await firstValueFrom(
-        this.http.put<GiftResponse>(url, status, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.put<GiftResponse>(url, status)
       );
       return {success: true, data: giftResponse};
     } catch (error) {
@@ -204,10 +178,7 @@ export class GiftService {
     const url = `${this.apiUrl}/suivis/${idEnc}`;
     try {
       const giftsFollowed = await firstValueFrom(
-        this.http.get<GiftFollowed[]>(url, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.get<GiftFollowed[]>(url)
       );
 
       this.giftsFollowed.set(giftsFollowed);
@@ -224,10 +195,7 @@ export class GiftService {
     const url = `${this.apiUrl}/${idEnc}/recu`;
     try {
       const gift = await firstValueFrom(
-        this.http.patch<GiftDetailResponse>(url, {recu}, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.patch<GiftDetailResponse>(url, {recu})
       );
 
       return {success: true, data: gift};
@@ -240,10 +208,7 @@ export class GiftService {
 
   async updateAllGifts(gifts: GiftPriority[]): Promise<ApiResponse<GiftResponse[]>> {
     try {
-      const giftsList = await firstValueFrom(this.http.put<GiftResponse[]>(this.apiUrl, gifts, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const giftsList = await firstValueFrom(this.http.put<GiftResponse[]>(this.apiUrl, gifts));
 
       this.giftsResponse.set(giftsList);
       return {success: true, data: giftsList};
@@ -257,16 +222,4 @@ export class GiftService {
   clearGifts() {
     this.giftsResponse.set([]);
   }
-
-  private getAuthHeaders(): HttpHeaders {
-    const headersConfig: { [key: string]: string } = {};
-
-    const currentGroupId = this.groupContextService.getGroupId();
-    if (currentGroupId) {
-      headersConfig['X-Group-Id'] = currentGroupId.toString();
-    }
-
-    return new HttpHeaders(headersConfig);
-  }
-
 }

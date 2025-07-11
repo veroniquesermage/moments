@@ -113,7 +113,6 @@ export class AuthService {
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
-
   refreshToken(): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/refresh`, null, {
       withCredentials: true
