@@ -46,7 +46,7 @@
         aria-labelledby="modal-title">
         <h2 id="modal-title">Liste des membres du groupe</h2>
         <ol>
-          <li *ngFor="let member of allMembers" style="list-style: none"> {{member.prenom}} {{member.nom | uppercase }}
+          <li *ngFor="let member of membersSignal()" style="list-style: none"> {{member.prenom}} {{member.nom | uppercase }}
             <span *ngIf="member.surnom" class="alias"> alias {{ member.surnom }}</span>
           </li>
         </ol>

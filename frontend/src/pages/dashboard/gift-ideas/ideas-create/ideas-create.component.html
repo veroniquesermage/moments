@@ -7,7 +7,7 @@
 
   <app-gift-idea-form
     [giftIdeasResponse] = "undefined"
-    [membersGroup] = "membersGroup"
+    [membersGroup] = "membersSignal()"
     (formSubmitted) = "onSubmit($event)"
     (cancel) = "router.navigate(['/dashboard/idees'])"
   ></app-gift-idea-form>

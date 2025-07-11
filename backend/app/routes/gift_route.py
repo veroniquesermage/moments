@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.enum.gift_action_enum import GiftActionEnum
 from app.core.logger import logger
 from app.database import get_db
-from app.dependencies.current_user import get_current_user, get_current_group_id
+from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id
 from app.models import User
 from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
     GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, GiftFollowed
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/cadeaux", tags=["cadeaux"])
 async def get_gifts(
         userId: Optional[int] = None,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftResponse]:
 
     effective_user_id = userId or current_user.id
     logger.info(f"L'utilisateur concerné est {effective_user_id}")
@@ -30,7 +30,7 @@ async def get_gifts(
 async def create_gift(
         gift: GiftCreate,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftResponse:
 
     return await GiftService.create_gift(db, current_user, gift)
 
@@ -38,7 +38,7 @@ async def create_gift(
 async def update_all_gifts(
         gifts: list[GiftPriority],
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftResponse]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftResponse]:
 
     return await GiftService.update_all_gifts(db, current_user, gifts)
 
@@ -47,7 +47,7 @@ async def update_all_gifts(
 async def get_followed_gifts(
         groupId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> list[GiftFollowed]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftFollowed]:
 
     return await GiftService.get_followed_gifts(db, current_user, groupId)
 
@@ -55,7 +55,7 @@ async def get_followed_gifts(
 async def get_visible_gifts_for_member(
         user_id: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)) -> list[GiftPublicResponse]:
+        current_user: User = Depends(get_current_user_from_cookie)) -> list[GiftPublicResponse]:
 
     return await GiftService.get_visible_gifts_for_member(db, user_id)
 
@@ -64,7 +64,7 @@ async def get_gift(
         giftId: int,
         groupId: int = Depends(get_current_group_id),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftDetailResponse:
 
     return await GiftService.get_gift(db, giftId, groupId, current_user)
 
@@ -73,7 +73,7 @@ async def update_gift(
         giftId: int,
         giftUpdate: GiftUpdate,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftResponse:
 
     return await GiftService.update_gift(db, current_user, giftId, giftUpdate)
 
@@ -81,7 +81,7 @@ async def update_gift(
 async def delete_gift(
         giftId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ):
+        current_user: User = Depends(get_current_user_from_cookie) ):
 
     await GiftService.delete_gift(db, giftId, current_user)
     return
@@ -91,7 +91,7 @@ async def update_gift_delivery(
         giftId: int,
         giftDeliveryUpdate: GiftDeliveryUpdate,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftDeliveryUpdate:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftDeliveryUpdate:
 
     return await GiftService.update_gift_delivery(db, current_user, giftId, giftDeliveryUpdate)
 
@@ -100,7 +100,7 @@ async def verify_eligibility(
         giftId: int,
         action: Optional[GiftActionEnum] = None,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> EligibilityResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> EligibilityResponse:
 
     return await GiftService.verify_eligibility(db, giftId, current_user, action)
 
@@ -110,7 +110,7 @@ async def set_gift_delivery(
         payload: RecuPayload,
         groupId: int = Depends(get_current_group_id),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftDetailResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftDetailResponse:
 
     return await GiftService.set_gift_delivery(db, current_user, giftId, payload.recu, groupId)
 
@@ -120,7 +120,7 @@ async def change_status(
         giftId: int,
         gift_status: GiftStatus,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user) ) -> GiftResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftResponse:
 
     return await GiftService.change_status(db, current_user, giftId, gift_status)
 

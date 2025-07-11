@@ -75,7 +75,7 @@
 
         <select id="selectDest" [(ngModel)]="selectedDestId">
           <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
-          <option *ngFor="let user of allUsers" [value]="user.id">{{ user | displayName}}</option>
+          <option *ngFor="let user of membersSignal()" [value]="user.id">{{ user | displayName}}</option>
         </select>
 
 

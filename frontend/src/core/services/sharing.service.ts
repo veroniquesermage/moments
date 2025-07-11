@@ -1,19 +1,17 @@
 import {Injectable} from '@angular/core';
 import {environment} from 'src/environments/environment';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {GiftShared} from 'src/core/models/gift/gift-shared.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {firstValueFrom} from 'rxjs';
-import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Injectable({providedIn: 'root'})
 export class SharingService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.partage;
 
-  constructor(private http: HttpClient,
-              private groupContextService: GroupContextService) {
+  constructor(private http: HttpClient) {
   }
 
   async setGiftRefunded(shared: GiftShared): Promise<ApiResponse<GiftDetailResponse>>{
@@ -21,10 +19,7 @@ export class SharingService {
     try {
       console.log('[SharingService] Envoi statut remboursement :', shared);
       const gift = await firstValueFrom(
-        this.http.patch<GiftDetailResponse>(url, shared, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.patch<GiftDetailResponse>(url, shared)
       );
 
       return {success: true, data: gift};
@@ -40,10 +35,7 @@ export class SharingService {
     try {
       console.log('[SharingService] Modification ou ajout de partages :', shared);
       const gift = await firstValueFrom(
-        this.http.put<GiftDetailResponse>(url, shared, {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        })
+        this.http.put<GiftDetailResponse>(url, shared)
       );
 
       return {success: true, data: gift};
@@ -53,18 +45,4 @@ export class SharingService {
       return {success: false, message: "❌ Erreur lors de la mise à jour d\'un partage."};
     }
   }
-
-  private getAuthHeaders(): HttpHeaders {
-    const headersConfig: { [key: string]: string } = {
-      'Authorization': `Bearer ${localStorage.getItem('app_kdo.jwt')}`
-    };
-
-    const currentGroupId = this.groupContextService.getGroupId();
-    if (currentGroupId) {
-      headersConfig['X-Group-Id'] = currentGroupId.toString();
-    }
-
-    return new HttpHeaders(headersConfig);
-  }
-
 }

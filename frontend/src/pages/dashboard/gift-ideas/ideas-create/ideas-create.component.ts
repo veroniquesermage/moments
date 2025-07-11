@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Signal} from '@angular/core';
 import {TerminalModalComponent} from "src/shared/components/terminal-modal/terminal-modal.component";
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
@@ -26,12 +26,12 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
   templateUrl: './ideas-create.component.html',
   styleUrl: './ideas-create.component.scss'
 })
-export class IdeasCreateComponent implements OnInit {
+export class IdeasCreateComponent {
 
   message = 'Souhaitez-vous rendre cette idée visible aux membres du groupe ?\n'
   modalActions: TerminalModalAction[] = [{ label: 'Privé', eventName: 'PRIVATE', style: 'primary' },
                                           { label: 'Public', eventName: 'PUBLIC', style: 'primary' }];
-  membersGroup: UserDisplay[] = [];
+  membersSignal: Signal<UserDisplay[]>;
   giftIdeaCreate: GiftIdeaCreate | undefined;
   showModal = false;
   composant: string = "IdeasCreateComponent";
@@ -40,10 +40,7 @@ export class IdeasCreateComponent implements OnInit {
               private groupContextService: GroupContextService,
               public errorService: ErrorService,
               private ideaService: IdeaService) {
-  }
-
-  async ngOnInit() {
-    this.membersGroup = await this.groupContextService.getGroupMembers();
+    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async onSubmit(giftFormData: GiftIdeaFormData): Promise<void> {
