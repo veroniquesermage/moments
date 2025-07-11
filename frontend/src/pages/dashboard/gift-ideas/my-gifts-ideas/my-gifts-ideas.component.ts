@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Signal} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
@@ -41,7 +41,7 @@ export class MyGiftsIdeasComponent implements OnInit {
   ideaId: number | undefined;
   selectedDestId?: number;
   showDuplicationModal = false;
-  allUsers: UserDisplay[] = [];
+  membersSignal: Signal<UserDisplay[]>;
   composant: string = "MyGiftsIdeasComponent";
 
 
@@ -51,6 +51,7 @@ export class MyGiftsIdeasComponent implements OnInit {
               private router: Router,
               public errorService: ErrorService,
               private toastr: ToastrService) {
+    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
@@ -69,7 +70,6 @@ export class MyGiftsIdeasComponent implements OnInit {
 
   async duplicateIdea(ideaId: number) {
     this.ideaId = ideaId;
-    this.allUsers = await this.groupContextService.getGroupMembers();
     this.showDuplicationModal = true;
   }
 

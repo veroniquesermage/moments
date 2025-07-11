@@ -1,6 +1,5 @@
 <div class="terminal">
 <h2>> Gestion du partage pour le cadeau {{this.gift?.nom}}</h2>
-  <app-refresh-group-members (refreshed)="reloadMembers()" />
 
 
 <table class="gift-table">
@@ -28,7 +27,7 @@
     <td>
       <select [(ngModel)]="draft.participant">
         <option [ngValue]="null">choisir</option>
-        <option *ngFor="let membre of membresDisponibles" [ngValue]="membre">
+        <option *ngFor="let membre of membersSignal()" [ngValue]="membre">
           {{ membre | displayName }}
         </option>
       </select>

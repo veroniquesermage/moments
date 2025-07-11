@@ -3,7 +3,9 @@ import {Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {authConfig} from 'src/security/config/auth.config';
 import {User} from 'src/security/model/user.model';
-import {JwtResponse} from 'src/security/model/jwt-response.model'; // DTO miroir backend
+import {JwtResponse} from 'src/security/model/jwt-response.model';
+import {firstValueFrom, Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -12,8 +14,9 @@ export class AuthService {
   // Signals centralisés
   profile = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
+  private baseUrl = `${environment.backendBaseUrl}${environment.api.auth}`;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.handleGoogleCodeRedirect();
   }
 
@@ -56,17 +59,18 @@ export class AuthService {
    */
   private sendCodeToBackend(code: string): void {
     const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+    const url = this.baseUrl + environment.api.google
 
-    fetch(`${environment.backendBaseUrl}${environment.api.auth}`, {
+    fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({code, codeVerifier})
+      body: JSON.stringify({code, codeVerifier, remember_me: false}),
+      credentials: 'include'
     })
       .then(res => res.json() as Promise<JwtResponse>) // 👈 typage ici
       .then(data => {
         console.log('[Backend] Réponse reçue :', data);
-        if (data?.token) {
-          localStorage.setItem('app_kdo.jwt', data.token);
+        if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
         }
@@ -77,13 +81,15 @@ export class AuthService {
   /**
    * Déconnecte l'utilisateur
    */
-  logout(): void {
+  async logout(): Promise<void> {
+
     for (const key in localStorage) {
       if (key.startsWith('app_kdo.')) {
         localStorage.removeItem(key);
       }
     }
     sessionStorage.removeItem('pkce_code_verifier');
+    await firstValueFrom(this.logoutRefreshToken());
     this.profile.set(null);
     this.isLoggedIn.set(false);
     this.router.navigateByUrl('/');
@@ -107,5 +113,13 @@ export class AuthService {
     const digest = await window.crypto.subtle.digest('SHA-256', data);
     return btoa(String.fromCharCode(...new Uint8Array(digest)))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  refreshToken(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/refresh`, null);
+  }
+
+  logoutRefreshToken(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/logout`, null);
   }
 }
