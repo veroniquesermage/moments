@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
 from app.core.logger import logger
-from app.models import RefreshToken, User
+from app.models import RefreshToken
 from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, AuthResponse
 from app.services.auth.google_auth_service import exchange_code_for_tokens
@@ -83,15 +83,14 @@ class AuthService:
             httponly=False,
             secure=settings.is_prod,
             samesite="lax",
-            max_age=1800
+            max_age=60
         )
 
         return response
 
     @staticmethod
     async def refresh_access_token(db: AsyncSession,
-                                   request: Request,
-                                   user: User
+                                   request: Request
                                    ) -> JSONResponse:
 
         token = request.cookies.get("refresh_token")
@@ -102,6 +101,7 @@ class AuthService:
         remember_me: bool = payload.get("remember_me")
 
         if await RefreshTokenService.is_refresh_token_valid(db, jti, user_id):
+            user = await UserService.get_user_by_id(db, int(user_id))
             await RefreshTokenService.revoke_refresh_token(db, jti, user_id)
 
             return await AuthService.create_tokens(

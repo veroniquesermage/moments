@@ -25,10 +25,11 @@ export class TokenService {
   }
 
   isTokenExpired(): boolean {
+    const SAFETY_MARGIN = 10_000; // 10 s
     const payload = this.decodeAccessToken();
     if (!payload) return true;
 
-    return payload.exp * 1000 < Date.now();
+    return payload.exp * 1000 < (Date.now() + SAFETY_MARGIN);
   }
 
   hasRememberMe(): boolean {
@@ -46,6 +47,5 @@ export class TokenService {
   deleteAccessToken(): void {
     document.cookie = 'access_token=; Max-Age=0; path=/';
   }
-
 
 }

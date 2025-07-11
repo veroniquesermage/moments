@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from 'src/environments/environment';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {firstValueFrom} from 'rxjs';
@@ -22,10 +22,7 @@ export class IdeaService {
     const idEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${idEnc}`;
     try {
-      const ideas = await firstValueFrom(this.http.get<GiftIdeasResponse[]>(url, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const ideas = await firstValueFrom(this.http.get<GiftIdeasResponse[]>(url));
       return {success: true, data: ideas};
     } catch (error) {
       console.error('[IdeaService] Erreur lors de la récupération des idées', error);
@@ -35,10 +32,7 @@ export class IdeaService {
 
   async createIdeas(giftIdeaCreate: GiftIdeaCreate): Promise<ApiResponse<GiftIdeasResponse>> {
     try {
-      const giftIdeaResponse = await firstValueFrom(this.http.post<GiftIdeasResponse>(this.apiUrl, giftIdeaCreate, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const giftIdeaResponse = await firstValueFrom(this.http.post<GiftIdeasResponse>(this.apiUrl, giftIdeaCreate));
 
       return {success: true, data: giftIdeaResponse};
 
@@ -54,10 +48,7 @@ export class IdeaService {
     const url = `${this.apiUrl}/${idEnc}`;
 
     try {
-      await firstValueFrom(this.http.patch<void>(url, {visibility}, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      await firstValueFrom(this.http.patch<void>(url, {visibility}));
 
       return {success: true, data: 'ok' };
     } catch (error) {
@@ -71,10 +62,7 @@ export class IdeaService {
     const url = `${this.apiUrl}/${idEnc}`;
 
     try {
-      const result = await firstValueFrom(this.http.post<GiftIdeasResponse>(url, {newDestId}, {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      const result = await firstValueFrom(this.http.post<GiftIdeasResponse>(url, {newDestId}));
 
       return {success: true, data: result };
     } catch (error) {
@@ -88,25 +76,11 @@ export class IdeaService {
     const url = `${this.apiUrl}/${idEnc}`;
 
     try {
-      await firstValueFrom(this.http.delete<void>(url,{
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }));
+      await firstValueFrom(this.http.delete<void>(url));
       return {success: true, data: 'ok' };
     } catch (error) {
       console.error('[IdeaService] Erreur lors de la suppression de l\'idée', error);
       return {success: false, message: "❌ Impossible de supprimer l'idée."};
     }
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const headersConfig: { [key: string]: string } = {};
-
-    const currentGroupId = this.groupContextService.getGroupId();
-    if (currentGroupId) {
-      headersConfig['X-Group-Id'] = currentGroupId.toString();
-    }
-
-    return new HttpHeaders(headersConfig);
   }
 }
