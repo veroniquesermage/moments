@@ -5,13 +5,15 @@ import {LoadingComponent} from 'src/shared/components/loading/loading.component'
 import {GroupService} from 'src/core/services/group.service';
 import {FormsModule} from '@angular/forms';
 import {LoginRequest} from 'src/security/model/login-request.model';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
-  imports: [CommonModule, LoadingComponent, FormsModule],
+  imports: [CommonModule, LoadingComponent, FormsModule, TerminalModalComponent],
 })
 export class WelcomeComponent {
 
@@ -25,10 +27,12 @@ export class WelcomeComponent {
   passwordError = '';
 
 
-  constructor(public auth: AuthService, public groupeService: GroupService) {
+  constructor(public auth: AuthService,
+              public groupeService: GroupService,
+              public errorService: ErrorService) {
   }
 
-  submitEmailPassword(): void {
+  async submitEmailPassword(): Promise<void> {
     this.auth.rememberMe.set(this.stayLoggedIn);
     const credentials: LoginRequest = {
       email: this.email ?? '',
@@ -36,7 +40,10 @@ export class WelcomeComponent {
       rememberMe: this.stayLoggedIn
     };
 
-    this.auth.loginWithCredentials(credentials);
+    const result = await this.auth.loginWithCredentials(credentials);
+    if (!result.success) {
+      this.errorService.showError(result.message);
+    }
   }
 
 

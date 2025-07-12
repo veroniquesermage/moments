@@ -7,6 +7,9 @@ import {JwtResponse} from 'src/security/model/jwt-response.model';
 import {firstValueFrom, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {LoginRequest} from 'src/security/model/login-request.model';
+import {RegisterRequest} from 'src/security/model/register-request.model';
+import {CheckUserRequest} from 'src/security/model/check-user-request.model';
+import {ApiResponse} from 'src/core/models/api-response.model';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -133,7 +136,55 @@ export class AuthService {
     return this.http.post<void>(`${this.baseUrl}/logout`, null);
   }
 
-  loginWithCredentials(credentials: LoginRequest) {
+  async loginWithCredentials(credentials: LoginRequest): Promise<ApiResponse<void>> {
+    const checkPayload: CheckUserRequest = {
+      email: credentials.email,
+      isGoogleLogin: false
+    };
 
+    try {
+      await firstValueFrom(this.http.post<void>(`${this.baseUrl}/check-user`, checkPayload));
+    } catch (err: any) {
+      if (err.status === 404) {
+        const params = new URLSearchParams({
+          email: credentials.email,
+          password: credentials.password,
+          rememberMe: credentials.rememberMe ? 'true' : 'false'
+        });
+        await this.router.navigateByUrl(`/register?${params.toString()}`);
+        return {success: true, data: undefined};
+      }
+
+      const message = err.status === 409
+        ? '❌ Mauvais mode de connexion'
+        : '❌ Erreur de vérification utilisateur';
+      return {success: false, message};
+    }
+
+    try {
+      const data = await firstValueFrom(
+        this.http.post<JwtResponse>(`${this.baseUrl}/login`, credentials)
+      );
+      this.profile.set(data.profile);
+      this.isLoggedIn.set(true);
+      this.rememberMe.set(false);
+      return {success: true, data: undefined};
+    } catch (err) {
+      return {success: false, message: '❌ Email ou mot de passe invalide'};
+    }
+  }
+
+  async register(request: RegisterRequest): Promise<ApiResponse<void>> {
+    try {
+      const data = await firstValueFrom(
+        this.http.post<JwtResponse>(`${this.baseUrl}/register`, request)
+      );
+      this.profile.set(data.profile);
+      this.isLoggedIn.set(true);
+      this.rememberMe.set(false);
+      return {success: true, data: undefined};
+    } catch (err) {
+      return {success: false, message: '❌ Impossible de créer le compte'};
+    }
   }
 }
