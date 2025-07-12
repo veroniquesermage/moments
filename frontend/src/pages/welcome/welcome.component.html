@@ -1,12 +1,69 @@
 <div class="terminal">
   <h1>
-  <span class="bounce">🎁</span> Bienvenue sur List2Wish <span class="bounce">🎁</span>
+    <span class="bounce">🎁</span> Bienvenue sur (Moments) <span class="bounce">🎁</span>
   </h1>
 
-  <app-loading *ngIf="groupeService.isLoading()"/>
+  <app-loading *ngIf="groupeService.isLoading()"></app-loading>
+
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
-    <p class="command">> Veuillez vous connecter :</p>
-    <button (click)="auth.login()">Se connecter avec Google</button>
+    <p class="command-accueil">&gt; Veuillez vous connecter :</p>
+    <button class="google-btn" (click)="googleLogin()">Se connecter avec Google</button>
+
+    <div class="or-separator">OU</div>
+
+    <div class="login-form">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        [(ngModel)]="email"
+        autocomplete="username"
+        name="email"
+      />
+
+      <label for="password">Mot de passe</label>
+      <div class="password-wrapper">
+        <input
+          id="password"
+          [type]="showPassword() ? 'text' : 'password'"
+          [(ngModel)]="password"
+          (input)="onPasswordInput($event)"
+          name="password"
+          required
+          autocomplete="current-password"
+          [attr.aria-describedby]="passwordError ? 'password-error' : 'password-help'"
+        />
+        <button type="button" class="toggle-password" (click)="showPassword.set(!showPassword())">
+          {{ showPassword() ? '🙈 Masquer' : '👁 Afficher' }}
+        </button>
+      </div>
+
+      <div class="help-msg">
+        <span>🧠</span> <strong>8 caractères, une lettre, un chiffre.</strong><br />
+        <span class="subtle">Évitons “12345678”, le Sébou te regarde.</span>
+      </div>
+
+      <div class="checkbox-row">
+        <label>
+          <input type="checkbox" [(ngModel)]="stayLoggedIn" name="stayLoggedIn" />
+          Rester connecté (valable aussi pour Google)
+        </label>
+      </div>
+
+      <div class="sebou-alert">
+        <span class="intro">
+          <em>Dans chaque groupe sommeille un Sébou, créature sensible en guerre contre les surprises.</em>
+        </span>
+        <span class="middle">
+          Il fera tout pour deviner ce qu’on va lui offrir.
+        </span>
+        <span class="final">
+          Si vous hébergez un Sébou, ne cliquez pas, ne nourrissez pas le Sébou.
+        </span>
+      </div>
+
+      <button class="google-btn" (click)="submitEmailPassword()">Connexion / Création de compte</button>
+    </div>
   </div>
 
   <div *ngIf="auth.isLoggedIn() && !groupeService.isLoading()">
@@ -14,4 +71,3 @@
     <button (click)="auth.logout()">Se déconnecter</button>
   </div>
 </div>
-
