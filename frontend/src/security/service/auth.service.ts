@@ -6,6 +6,7 @@ import {User} from 'src/security/model/user.model';
 import {JwtResponse} from 'src/security/model/jwt-response.model';
 import {firstValueFrom, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {LoginRequest} from 'src/security/model/login-request.model';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -14,6 +15,8 @@ export class AuthService {
   // Signals centralisés
   profile = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
+  rememberMe = signal<boolean>(false);
+
   private baseUrl = `${environment.backendBaseUrl}${environment.api.auth}`;
 
   constructor(private http: HttpClient) {
@@ -61,10 +64,15 @@ export class AuthService {
     const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
     const url = this.baseUrl + environment.api.google
 
+    if (!codeVerifier) {
+      console.error('[Auth] Code verifier manquant dans le sessionStorage');
+      return;
+    }
+
     fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({code, codeVerifier, remember_me: false}),
+      body: JSON.stringify({code, codeVerifier, remember_me: this.rememberMe()}),
       credentials: 'include'
     })
       .then(res => res.json() as Promise<JwtResponse>) // 👈 typage ici
@@ -73,6 +81,7 @@ export class AuthService {
         if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
+          this.rememberMe.set(false);
         }
       })
       .catch(err => console.error('[Backend] Erreur :', err));
@@ -92,6 +101,7 @@ export class AuthService {
     await firstValueFrom(this.logoutRefreshToken());
     this.profile.set(null);
     this.isLoggedIn.set(false);
+    this.rememberMe.set(false);
     this.router.navigateByUrl('/');
   }
 
@@ -121,5 +131,9 @@ export class AuthService {
 
   logoutRefreshToken(): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/logout`, null);
+  }
+
+  loginWithCredentials(credentials: LoginRequest) {
+
   }
 }
