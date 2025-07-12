@@ -8,6 +8,6 @@ class UserSchema(CamelModel):
     nom: str
     prenom: str
     email: str
-    google_id: str
+    google_id: str | None = None
     date_creation: datetime
 

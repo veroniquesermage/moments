@@ -12,11 +12,18 @@ from app.core.jwt import create_access_token
 from app.core.logger import logger
 from app.models import RefreshToken
 from app.schemas import UserSchema
-from app.schemas.auth import GoogleAuthRequest, AuthResponse
+from app.schemas.auth import (
+    GoogleAuthRequest,
+    AuthResponse,
+    LoginRequest,
+    RegisterRequest,
+    CheckUserRequest,
+)
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.user_service import UserService
 from app.services.refresh_token_service import RefreshTokenService
 from app.utils.date_helper import now_paris
+from app.utils.password_helper import hash_password, verify_password
 
 
 class AuthService:
@@ -39,6 +46,43 @@ class AuthService:
         )
 
         return await AuthService.create_tokens(db, user, request.remember_me)
+
+    @staticmethod
+    async def authenticate_email_user(request: LoginRequest, db: AsyncSession) -> JSONResponse:
+        user = await UserService.get_user_by_email(db, request.email)
+        if not user or not user.password:
+            raise HTTPException(status_code=401, detail="❌ Email ou mot de passe invalide")
+        if not verify_password(request.password, user.password):
+            raise HTTPException(status_code=401, detail="❌ Email ou mot de passe invalide")
+        return await AuthService.create_tokens(db, user, request.remember_me)
+
+    @staticmethod
+    async def register_user(request: RegisterRequest, db: AsyncSession) -> JSONResponse:
+        hashed_password = hash_password(request.password) if request.password else None
+        user = await UserService.create_user(
+            db=db,
+            prenom=request.prenom,
+            nom=request.nom,
+            email=request.email,
+            google_id=request.google_id,
+            password=hashed_password,
+        )
+        response = await AuthService.create_tokens(db, user, request.remember_me)
+        response.status_code = 201
+        return response
+
+    @staticmethod
+    async def check_user(request: CheckUserRequest, db: AsyncSession) -> JSONResponse:
+        user = await UserService.get_user_by_email(db, request.email)
+        if not user:
+            return JSONResponse(status_code=404, content={"detail": "Utilisateur non trouvé"})
+        if request.is_google_login:
+            if user.google_id is None:
+                return JSONResponse(status_code=409, content={"detail": "Mauvais mode de connexion"})
+        else:
+            if user.password is None:
+                return JSONResponse(status_code=409, content={"detail": "Mauvais mode de connexion"})
+        return JSONResponse(status_code=200, content={})
 
     @staticmethod
     async def create_tokens(db: AsyncSession, user: UserSchema, remember_me: bool) -> JSONResponse:
