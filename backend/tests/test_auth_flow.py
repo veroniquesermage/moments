@@ -2,7 +2,6 @@ import os
 import sys
 import asyncio
 
-# Configuration for Settings before any app import
 os.environ['GOOGLE_CLIENT_ID'] = 'test'
 os.environ['GOOGLE_CLIENT_SECRET'] = 'test'
 os.environ['GOOGLE_REDIRECT_URI'] = 'http://localhost'
@@ -21,13 +20,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.database import Base, get_db
-from app.dependencies.current_user import get_current_user_from_cookie
-from app.models import User
 
-# Create an isolated in-memory database for the tests
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 engine = create_async_engine(
-    TEST_DATABASE_URL,
+    os.environ['DATABASE_URL'],
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
@@ -47,16 +42,30 @@ async def override_get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-async def override_get_current_user_from_cookie():
-    return User(id=1, email="user@example.com", prenom="Test", nom="User", google_id="1")
-
 app.dependency_overrides[get_db] = override_get_db
-app.dependency_overrides[get_current_user_from_cookie] = override_get_current_user_from_cookie
 
 client = TestClient(app)
 
 
-def test_get_group_not_found():
-    response = client.get("/groupe/999")
+def test_check_user_not_found():
+    response = client.post('/api/auth/check-user', json={'email': 'a@b.com', 'isGoogleLogin': False})
     assert response.status_code == 404
+
+
+def test_register_and_login():
+    reg_payload = {
+        'prenom': 'John',
+        'nom': 'Doe',
+        'email': 'john@example.com',
+        'password': 'secret',
+        'rememberMe': True,
+    }
+    response = client.post('/api/auth/register', json=reg_payload)
+    assert response.status_code == 201
+
+    bad = client.post('/api/auth/login', json={'email': 'john@example.com', 'password': 'wrong', 'rememberMe': False})
+    assert bad.status_code == 401
+
+    good = client.post('/api/auth/login', json={'email': 'john@example.com', 'password': 'secret', 'rememberMe': True})
+    assert good.status_code == 200
 

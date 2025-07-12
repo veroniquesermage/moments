@@ -46,3 +46,39 @@ class UserService:
         return UserSchema.model_validate(user)
 
 
+
+    @staticmethod
+    async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+        return user
+
+    @staticmethod
+    async def create_user(
+            db: AsyncSession,
+            prenom: str,
+            nom: str,
+            email: str | None = None,
+            google_id: str | None = None,
+            password: str | None = None,
+    ) -> UserSchema:
+        new_user = User(
+            email=email,
+            prenom=prenom,
+            nom=nom,
+            google_id=google_id,
+            password=password,
+        )
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+
+        await TraceService.record_trace(
+            db,
+            f"{prenom} {nom}",
+            "USER_CREATED",
+            "Creation d'un nouvel utilisateur",
+            {"user_id": new_user.id, "email": email},
+        )
+
+        return UserSchema.model_validate(new_user)

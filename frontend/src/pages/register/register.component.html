@@ -1,0 +1,32 @@
+<div class="form-container">
+  <h1>> Création de compte</h1>
+  <form (ngSubmit)="submit()">
+    <label for="prenom">Prénom</label>
+    <input id="prenom" type="text" [(ngModel)]="prenom" name="prenom" required>
+
+    <label for="nom">Nom</label>
+    <input id="nom" type="text" [(ngModel)]="nom" name="nom" required>
+
+    <label *ngIf="email !== null" for="email">Email</label>
+    <input *ngIf="email !== null" id="email" type="email" [(ngModel)]="email" name="email" [readonly]="true">
+
+    <label *ngIf="password !== null" for="password">Mot de passe</label>
+    <input *ngIf="password !== null" id="password" type="password" [(ngModel)]="password" name="password" required>
+
+    <div class="checkbox-row">
+      <label>
+        <input type="checkbox" [(ngModel)]="stayLoggedIn" name="stayLoggedIn"> Rester connecté
+      </label>
+    </div>
+
+    <button type="submit" class="google-btn">Créer mon compte</button>
+  </form>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>
+<app-feedback-test [composant]="composant"></app-feedback-test>
