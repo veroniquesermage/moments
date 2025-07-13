@@ -1,5 +1,5 @@
 import {Component, signal} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {AuthService} from 'src/security/service/auth.service';
 import {LoadingComponent} from 'src/shared/components/loading/loading.component';
 import {GroupService} from 'src/core/services/group.service';
@@ -11,7 +11,7 @@ import {LoginRequest} from 'src/security/model/login-request.model';
   standalone: true,
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
-  imports: [CommonModule, LoadingComponent, FormsModule],
+  imports: [CommonModule, LoadingComponent, FormsModule, NgOptimizedImage],
 })
 export class WelcomeComponent {
 
