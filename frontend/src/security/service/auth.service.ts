@@ -75,13 +75,16 @@ export class AuthService {
       body: JSON.stringify({code, codeVerifier, remember_me: this.rememberMe()}),
       credentials: 'include'
     })
-      .then(res => res.json() as Promise<JwtResponse>) // 👈 typage ici
-      .then(data => {
+      .then(res => res.json() as Promise<JwtResponse>)
+      .then(async data => {
         console.log('[Backend] Réponse reçue :', data);
-        if (data?.profile) {
+        if (data?.isNewUser && data?.profile) {
+          this.profile.set(data.profile);
+          this.rememberMe.set(false);
+          void this.router.navigate(['/auth/initialiser']);
+        } else if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
-          this.rememberMe.set(false);
         }
       })
       .catch(err => console.error('[Backend] Erreur :', err));
@@ -131,6 +134,21 @@ export class AuthService {
 
   logoutRefreshToken(): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/logout`, null);
+  }
+
+  async completeProfile(givenName: string, familyName: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/auth/complete-profile`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({givenName, familyName})
+    });
+    if (!res.ok) {
+      throw new Error("Échec de la mise à jour du profil");
+    }
+    const data: User = await res.json();
+    this.profile.set(data);
+    this.isLoggedIn.set(true);
   }
 
   loginWithCredentials(credentials: LoginRequest) {

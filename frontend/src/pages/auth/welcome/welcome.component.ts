@@ -58,7 +58,6 @@ export class WelcomeComponent {
     return this.passwordRegex.test(password);
   }
 
-
   googleLogin() {
     this.auth.rememberMe.set(this.stayLoggedIn);
     this.auth.login();
