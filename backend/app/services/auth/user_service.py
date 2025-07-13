@@ -1,21 +1,29 @@
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import HTTPException
+
 from app.core.logger import logger
 from app.models.user import User
 from app.schemas import UserSchema
+from app.schemas.auth import CompleteProfileRequest
 from app.services.trace_service import TraceService
 
 
 class UserService:
 
     @staticmethod
-    async def get_or_create_user(db: AsyncSession, email: str, prenom: str, nom: str, google_id: str) -> UserSchema:
+    async def get_or_create_user(
+            db: AsyncSession,
+            email: str,
+            prenom: str,
+            nom: str,
+            google_id: str
+    ) -> tuple[UserSchema, bool]:
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
 
         if user:
-            return UserSchema.model_validate(user)
+            return UserSchema.model_validate(user), False
 
         new_user = User(email=email, prenom=prenom, nom=nom, google_id=google_id)
         db.add(new_user)
@@ -30,7 +38,7 @@ class UserService:
             {"user_id": new_user.id, "email": email},
         )
 
-        return UserSchema.model_validate(new_user)
+        return UserSchema.model_validate(new_user), True
 
 
     @staticmethod
@@ -44,5 +52,33 @@ class UserService:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
 
         return UserSchema.model_validate(user)
+
+    @staticmethod
+    async def complete_user( db: AsyncSession, user_id: int, request: CompleteProfileRequest) -> UserSchema:
+
+        result = await db.execute(select(User).where(User.id == user_id))
+        existing: User = result.scalars().first()
+
+        if not existing:
+            raise HTTPException(status_code=404, detail="❌ Utilisateur non trouvé")
+
+        old_name = existing.nom
+        old_given_name = existing.prenom
+
+        existing.nom = request.family_name
+        existing.prenom = request.given_name
+
+        await TraceService.record_trace(
+            db,
+            f"{existing.nom} {existing.prenom}",
+            "USER_COMPLETE",
+            "Complétion d'un nouvel utilisateur",
+            {"user_id": user_id, "email": existing.email, "ancien_prenom": old_given_name, "ancien_nom": old_name},
+        )
+
+        await db.commit()
+        await db.refresh(existing)
+
+        return UserSchema.model_validate(existing)
 
 

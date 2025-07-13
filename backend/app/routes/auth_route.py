@@ -2,8 +2,11 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
+from app.dependencies.current_user import get_current_user_from_cookie
 from app.main import get_db
-from app.schemas.auth import GoogleAuthRequest
+from app.models import User
+from app.schemas import UserSchema
+from app.schemas.auth import GoogleAuthRequest, CompleteProfileRequest
 from app.services.auth.auth_service import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])
@@ -28,3 +31,11 @@ async def logout(
         db: AsyncSession = Depends(get_db)
 ):
     return await AuthService.logout(db, request)
+
+@router.patch("/complete-profile", status_code=200)
+async def complete_profile(
+        request: CompleteProfileRequest,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+) -> UserSchema:
+    return await AuthService.complete_profile(db, current_user, request)

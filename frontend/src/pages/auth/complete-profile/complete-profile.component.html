@@ -1,0 +1,41 @@
+<div class="terminal">
+  <h1> Merci de compléter votre profil.</h1>
+
+  <div class="login-form" *ngIf="user">
+    <label for="email">Email</label>
+    <p>{{user!.email}}</p>
+
+    <label for="givenName">Prénom</label>
+    <input
+      id="givenName"
+      [(ngModel)]="givenName"
+      type="text"
+      required
+      [attr.aria-describedby]="givenName"
+    />
+
+    <label for="familyName">Nom</label>
+    <input
+      id="familyName"
+      [(ngModel)]="familyName"
+      type="text"
+      required
+      [attr.aria-describedby]="familyName"
+    />
+    <div class="options">
+      <button (click)="submitName()">💾 Valider vos informations</button>
+    </div>
+  </div>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+
+</div>
+
+<app-feedback-test
+  [composant]="composant">
+</app-feedback-test>

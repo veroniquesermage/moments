@@ -10,9 +10,9 @@ from app.core.config import settings
 from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
 from app.core.logger import logger
-from app.models import RefreshToken
+from app.models import RefreshToken, User
 from app.schemas import UserSchema
-from app.schemas.auth import GoogleAuthRequest, AuthResponse
+from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.user_service import UserService
 from app.services.refresh_token_service import RefreshTokenService
@@ -30,7 +30,7 @@ class AuthService:
 
         payload = await verify_google_id_token(token_data["id_token"])
 
-        user = await UserService.get_or_create_user(
+        user, is_new_user = await UserService.get_or_create_user(
             db=db,
             email=payload["email"],
             prenom=payload.get("given_name", ""),
@@ -38,10 +38,10 @@ class AuthService:
             google_id=payload["sub"]
         )
 
-        return await AuthService.create_tokens(db, user, request.remember_me)
+        return await AuthService.create_tokens(db, user, request.remember_me, is_new_user)
 
     @staticmethod
-    async def create_tokens(db: AsyncSession, user: UserSchema, remember_me: bool) -> JSONResponse:
+    async def create_tokens(db: AsyncSession, user: UserSchema, remember_me: bool, is_new_user=False) -> JSONResponse:
 
         jti = str(uuid4())
         refresh_payload = {
@@ -57,7 +57,7 @@ class AuthService:
         access_token = create_access_token(data={"sub": str(user.id)}, expires_at=access_token_duration)
 
         # Création de la réponse JSON avec cookies
-        content = jsonable_encoder(AuthResponse(profile=user))
+        content = jsonable_encoder(AuthResponse(profile=user, is_new_user=is_new_user))
         response = JSONResponse(content=content)
         if remember_me:
             response.set_cookie(
@@ -127,3 +127,11 @@ class AuthService:
         response.delete_cookie(key="access_token", path="/")
         response.delete_cookie(key="refresh_token", path="/")
         return response
+
+    @staticmethod
+    async def complete_profile( db: AsyncSession, current_user: User, request: CompleteProfileRequest) -> UserSchema:
+
+        logger.info(f"Completion du nouvel utilisateur {current_user.id}")
+        return await UserService.complete_user(db, current_user.id, request)
+
+
