@@ -7,7 +7,12 @@
 
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
     <p class="command-accueil">&gt; Veuillez vous connecter :</p>
-    <button class="google-btn" (click)="googleLogin()">Se connecter avec Google</button>
+    <div class="google-btn">
+      <button class="google-signin-btn" (click)="googleLogin()">
+        <img ngSrc="assets/web_neutral_sq_na.svg" alt="Google logo" width="39" height="39"/>
+        <span>Connexion avec Google</span>
+      </button>
+    </div>
 
     <div class="or-separator">OU</div>
 
@@ -62,7 +67,8 @@
         </span>
       </div>
 
-      <button class="google-btn" (click)="submitEmailPassword()">Connexion / Création de compte</button>
+      <button class="options-wlc" (click)="submitEmailPassword()">✍️ Connexion / Création de compte</button>
+
     </div>
   </div>
 

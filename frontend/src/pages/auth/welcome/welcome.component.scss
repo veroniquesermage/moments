@@ -6,8 +6,15 @@
   text-align: center;
 }
 
-/* Bouton Google + Bouton Email/Mdp */
+/* Bouton Google */
 .google-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Bouton Email/Mdp */
+.options-wlc {
   display: block;
   width: 100%;
   max-width: 500px;
@@ -25,10 +32,35 @@
   letter-spacing: 0.02em;
 }
 
-.google-btn:hover,
+.options-wlc:hover,
 .terminal-btn:hover {
   background-color: var(--color-border);
   color: var(--color-bg);
+}
+
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  background-color: #F2F2F2;
+  border-radius: 4px;
+
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1F1F1F;
+
+  height: 40px;
+  padding: 0 16px;
+  cursor: pointer;
+
+  transition: box-shadow 0.2s ease;
+}
+
+.google-signin-btn:hover {
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
 }
 
 .or-separator {
