@@ -51,7 +51,7 @@ export class GroupMemberGiftsComponent implements OnInit {
   }
 
   onGiftClicked(gift: GiftPublicResponse): void {
-    this.router.navigate(['/dashboard/cadeau', gift.id], {
+    void this.router.navigate(['/dashboard/cadeau', gift.id], {
       queryParams: { context: 'cadeaux-groupe' }
     });
   }
@@ -59,7 +59,7 @@ export class GroupMemberGiftsComponent implements OnInit {
   retour() {
     this.selectedMember = undefined;
     this.giftService.clearGifts();
-    this.router.navigate(['/dashboard']);
+    void this.router.navigate(['/dashboard']);
   }
 
   async selectMember(user: UserDisplay) {

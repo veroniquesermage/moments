@@ -80,7 +80,7 @@ export class GiftSharingComponent implements OnInit {
   }
 
   retourEnArriere(){
-    this.router.navigate(['/dashboard/cadeau', this.idGift], {
+    void this.router.navigate(['/dashboard/cadeau', this.idGift], {
       queryParams: { context: this.contextBrut }
     });
   }

@@ -32,11 +32,11 @@ export class StartupService {
 
       } catch (error) {
         this.tokenService.clear();
-        this.router.navigate(['/']);
+        void this.router.navigate(['/']);
       }
     } else {
       this.tokenService.clear();
-      this.router.navigate(['/']);
+      void this.router.navigate(['/']);
     }
   }
 

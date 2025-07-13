@@ -36,13 +36,13 @@ export class GiftDetailPageComponent {
 
   handleBack(): void {
     if (this.context === 'mes-cadeaux') {
-      this.router.navigate(['/dashboard/mes-cadeaux']);
+      void this.router.navigate(['/dashboard/mes-cadeaux']);
     } else if (this.context === 'cadeaux-groupe') {
-      this.router.navigate(['/dashboard/leurs-cadeaux']);
+      void this.router.navigate(['/dashboard/leurs-cadeaux']);
     } else if (this.context === 'suivi') {
-      this.router.navigate(['/dashboard/cadeaux-suivis']);
+      void this.router.navigate(['/dashboard/cadeaux-suivis']);
     } else {
-      this.router.navigate(['/dashboard']);
+      void this.router.navigate(['/dashboard']);
     }
   }
 

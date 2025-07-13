@@ -55,7 +55,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
   }
 
   back(){
-    this.router.navigate(['/dashboard/cadeaux-suivis']);
+    void this.router.navigate(['/dashboard/cadeaux-suivis']);
   }
 
   async changeStatus(){
@@ -68,7 +68,7 @@ export class GiftFollowUpDetailComponent implements OnInit{
   }
 
   addDeliver(){
-    this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftId]);
+    void this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftId]);
   }
 
   async confirmReception() {
@@ -100,6 +100,6 @@ export class GiftFollowUpDetailComponent implements OnInit{
 
 
   cancel(){
-    this.router.navigate(['/dashboard/cadeaux-suivis']);
+    void this.router.navigate(['/dashboard/cadeaux-suivis']);
   }
 }
