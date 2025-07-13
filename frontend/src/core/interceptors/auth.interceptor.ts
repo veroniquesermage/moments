@@ -44,7 +44,7 @@ export class AuthInterceptor implements HttpInterceptor {
             // 3) si le refresh échoue, on logout
             catchError(innerErr => {
               this.tokenService.clear();
-              this.router.navigate(['/']);
+              void this.router.navigate(['/']);
               return throwError(() => innerErr);
             })
           );

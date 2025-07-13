@@ -81,34 +81,34 @@ export class GiftDetailComponent implements OnInit{
   }
 
   modifier(): void {
-    this.router.navigate(['/dashboard/mes-cadeaux/modifier', this.giftDetail.gift.id]);
+    void this.router.navigate(['/dashboard/mes-cadeaux/modifier', this.giftDetail.gift.id]);
   }
 
   modifierIdee():void {
-    this.router.navigate(['/dashboard/idees/modifier', this.giftDetail.gift.id]);
+    void this.router.navigate(['/dashboard/idees/modifier', this.giftDetail.gift.id]);
   }
 
   gererLivraison(): void {
-    this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftDetail.gift.id]);
+    void this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftDetail.gift.id]);
   }
 
   gererPartage(): void {
-    this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
+    void this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
       queryParams: { context: 'suivi' }
     });
   }
 
   retour(): void {
     if (this.context === 'mes-cadeaux') {
-      this.router.navigate(['/dashboard/mes-cadeaux']);
+      void this.router.navigate(['/dashboard/mes-cadeaux']);
     } else if (this.context === 'cadeaux-groupe') {
-      this.router.navigate(['/dashboard/leurs-cadeaux']);
+      void this.router.navigate(['/dashboard/leurs-cadeaux']);
     } else if (this.context === 'suivi') {
-      this.router.navigate(['/dashboard/cadeaux-suivis']);
+      void this.router.navigate(['/dashboard/cadeaux-suivis']);
     } else if (this.context === 'idee-cadeau') {
-      this.router.navigate(['/dashboard/idees']);
+      void this.router.navigate(['/dashboard/idees']);
     } else {
-      this.router.navigate(['/dashboard']);
+      void this.router.navigate(['/dashboard']);
     }
   }
 
@@ -169,7 +169,7 @@ export class GiftDetailComponent implements OnInit{
       this.pendingAction = undefined;
       this.showModal = false;
     } else if (eventName === ModalActionType.PARTAGE) {
-      this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
+      void this.router.navigate(['/dashboard/partage', this.giftDetail.gift.id], {
         queryParams: { context: 'cadeaux-groupe' }
       });
     } else if (eventName === ModalActionType.BACK_TO_LIST) {

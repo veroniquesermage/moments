@@ -92,7 +92,7 @@ export class GiftDeliverComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/dashboard/cadeaux-suivis']);
+    void this.router.navigate(['/dashboard/cadeaux-suivis']);
   }
 
   sanitizeDecimal(event: Event, key: string): void {

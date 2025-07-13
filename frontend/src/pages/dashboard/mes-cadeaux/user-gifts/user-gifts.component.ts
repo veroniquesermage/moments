@@ -26,16 +26,16 @@ export class UserGiftsComponent implements OnInit{
   }
 
   goToAjout(): void {
-    this.router.navigate(['/dashboard/mes-cadeaux/creer']);
+    void this.router.navigate(['/dashboard/mes-cadeaux/creer']);
   }
 
   onGiftClicked(gift: GiftResponse): void {
-    this.router.navigate(['/dashboard/cadeau', gift.id], {
+    void this.router.navigate(['/dashboard/cadeau', gift.id], {
       queryParams: { context: 'mes-cadeaux' }
     });
   }
 
   return() {
-    this.router.navigate(['/dashboard']);
+    void this.router.navigate(['/dashboard']);
   }
 }
