@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta, datetime
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -16,6 +17,7 @@ from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest, RegisterRequest
 from app.schemas.auth.login_request import LoginRequest
 from app.services.auth.google_auth_service import exchange_code_for_tokens
+from app.services.auth.login_attempt_service import LoginAttemptService
 from app.services.auth.user_service import UserService
 from app.services.mailing.mail_service import MailService
 from app.services.token_service import TokenService
@@ -177,5 +179,22 @@ class AuthService:
 
         return await AuthService.create_tokens(db, user, remember_me, True)
 
+    @staticmethod
+    async def login_with_credentials( request: LoginRequest, db: AsyncSession):
 
+        if await LoginAttemptService.is_blocked(db, request.email):
+            raise HTTPException(status_code=403, detail="Compte bloqué.")
 
+        user: User = await UserService.get_user_by_mail(db, request.email)
+        if not user:
+            await asyncio.sleep(1)  # Pour égaliser avec le temps de vérif du hash
+            raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+
+        matching_password: bool = PasswordUtils.verify_password(request.password, user.password)
+
+        if not matching_password:
+            await LoginAttemptService.increment_attempt(db, request.email)
+            raise HTTPException(status_code=401, detail="Mauvais mot de passe.")
+
+        await LoginAttemptService.reset_attempts(db, request.email)
+        return await AuthService.create_tokens(db, UserSchema.model_validate(user), request.remember_me, False)

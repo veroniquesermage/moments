@@ -19,6 +19,13 @@ async def authenticate_with_google(
 ) -> JSONResponse:
     return await AuthService.authenticate_google_user(request, db)
 
+@router.post("/credentials", status_code=200)
+async def login_with_credentials(
+        request: LoginRequest,
+        db: AsyncSession = Depends(get_db)
+) -> JSONResponse:
+    return await AuthService.login_with_credentials(request, db)
+
 @router.post("/register-credentials", status_code=200)
 async def authenticate_with_credentials(
         request: RegisterRequest,
