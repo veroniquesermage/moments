@@ -22,8 +22,10 @@
         id="email"
         type="email"
         [(ngModel)]="email"
+        (input)="onEmailInput($event)"
         autocomplete="username"
         name="email"
+        [attr.aria-describedby]="emailError ? 'email-error' : 'email-help'"
       />
 
       <label for="password">Mot de passe</label>
@@ -67,13 +69,15 @@
         </span>
       </div>
 
-      <button class="options-wlc" (click)="submitEmailPassword()">✍️ Connexion / Création de compte</button>
+      <button class="options-wlc" (click)="loginWithCredentials()">🔑 Connexion</button>
+      <button class="options-wlc" (click)="registerWithCredentials()">✍️ Création de compte</button>
 
     </div>
   </div>
-
-  <div *ngIf="auth.isLoggedIn() && !groupeService.isLoading()">
-    <p>Connecté en tant que : {{ auth.profile()?.email }}</p>
-    <button (click)="auth.logout()">Se déconnecter</button>
-  </div>
 </div>
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>

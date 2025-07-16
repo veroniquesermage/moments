@@ -1,5 +1,6 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
@@ -12,11 +13,14 @@ from app.core.jwt import create_access_token
 from app.core.logger import logger
 from app.models import RefreshToken, User
 from app.schemas import UserSchema
-from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest
+from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest, RegisterRequest
+from app.schemas.auth.login_request import LoginRequest
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.user_service import UserService
-from app.services.refresh_token_service import RefreshTokenService
-from app.utils.date_helper import now_paris
+from app.services.mailing.mail_service import MailService
+from app.services.token_service import TokenService
+from app.utils.date_helper import now_paris, is_expired
+from app.utils.password_utils import PasswordUtils
 
 
 class AuthService:
@@ -50,8 +54,8 @@ class AuthService:
             "remember_me": remember_me
         }
 
-        refresh_token_stored: RefreshToken = await RefreshTokenService.store_refresh_token(db, user.id, jti)
-        refresh_token = RefreshTokenService.create_refresh_token(refresh_payload, refresh_token_stored.expires_at)
+        refresh_token_stored: RefreshToken = await TokenService.store_refresh_token(db, user.id, jti)
+        refresh_token = TokenService.create_refresh_token(refresh_payload, refresh_token_stored.expires_at)
 
         access_token_duration = now_paris() + timedelta(minutes=30)
         access_token = create_access_token(data={"sub": str(user.id)}, expires_at=access_token_duration)
@@ -95,14 +99,14 @@ class AuthService:
 
         token = request.cookies.get("refresh_token")
 
-        payload = RefreshTokenService.decode_refresh_token(token)
+        payload = TokenService.decode_refresh_token(token)
         user_id: int = int(payload.get("sub"))
         jti: str = payload.get("jti")
         remember_me: bool = payload.get("remember_me")
 
-        if await RefreshTokenService.is_refresh_token_valid(db, jti, user_id):
+        if await TokenService.is_refresh_token_valid(db, jti, user_id):
             user = await UserService.get_user_by_id(db, int(user_id))
-            await RefreshTokenService.revoke_refresh_token(db, jti, user_id)
+            await TokenService.revoke_refresh_token(db, jti, user_id)
 
             return await AuthService.create_tokens(
                 db, UserSchema.model_validate(user), remember_me
@@ -116,10 +120,10 @@ class AuthService:
         token = request.cookies.get("refresh_token")
         if token:
             try:
-                payload = RefreshTokenService.decode_refresh_token(token)
+                payload = TokenService.decode_refresh_token(token)
                 user_id: int = int(payload.get("sub"))
                 jti: str = payload.get("jti")
-                await RefreshTokenService.revoke_refresh_token(db, jti, user_id)
+                await TokenService.revoke_refresh_token(db, jti, user_id)
             except Exception:
                 pass
 
@@ -129,9 +133,49 @@ class AuthService:
         return response
 
     @staticmethod
-    async def complete_profile( db: AsyncSession, current_user: User, request: CompleteProfileRequest) -> UserSchema:
+    async def complete_profile(
+            db: AsyncSession,
+            current_user: User,
+            request: CompleteProfileRequest) -> UserSchema:
 
         logger.info(f"Completion du nouvel utilisateur {current_user.id}")
         return await UserService.complete_user(db, current_user.id, request)
+
+    @staticmethod
+    async def check_mail(db: AsyncSession, login_request: LoginRequest):
+        mail_valid: bool = await UserService.ensure_mail_available(db, login_request.email)
+
+        if mail_valid :
+            password = PasswordUtils.hash_password(login_request.password)
+
+            token = TokenService.generate_signup_token(login_request.email, password, login_request.rememberMe)
+
+            await MailService.send_validation_email(db, login_request.email, token)
+
+    @staticmethod
+    async def authenticate_credentials_user(request: RegisterRequest, db: AsyncSession) -> JSONResponse:
+        try:
+            token_data = TokenService.decode_signup_token(request.token)
+        except Exception:
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        expire: datetime = datetime.fromtimestamp(token_data["exp"], tz=ZoneInfo("Europe/Paris"))
+
+        if is_expired(expire) :
+            raise HTTPException(status_code=401, detail="Token expiré.")
+
+        email = token_data["sub"]
+        password = token_data["hashed_pw"]
+        remember_me = token_data["remember_me"]
+        user = await UserService.create_user(
+            db=db,
+            email=email,
+            prenom=request.prenom,
+            nom=request.nom,
+            password=password
+        )
+
+        return await AuthService.create_tokens(db, user, remember_me, True)
+
 
 

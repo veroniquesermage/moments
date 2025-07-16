@@ -10,20 +10,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.logger import logger
 from app.models import RefreshToken
-from app.utils.date_helper import is_expired
+from app.utils.date_helper import is_expired, now_paris
 
 
-class RefreshTokenService:
+class TokenService:
 
     SECRET_KEY = settings.jwt_secret
     ALGORITHM = "HS256"
     TZ = ZoneInfo("Europe/Paris")
+    EXPIRATION_MINUTES = 30
 
     @staticmethod
     def create_refresh_token(data: dict, expires_at: datetime) -> str:
         to_encode = data.copy()
         to_encode.update({"exp": expires_at})
-        encoded_jwt = jwt.encode(to_encode, RefreshTokenService.SECRET_KEY, algorithm=RefreshTokenService.ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
         return encoded_jwt
 
     @staticmethod
@@ -34,7 +35,7 @@ class RefreshTokenService:
     ) -> RefreshToken:
 
         logger.info(f"Enregistrement refresh token pour l'utilisateur {user_id}")
-        expires_at: datetime = (datetime.now(RefreshTokenService.TZ) +
+        expires_at: datetime = (datetime.now(TokenService.TZ) +
                                 (timedelta(days=30)))
 
         logger.info(f"Date d'expiration pour le refresh_token {expires_at}")
@@ -106,8 +107,19 @@ class RefreshTokenService:
             payload = jwt.decode(
                 token,
                 settings.jwt_secret,
-                algorithms=[RefreshTokenService.ALGORITHM]
+                algorithms=[TokenService.ALGORITHM]
             )
             return payload
         except JWTError:
             raise HTTPException(status_code=401, detail="❌ Token corrompu ou expiré")
+
+
+    @staticmethod
+    def generate_signup_token(email: str, hashed_pw: str, remember_me: bool) -> str:
+        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES)
+        to_encode = {"sub": email, "hashed_pw": hashed_pw, "remember_me": remember_me, "exp": exp}
+        return jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
+
+    @staticmethod
+    def decode_signup_token(token: str) -> dict:
+        return jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])

@@ -5,13 +5,16 @@ import {LoadingComponent} from 'src/shared/components/loading/loading.component'
 import {GroupService} from 'src/core/services/group.service';
 import {FormsModule} from '@angular/forms';
 import {LoginRequest} from 'src/security/model/login-request.model';
+import {Router} from '@angular/router';
+import {ErrorService} from 'src/core/services/error.service';
+import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
-  imports: [CommonModule, LoadingComponent, FormsModule, NgOptimizedImage],
+  imports: [CommonModule, LoadingComponent, FormsModule, NgOptimizedImage, TerminalModalComponent],
 })
 export class WelcomeComponent {
 
@@ -21,24 +24,23 @@ export class WelcomeComponent {
   stayLoggedIn: boolean = false;
   // entre 8 et 128 caractères, au moins 1 lettre et 1 chiffre
   passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,128}$/;
+  emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   passwordTouched = false;
   passwordError = '';
+  emailTouched = false;
+  emailError = '';
 
-
-  constructor(public auth: AuthService, public groupeService: GroupService) {
+  constructor(
+    public auth: AuthService,
+    public groupeService: GroupService,
+    public errorService: ErrorService,
+    private router: Router) {
   }
 
-  submitEmailPassword(): void {
+  googleLogin() {
     this.auth.rememberMe.set(this.stayLoggedIn);
-    const credentials: LoginRequest = {
-      email: this.email ?? '',
-      password: this.password ?? '',
-      rememberMe: this.stayLoggedIn
-    };
-
-    this.auth.loginWithCredentials(credentials);
+    this.auth.login();
   }
-
 
   onPasswordInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -54,13 +56,42 @@ export class WelcomeComponent {
     }
   }
 
+  onEmailInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+
+    this.emailTouched = true;
+    this.email = value;
+
+    if (!this.isEmailValid(value)) {
+      this.emailError = 'Le format de l\'email est erronné.';
+    } else {
+      this.emailError = '';
+    }
+  }
+
   isPasswordValid(password: string): boolean {
     return this.passwordRegex.test(password);
   }
 
-  googleLogin() {
-    this.auth.rememberMe.set(this.stayLoggedIn);
-    this.auth.login();
+  isEmailValid(email: string): boolean {
+    return this.emailRegex.test(email);
+  }
+
+  loginWithCredentials() {
+
+  }
+
+  async registerWithCredentials() {
+    const credentials: LoginRequest = {
+      email: this.email,
+      password: this.password,
+      rememberMe: this.stayLoggedIn
+    };
+    const result = await this.auth.checkMail(credentials);
+    if (!result.success) {
+      this.errorService.showError(result.message);
+    }
   }
 }
 

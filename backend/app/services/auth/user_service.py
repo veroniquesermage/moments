@@ -40,6 +40,35 @@ class UserService:
 
         return UserSchema.model_validate(new_user), True
 
+    @staticmethod
+    async def create_user(
+            db: AsyncSession,
+            email: str,
+            prenom: str,
+            nom: str,
+            password: str
+    ) -> UserSchema:
+
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+
+        if user:
+            raise HTTPException(status_code=409, detail="Utilisateur déjà existant.")
+
+        new_user = User(email=email, prenom=prenom, nom=nom, password=password)
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+
+        await TraceService.record_trace(
+            db,
+            f"{prenom} {nom}",
+            "USER_CREATED",
+            "Creation d'un nouvel utilisateur",
+            {"user_id": new_user.id, "email": email},
+        )
+
+        return UserSchema.model_validate(new_user)
 
     @staticmethod
     async def get_user_by_id(db: AsyncSession, user_id: int) -> UserSchema:
@@ -52,6 +81,25 @@ class UserService:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
 
         return UserSchema.model_validate(user)
+
+    @staticmethod
+    async def ensure_mail_available(db: AsyncSession, mail: str) -> bool:
+        logger.info(f"[MAIL CHECK] Vérification de l'existence de l'email : {mail}")
+
+        result = await db.execute(select(User).where(User.email == mail))
+        user: User | None = result.scalars().first()
+
+        if user:
+            if user.password:
+                logger.info("[MAIL CHECK] ❌ Email déjà utilisé avec un mot de passe")
+                raise HTTPException(status_code=409)
+            if user.google_id:
+                logger.info("[MAIL CHECK] ❌ Email déjà utilisé avec Google")
+                raise HTTPException(status_code=423)
+            return False
+        else:
+            logger.info("[MAIL CHECK] ✅ Email disponible")
+            return True
 
     @staticmethod
     async def complete_user( db: AsyncSession, user_id: int, request: CompleteProfileRequest) -> UserSchema:

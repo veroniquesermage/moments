@@ -21,3 +21,36 @@
   color: var(--color-text);
   font-family: inherit;
 }
+
+.sebou-alert {
+  background-color: var(--color-bg);
+  border: 1px dashed var(--color-highlight);
+  padding: 1.2em 1.4em;
+  margin-top: 1em;
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.95em;
+  line-height: 1.6em;
+  text-align: justify;
+  text-align-last: center;
+}
+
+.sebou-alert .intro {
+  font-style: italic;
+  margin-bottom: 0.7em;
+  display: block;
+}
+
+.sebou-alert .middle {
+  opacity: 0.85;
+  margin-bottom: 0.7em;
+  display: block;
+}
+
+.sebou-alert .final {
+  color: var(--color-highlight);
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  margin-top: 0.8em;
+}

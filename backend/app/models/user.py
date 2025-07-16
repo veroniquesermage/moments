@@ -11,7 +11,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email = Column(String(255), nullable=False, unique=True, index=True)
     prenom = Column(String(255), nullable=False)
-    nom = Column(String(255), nullable=False)
+    nom = Column(String(255), nullable=True)
     google_id = Column(String(255), nullable=True)
     password = Column(String(255), nullable=True)
     date_creation = Column(DateTime(timezone=True), default=lambda:now_paris())

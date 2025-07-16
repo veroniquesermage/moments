@@ -2,8 +2,8 @@
   <h1> Merci de compléter votre profil.</h1>
 
   <div class="login-form" *ngIf="user">
-    <label for="email">Email</label>
-    <p>{{user!.email}}</p>
+      <label for="email">Email</label>
+      <p>{{user!.email}}</p>
 
     <label for="givenName">Prénom</label>
     <input
@@ -19,11 +19,24 @@
       id="familyName"
       [(ngModel)]="familyName"
       type="text"
-      required
       [attr.aria-describedby]="familyName"
     />
+
+    <div class="sebou-alert">
+      <span class="intro">
+        <em>Ces informations sont communes à tous vos groupes, pour que chacun sache qui vous êtes.</em>
+      </span>
+      <span class="final">
+        Vous pourrez personnaliser un surnom dans chaque groupe, depuis votre profil.
+      </span>
+      <span class="middle">
+        Après tout, tout le monde ne vous connaît pas sous le nom de “Oncle Dood”.
+      </span>
+    </div>
+
     <div class="options">
-      <button (click)="submitName()">💾 Valider vos informations</button>
+      <button *ngIf="context=='google'" (click)="submitName()">💾 Valider vos informations</button>
+      <button *ngIf="context=='credentials'" (click)="registerWithCredentials()">🌟 Finaliser mon inscription</button>
     </div>
   </div>
 
