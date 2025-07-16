@@ -1,18 +1,18 @@
 import json
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
-from app.models import User
-from fastapi import HTTPException
 from app.models import Gift
+from app.models import User
 from app.schemas.group import GroupResponse
 from app.schemas.mailing import FeedbackRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.group_service import GroupService
+from app.services.mailing.mailjet_adapter import MailjetAdapter
 from app.services.trace_service import TraceService
 from app.services.user_group_service import UserGroupService
-from app.services.mailing.mailjet_adapter import MailjetAdapter
 
 
 class MailService:
@@ -105,4 +105,32 @@ class MailService:
                 )
         except Exception as e:
             logger.error(f"📨 Erreur d'envoi du mail d'invitation")
+            logger.exception(e)
+
+    @staticmethod
+    async def send_validation_email(
+            db: AsyncSession,
+            email: str,
+            token: str
+    ):
+        try:
+            response = await MailjetAdapter.send_validation_email(email, token)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{email}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail de confirmation de compte",
+                    {"token": token}
+                )
+            else :
+                await TraceService.record_trace(
+                    db,
+                    f"{email}",
+                    "CHECK_MAIL",
+                    f"Envoi d'un mail de confirmation de compte",
+                    {"token": token}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur d'envoi du mail de confirmation de compte")
             logger.exception(e)

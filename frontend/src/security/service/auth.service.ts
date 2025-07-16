@@ -7,6 +7,8 @@ import {JwtResponse} from 'src/security/model/jwt-response.model';
 import {firstValueFrom, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {LoginRequest} from 'src/security/model/login-request.model';
+import {ApiResponse} from 'src/core/models/api-response.model';
+import {IncompleteUser} from 'src/security/model/incomplete_user.model';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -16,6 +18,7 @@ export class AuthService {
   profile = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
   rememberMe = signal<boolean>(false);
+  incompleteUser = signal<IncompleteUser | null>(null);
 
   private baseUrl = `${environment.backendBaseUrl}${environment.api.auth}`;
 
@@ -79,9 +82,15 @@ export class AuthService {
       .then(async data => {
         console.log('[Backend] Réponse reçue :', data);
         if (data?.isNewUser && data?.profile) {
-          this.profile.set(data.profile);
+          this.incompleteUser.set({
+            email: data.profile.email,
+            nom: data.profile.nom,
+            prenom: data.profile.prenom
+          })
           this.rememberMe.set(false);
-          void this.router.navigate(['/auth/initialiser']);
+          void this.router.navigate(['/auth/initialiser'], {
+            queryParams: { context: 'google' }
+          });
         } else if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
@@ -136,7 +145,7 @@ export class AuthService {
     return this.http.post<void>(`${this.baseUrl}/logout`, null);
   }
 
-  async completeProfile(givenName: string, familyName: string): Promise<void> {
+  async completeProfile(givenName: string, familyName: string | undefined): Promise<void> {
     const res = await fetch(`${this.baseUrl}/auth/complete-profile`, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
@@ -147,11 +156,54 @@ export class AuthService {
       throw new Error("Échec de la mise à jour du profil");
     }
     const data: User = await res.json();
+    this.incompleteUser.set(null);
     this.profile.set(data);
     this.isLoggedIn.set(true);
   }
 
-  loginWithCredentials(credentials: LoginRequest) {
+  async registerWithCredentials(givenName: string, familyName: string | undefined, token: string | null) {
+    const registerRequest = {
+      token: token,
+      prenom: givenName,
+      nom: familyName
+    }
 
+    await firstValueFrom(this.http.post<JwtResponse>(
+      `${this.baseUrl}/auth/register-credentials`,
+      registerRequest,
+      { withCredentials: true }
+    ))
+      .then(data => {
+        console.log('[Backend] Réponse reçue :', data);
+        if (data?.profile) {
+          this.profile.set(data.profile);
+          this.isLoggedIn.set(true);
+        }
+      })
+      .catch(err => console.error('[Backend] Erreur :', err));
+  }
+
+  async checkMail(credentials: LoginRequest): Promise<ApiResponse<void>> {
+    this.rememberMe.set(credentials.rememberMe);
+
+    try {
+      await firstValueFrom(this.http.post<void>(`${this.baseUrl}/auth/check-email`, credentials));
+      this.incompleteUser.set({
+        email: credentials.email
+      })
+      return { success: true, data: undefined };
+    } catch (error: any) {
+      if (error.status === 409) {
+        this.rememberMe.set(false);
+        return { success: false, message: "❌ Ce mail est déjà utilisé avec un mot de passe." };
+      }
+      if (error.status === 423) {
+        this.rememberMe.set(false);
+        return { success: false, message: "❌ Ce mail est déjà lié à un compte Google." };
+      }
+      this.rememberMe.set(false);
+      console.error('[AuthService] Erreur lors de la vérification du mail', error);
+      return { success: false, message: "❌ Erreur inconnue lors de la vérification du mail." };
+    }
   }
 }
