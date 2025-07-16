@@ -1,6 +1,5 @@
 export enum ModalActionType {
   VISIBILITY = 'VISIBILITY',
-  DUPLICATE = 'DUPLICATE',
   CANCEL = 'CANCEL',
   DELETE = 'DELETE',
   DELETE_IDEA = 'DELETE_IDEA',
@@ -12,7 +11,7 @@ export enum ModalActionType {
   BACK_TO_LIST = 'BACK_TO_LIST',
   PRIVATE = 'PRIVATE',
   PUBLIC = 'PUBLIC',
-  UPDATE_ROLES = 'UPDATE_ROLES',
-  EXCLURE = 'EXCLURE'
+  EXCLURE = 'EXCLURE',
+  FORGOT = 'FORGOT'
 
 }

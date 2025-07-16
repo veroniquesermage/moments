@@ -184,3 +184,18 @@ input[type="checkbox"] {
   font-weight: bold;
 }
 
+input.error {
+  border: 2px solid #dc3545; /* rouge erreur */
+}
+
+.form-error {
+  color: #dc3545;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+}

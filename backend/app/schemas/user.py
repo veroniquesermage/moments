@@ -9,5 +9,6 @@ class UserSchema(CamelModel):
     prenom: str
     email: str
     google_id: str
+    password: str
     date_creation: datetime
 

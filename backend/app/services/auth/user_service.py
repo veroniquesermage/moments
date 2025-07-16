@@ -130,3 +130,14 @@ class UserService:
         return UserSchema.model_validate(existing)
 
 
+    @staticmethod
+    async def get_user_by_mail(db: AsyncSession, mail: str) -> User:
+        logger.info(f"Récupération de l'utilisateur avec l'email {mail}")
+
+        result = await db.execute(select(User).where(User.email == mail))
+        user = result.scalars().first()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
+
+        return user

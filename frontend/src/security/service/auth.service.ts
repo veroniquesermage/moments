@@ -206,4 +206,11 @@ export class AuthService {
       return { success: false, message: "❌ Erreur inconnue lors de la vérification du mail." };
     }
   }
+
+  async loginWithCredentials(email: string, password: string, rememberMe: boolean): Promise<JwtResponse> {
+    const loginRequest = { email, password, remember_me: rememberMe };
+    return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/auth/credentials`, loginRequest));
+  }
+
+
 }
