@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Body
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
@@ -51,14 +51,16 @@ async def logout(
 
 @router.post("/request-password-reset", status_code=204)
 async def check_password(
-        mail: str,
+        mail: str = Body(embed=True),
         db: AsyncSession = Depends(get_db)
 ):
     await AuthService.request_password_reset(db, mail)
 
 @router.post("/verify-reset-token", status_code=200)
-async def verify_reset_token(token: str,
-                             db: AsyncSession = Depends(get_db)) -> str:
+async def verify_reset_token(
+        token: str = Body(embed=True),
+        db: AsyncSession = Depends(get_db)
+) -> str:
     return await AuthService.verify_reset_token(db, token)
 
 @router.patch("/complete-profile", status_code=200)
