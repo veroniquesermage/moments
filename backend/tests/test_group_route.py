@@ -11,6 +11,8 @@ os.environ['JWK_URI'] = 'http://localhost/jwk'
 os.environ['JWT_SECRET'] = 'secret'
 os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///:memory:'
 os.environ['SYNC_DB_URL'] = 'sqlite:///:memory:'
+os.environ['CHECK_MAIL'] = 'http://localhost/check_mail'
+os.environ['RESET_PASSWORD'] = 'http://localhost/reset-password?token='
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -21,7 +23,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.database import Base, get_db
-from app.dependencies.current_user import get_current_user
+from app.dependencies.current_user import get_current_user_from_cookie
 from app.models import User
 
 # Create an isolated in-memory database for the tests
@@ -51,7 +53,7 @@ async def override_get_current_user():
     return User(id=1, email="user@example.com", prenom="Test", nom="User", google_id="1")
 
 app.dependency_overrides[get_db] = override_get_db
-app.dependency_overrides[get_current_user] = override_get_current_user
+app.dependency_overrides[get_current_user_from_cookie] = override_get_current_user
 
 client = TestClient(app)
 

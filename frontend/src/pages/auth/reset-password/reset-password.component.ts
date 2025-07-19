@@ -45,23 +45,24 @@ export class ResetPasswordComponent implements OnInit{
 
   async ngOnInit(): Promise<void> {
     this.user = this.authService.incompleteUser();
+    const contextParam = this.route.snapshot.queryParamMap.get('context') as 'change' | 'reset' | null;
     const token = this.route.snapshot.queryParamMap.get('token');
 
-    if(!token){
-      this.errorService.showError("Une erreur s'est produite lors de votre réinitialisation de mot de passe. Veuillez réessayer.")
-    } else {
+    if (token) {
       this.tokenResetPassword = token;
       try {
-         await this.authService.verifyResetToken(token);
-         this.context = 'reset';
+        await this.authService.verifyResetToken(token);
+        this.context = 'reset';
       } catch (err) {
-        this.errorService.showError("Une erreur s'est produite lors de votre réinitialisation de mot de passe. Veuillez réessayer.")
+        this.errorService.showError("Une erreur s'est produite lors de votre réinitialisation de mot de passe. Veuillez réessayer.");
       }
+    } else if (!contextParam) {
+      this.errorService.showError("Une erreur s'est produite lors de votre réinitialisation de mot de passe. Veuillez réessayer.");
     }
 
-    const contexteBrut = this.route.snapshot.queryParamMap.get('context');
-    const contextValide = ['change', 'reset'].includes(contexteBrut ?? '');
-    this.context = (contextValide ? contexteBrut : 'change') as 'change' | 'reset';
+    if (contextParam) {
+      this.context = contextParam;
+    }
 
     console.log(this.context);
   }
