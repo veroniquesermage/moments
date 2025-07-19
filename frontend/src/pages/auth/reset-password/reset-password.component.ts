@@ -5,7 +5,9 @@ import {NgIf} from "@angular/common";
 import {IncompleteUser} from 'src/security/model/incomplete_user.model';
 import {AuthService} from 'src/security/service/auth.service';
 import {ErrorService} from 'src/core/services/error.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ChangePassword} from 'src/security/model/change-password.model';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -36,7 +38,9 @@ export class ResetPasswordComponent implements OnInit{
 
   constructor(
     private authService: AuthService,
-    public errorService: ErrorService
+    public errorService: ErrorService,
+    private toastr: ToastrService,
+    public router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -112,7 +116,18 @@ export class ResetPasswordComponent implements OnInit{
     }
 
     if (this.context === 'change') {
-      await this.authService.submitPasswordChange(this.oldPassword, this.newPassword);
+      const changePassword: ChangePassword = {
+        oldPassword: this.oldPassword,
+        newPassword: this.newPassword
+      }
+      try {
+        await this.authService.submitPasswordChange(changePassword);
+        this.toastr.success('Changement de mot de passe confirmé 👍');
+        void this.router.navigate(['profile']);
+        return;
+      } catch (err) {
+        this.errorService.showError("Une erreur s'est produite lors de votre réinitialisation de mot de passe. Veuillez réessayer.")
+      }
       return;
     }
 

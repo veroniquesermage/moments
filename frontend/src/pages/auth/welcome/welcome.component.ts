@@ -45,7 +45,7 @@ export class WelcomeComponent {
 
   googleLogin() {
     this.auth.rememberMe.set(this.stayLoggedIn);
-    this.auth.login();
+    void this.auth.login();
   }
 
   onPasswordInput(event: Event): void {
@@ -134,7 +134,8 @@ export class WelcomeComponent {
 
   async handleClicked(eventName: string) {
     if (eventName === ModalActionType.FORGOT) {
-        //TODO : gérer le mot de passe oublié
+      await this.auth.requestPasswordReset(this.email);
+      this.showConfirmModal = false;
     } else if (eventName === ModalActionType.CANCEL) {
       this.showConfirmModal = false;
     }

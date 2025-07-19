@@ -75,7 +75,7 @@ async def change_password(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user_from_cookie)
 ):
-    return await AuthService.change_password(db, current_user, request)
+    await AuthService.change_password(db, current_user, request)
 
 @router.patch("/reset-password", status_code=200)
 async def reset_password(
