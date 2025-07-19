@@ -7,7 +7,9 @@ from app.main import get_db
 from app.models import User
 from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, CompleteProfileRequest, RegisterRequest
+from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
+from app.schemas.auth.reset_password_payload import ResetPasswordPayload
 from app.services.auth.auth_service import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])
@@ -47,6 +49,18 @@ async def logout(
 ):
     return await AuthService.logout(db, request)
 
+@router.post("/request-password-reset", status_code=204)
+async def check_password(
+        mail: str,
+        db: AsyncSession = Depends(get_db)
+):
+    await AuthService.request_password_reset(db, mail)
+
+@router.post("/verify-reset-token", status_code=200)
+async def verify_reset_token(token: str,
+                             db: AsyncSession = Depends(get_db)) -> str:
+    return await AuthService.verify_reset_token(db, token)
+
 @router.patch("/complete-profile", status_code=200)
 async def complete_profile(
         request: CompleteProfileRequest,
@@ -55,10 +69,26 @@ async def complete_profile(
 ) -> UserSchema:
     return await AuthService.complete_profile(db, current_user, request)
 
+@router.patch("/change-password", status_code=200)
+async def change_password(
+        request: ChangePassword,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+):
+    return await AuthService.change_password(db, current_user, request)
+
+@router.patch("/reset-password", status_code=200)
+async def reset_password(
+        request: ResetPasswordPayload,
+        db: AsyncSession = Depends(get_db)
+) -> JSONResponse:
+    return await AuthService.reset_password(db, request)
+
 @router.get("/check-email", status_code=204)
 async def check_mail(
         login_request: LoginRequest,
         db: AsyncSession = Depends(get_db)
 ):
     await AuthService.check_mail(db, login_request)
+
 

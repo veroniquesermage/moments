@@ -129,6 +129,29 @@ class UserService:
 
         return UserSchema.model_validate(existing)
 
+    @staticmethod
+    async def reset_password( db: AsyncSession, mail: str, new_password: str) -> UserSchema:
+
+        result = await db.execute(select(User).where(User.email == mail))
+        existing: User = result.scalars().first()
+
+        if not existing:
+            raise HTTPException(status_code=404, detail="❌ Utilisateur non trouvé")
+
+        existing.password = new_password
+        await TraceService.record_trace(
+            db,
+            f"{existing.nom} {existing.prenom}",
+            "RESET_PASSWORD",
+            "Réinitialisation du mot de passe",
+            {"user_id": existing.id, "email": existing.email, "changement": "✔ mot de passe mis à jour"},
+        )
+
+        await db.commit()
+        await db.refresh(existing)
+
+        return UserSchema.model_validate(existing)
+
 
     @staticmethod
     async def get_user_by_mail(db: AsyncSession, mail: str) -> User:
@@ -139,5 +162,18 @@ class UserService:
 
         if not user:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
+
+        return user
+
+    @staticmethod
+    async def change_password(db: AsyncSession, mail: str, password: str) -> User:
+
+        user: User = await UserService.get_user_by_mail(db, mail)
+
+        if not user :
+            raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
+
+        user.password = password
+        await db.commit()
 
         return user

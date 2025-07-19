@@ -15,7 +15,9 @@ from app.core.logger import logger
 from app.models import RefreshToken, User
 from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest, RegisterRequest
+from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
+from app.schemas.auth.reset_password_payload import ResetPasswordPayload
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.login_attempt_service import LoginAttemptService
 from app.services.auth.user_service import UserService
@@ -180,15 +182,12 @@ class AuthService:
         return await AuthService.create_tokens(db, user, remember_me, True)
 
     @staticmethod
-    async def login_with_credentials( request: LoginRequest, db: AsyncSession):
+    async def login_with_credentials( request: LoginRequest, db: AsyncSession) -> JSONResponse:
 
         if await LoginAttemptService.is_blocked(db, request.email):
             raise HTTPException(status_code=403, detail="Compte bloqué.")
 
-        user: User = await UserService.get_user_by_mail(db, request.email)
-        if not user:
-            await asyncio.sleep(1)  # Pour égaliser avec le temps de vérif du hash
-            raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+        user = await AuthService.check_user(db, request.email)
 
         matching_password: bool = PasswordUtils.verify_password(request.password, user.password)
 
@@ -198,3 +197,65 @@ class AuthService:
 
         await LoginAttemptService.reset_attempts(db, request.email)
         return await AuthService.create_tokens(db, UserSchema.model_validate(user), request.remember_me, False)
+
+    @staticmethod
+    async def change_password(db: AsyncSession, current_user: User, request: ChangePassword):
+
+        matching_old_password: bool = PasswordUtils.verify_password(request.old_password, current_user.password)
+
+        if not matching_old_password:
+            raise HTTPException(status_code=401, detail="Mauvais mot de passe.")
+
+        password_hash = PasswordUtils.hash_password(request.new_password)
+
+        await UserService.change_password(db, current_user.email, password_hash)
+
+    @staticmethod
+    async def request_password_reset(db: AsyncSession, mail: str):
+        await AuthService.check_user(db, mail)
+
+        token: str = TokenService.generate_password_token(mail)
+
+        await MailService.send_token_password(db, mail, token)
+
+    @staticmethod
+    async def verify_reset_token(db: AsyncSession, token: str) -> str :
+
+        try:
+            token_data = TokenService.decode_password_token(token)
+        except Exception:
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        expire: datetime = datetime.fromtimestamp(token_data["exp"], tz=ZoneInfo("Europe/Paris"))
+
+        if is_expired(expire) :
+            raise HTTPException(status_code=401, detail="Token expiré.")
+
+        return token_data['sub']
+
+    @staticmethod
+    async def reset_password( db: AsyncSession, request: ResetPasswordPayload) -> JSONResponse:
+
+        try:
+            token_data = TokenService.decode_password_token(request.token)
+        except Exception:
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        new_password = PasswordUtils.hash_password(request.new_password)
+        user: UserSchema = await UserService.reset_password(db, token_data['sub'], new_password)
+
+        return await AuthService.create_tokens(db, user, False, False)
+
+    @staticmethod
+    async def check_user(db: AsyncSession, mail: str) -> User:
+        user: User = await UserService.get_user_by_mail(db, mail)
+        if not user:
+            await asyncio.sleep(1)  # Pour égaliser avec le temps de vérif du hash
+            raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+
+        return user
+
+
+
+
+

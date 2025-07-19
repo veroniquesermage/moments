@@ -1,7 +1,8 @@
 import os
+
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 env = os.getenv("APP_ENV", "dev")
 
@@ -27,6 +28,8 @@ class Settings(BaseSettings):
     mj_sender_email: str
     mj_feedback_email: str
     invitation_link: str
+    check_mail: str
+    reset_password: str
 
     @property
     def is_prod(self) -> bool:

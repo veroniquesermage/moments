@@ -18,12 +18,13 @@ class TokenService:
     SECRET_KEY = settings.jwt_secret
     ALGORITHM = "HS256"
     TZ = ZoneInfo("Europe/Paris")
-    EXPIRATION_MINUTES = 30
+    EXPIRATION_MINUTES_SIGN_UP = 30
+    EXPIRATION_MINUTES_PASSWORD = 15
 
     @staticmethod
     def create_refresh_token(data: dict, expires_at: datetime) -> str:
         to_encode = data.copy()
-        to_encode.update({"exp": expires_at})
+        to_encode.update({"purpose": 'refresh_token', "exp": expires_at})
         encoded_jwt = jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
         return encoded_jwt
 
@@ -109,6 +110,10 @@ class TokenService:
                 settings.jwt_secret,
                 algorithms=[TokenService.ALGORITHM]
             )
+
+            if payload['purpose'] != 'refresh_token':
+                raise HTTPException(status_code=401, detail="Token invalide.")
+
             return payload
         except JWTError:
             raise HTTPException(status_code=401, detail="❌ Token corrompu ou expiré")
@@ -116,10 +121,31 @@ class TokenService:
 
     @staticmethod
     def generate_signup_token(email: str, hashed_pw: str, remember_me: bool) -> str:
-        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES)
-        to_encode = {"sub": email, "hashed_pw": hashed_pw, "remember_me": remember_me, "exp": exp}
+        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES_SIGN_UP)
+        to_encode = {"sub": email, "hashed_pw": hashed_pw, "remember_me": remember_me, "purpose": 'sign_up', "exp": exp}
         return jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
 
     @staticmethod
     def decode_signup_token(token: str) -> dict:
-        return jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])
+        token_data = jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])
+        if token_data.get('purpose') != 'sign_up':
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        return token_data
+
+    @staticmethod
+    def generate_password_token(email: str) -> str:
+        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES_PASSWORD)
+        to_encode = {"sub": email, "purpose": 'reset_password', "exp": exp}
+        return jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
+
+    @staticmethod
+    def decode_password_token(token: str) -> dict:
+
+        token_data = jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])
+
+        if token_data['purpose'] != 'reset_password':
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        return token_data
+

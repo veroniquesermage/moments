@@ -65,6 +65,10 @@ export class CompleteProfileComponent implements OnInit{
       this.errorService.showError("Le prénom est obligatoire.");
       return;
     }
-    await this.authService.registerWithCredentials(this.givenName!.trim(), this.familyName?.trim(), this.token)
+    if (!this.token){
+      this.errorService.showError("Une erreur est survenue, veuillez réessayer plus tard.")
+    } else {
+      await this.authService.registerWithCredentials(this.givenName!.trim(), this.familyName?.trim(), this.token)
+    }
   }
 }
