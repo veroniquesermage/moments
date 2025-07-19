@@ -10,6 +10,8 @@ import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupDetail} from 'src/core/models/group/group-detail.model';
+import {User} from 'src/security/model/user.model';
+import {AuthService} from 'src/security/service/auth.service';
 
 @Component({
   selector: 'app-profile-group',
@@ -24,9 +26,10 @@ import {GroupDetail} from 'src/core/models/group/group-detail.model';
 })
 export class ProfileGroupComponent implements OnInit{
 
+  membersSignal: Signal<UserDisplay[]>;
+  user: User | null = null;
   group: GroupDetail | undefined
   members: string[] = []
-  membersSignal: Signal<UserDisplay[]>;
   showMemberModal: boolean = false;
   showNicknameModal: boolean = false;
   showConfirmModal: boolean = false;
@@ -39,12 +42,14 @@ export class ProfileGroupComponent implements OnInit{
               private userGroupService: UserGroupService,
               public errorService: ErrorService,
               private router: Router,
-              private groupContextService: GroupContextService) {
+              private groupContextService: GroupContextService,
+              private authService: AuthService) {
     this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit(){
       await this.loadGroupDetail();
+      this.user = this.authService.profile();
   }
 
   async getAllMembers() {
@@ -113,13 +118,11 @@ export class ProfileGroupComponent implements OnInit{
   }
 
   async hasAnotherAdminsInGroup() {
-    const result = await this.userGroupService.getUser();
-    if (!result.success) {
-      this.errorService.showError(result.message);
-      return false;
-    }
 
-    const currentUserId = result.data.id;
+    if (this.user == null) {
+      this.errorService.showError("Veuillez vous reconnecter")
+    }
+    const currentUserId = this.user!.id;
 
     // Si je ne suis pas admin, je peux partir
     if (this.group?.role !== 'ADMIN') return true;

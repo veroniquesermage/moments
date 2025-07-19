@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
-import {User} from 'src/security/model/user.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
 
@@ -22,17 +21,6 @@ export class UserGroupService {
     } catch (error) {
       console.error('[UserGroupService] Erreur lors de la récupération des membres du groupe', error);
       return {success: false, message: "❌ Groupe inexistant."};
-    }
-  }
-
-  async getUser(): Promise<ApiResponse<User>> {
-    const url = `${this.apiUrl.replace(/\/$/, '')}/me`;
-    try {
-      const user = await firstValueFrom(this.http.get<User>(url));
-      return {success: true, data: user};
-    } catch (error) {
-      console.error('[UserGroupService] Erreur lors de la récupération de l\'utilisateur', error);
-      return {success: false, message: "❌ Aucun membre trouvé."};
     }
   }
 
