@@ -11,6 +11,7 @@ import {ApiResponse} from 'src/core/models/api-response.model';
 import {IncompleteUser} from 'src/security/model/incomplete_user.model';
 import {RegisterRequest} from 'src/security/model/register-request.model';
 import {ResetPasswordPayload} from 'src/security/model/reset-password-payload.model';
+import {ChangePassword} from 'src/security/model/change-password.model';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -214,27 +215,34 @@ export class AuthService {
     return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/auth/credentials`, loginRequest));
   }
 
-
-  async submitPasswordChange(oldPassword: string, newPassword: string) {
-
+  async submitPasswordChange(changePassword: ChangePassword) {
+    try {
+      await firstValueFrom(
+        this.http.patch<void>(
+          `${this.baseUrl}/auth/change-password`,
+          changePassword,
+          { withCredentials: true }
+        )
+      );
+    } catch (err) {
+      console.error('[Backend] Erreur :', err);
+      throw err;
+    }
   }
 
-  async submitPasswordReset(token: string, newPassword: string) {
-    const resetPasswordPayload: ResetPasswordPayload = {token, newPassword}
-
-    await firstValueFrom(this.http.patch<JwtResponse>(
-      `${this.baseUrl}/auth/reset-password`,
-      resetPasswordPayload,
-      { withCredentials: true }
-    ))
-      .then(data => {
-        console.log('[Backend] Réponse reçue :', data);
-        if (data?.profile) {
-          this.profile.set(data.profile);
-          this.isLoggedIn.set(true);
-        }
-      })
-      .catch(err => console.error('[Backend] Erreur :', err));
+  async requestPasswordReset(mail: string){
+    try {
+      await firstValueFrom(
+        this.http.post<string>(
+          `${this.baseUrl}/auth/request-password-reset`,
+          mail,
+          { withCredentials: true }
+        )
+      );
+    } catch (err) {
+      console.error('[Backend] Erreur :', err);
+      throw err;
+    }
   }
 
   async verifyResetToken(token: string): Promise<string> {
@@ -258,5 +266,22 @@ export class AuthService {
     }
   }
 
+  async submitPasswordReset(token: string, newPassword: string) {
+    const resetPasswordPayload: ResetPasswordPayload = {token, newPassword}
+
+    await firstValueFrom(this.http.patch<JwtResponse>(
+      `${this.baseUrl}/auth/reset-password`,
+      resetPasswordPayload,
+      { withCredentials: true }
+    ))
+      .then(data => {
+        console.log('[Backend] Réponse reçue :', data);
+        if (data?.profile) {
+          this.profile.set(data.profile);
+          this.isLoggedIn.set(true);
+        }
+      })
+      .catch(err => console.error('[Backend] Erreur :', err));
+  }
 
 }
