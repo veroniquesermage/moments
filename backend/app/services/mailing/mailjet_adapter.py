@@ -202,6 +202,8 @@ class MailjetAdapter:
         logger.info(f"📧 Mailjet response status: {response.status_code}")
         logger.info(f"📧 Mailjet response body: {response.json()}")
 
+        return response
+
     @staticmethod
     async def send_token_password(
             email: str,
@@ -246,6 +248,8 @@ class MailjetAdapter:
         # Log minimal pour voir si ça passe
         logger.info(f"📧 Mailjet response status: {response.status_code}")
         logger.info(f"📧 Mailjet response body: {response.json()}")
+
+        return response
 
     @staticmethod
     def _get_mailjet_client():

@@ -152,7 +152,7 @@ class AuthService:
         if mail_valid :
             password = PasswordUtils.hash_password(login_request.password)
 
-            token = TokenService.generate_signup_token(login_request.email, password, login_request.rememberMe)
+            token = TokenService.generate_signup_token(login_request.email, password, login_request.remember_me)
 
             await MailService.send_validation_email(db, login_request.email, token)
 
@@ -188,6 +188,9 @@ class AuthService:
             raise HTTPException(status_code=403, detail="Compte bloqué.")
 
         user = await AuthService.check_user(db, request.email)
+
+        if user.password is None:
+            raise HTTPException(status_code=409, detail="Cet adresse mail est bien en base mais avec un autre type de connexion.")
 
         matching_password: bool = PasswordUtils.verify_password(request.password, user.password)
 

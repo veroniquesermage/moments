@@ -1,9 +1,11 @@
 <div class="terminal">
   <h1> Merci de compléter votre profil.</h1>
 
-  <div class="login-form" *ngIf="user">
+  <div class="login-form">
+    <div *ngIf="user">
       <label for="email">Email</label>
       <p>{{user!.email}}</p>
+    </div>
 
     <label for="givenName">Prénom</label>
     <input

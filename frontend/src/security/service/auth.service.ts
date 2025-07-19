@@ -149,7 +149,7 @@ export class AuthService {
   }
 
   async completeProfile(givenName: string, familyName: string | undefined): Promise<void> {
-    const res = await fetch(`${this.baseUrl}/auth/complete-profile`, {
+    const res = await fetch(`${this.baseUrl}/complete-profile`, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',
@@ -172,7 +172,7 @@ export class AuthService {
     }
 
     await firstValueFrom(this.http.post<JwtResponse>(
-      `${this.baseUrl}/auth/register-credentials`,
+      `${this.baseUrl}/register-credentials`,
       registerRequest,
       { withCredentials: true }
     ))
@@ -190,7 +190,7 @@ export class AuthService {
     this.rememberMe.set(credentials.rememberMe);
 
     try {
-      await firstValueFrom(this.http.post<void>(`${this.baseUrl}/auth/check-email`, credentials));
+      await firstValueFrom(this.http.post<void>(`${this.baseUrl}/check-email`, credentials));
       this.incompleteUser.set({
         email: credentials.email
       })
@@ -212,14 +212,14 @@ export class AuthService {
 
   async loginWithCredentials(email: string, password: string, rememberMe: boolean): Promise<JwtResponse> {
     const loginRequest: LoginRequest = { email, password, rememberMe };
-    return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/auth/credentials`, loginRequest));
+    return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/credentials`, loginRequest, { withCredentials: true }));
   }
 
   async submitPasswordChange(changePassword: ChangePassword) {
     try {
       await firstValueFrom(
         this.http.patch<void>(
-          `${this.baseUrl}/auth/change-password`,
+          `${this.baseUrl}/change-password`,
           changePassword,
           { withCredentials: true }
         )
@@ -234,8 +234,8 @@ export class AuthService {
     try {
       await firstValueFrom(
         this.http.post<string>(
-          `${this.baseUrl}/auth/request-password-reset`,
-          mail,
+          `${this.baseUrl}/request-password-reset`,
+          {mail},
           { withCredentials: true }
         )
       );
@@ -249,8 +249,8 @@ export class AuthService {
     try {
       const data = await firstValueFrom(
         this.http.post<string>(
-          `${this.baseUrl}/auth/verify-reset-token`,
-          token,
+          `${this.baseUrl}/verify-reset-token`,
+          {token},
           { withCredentials: true }
         )
       );
@@ -270,7 +270,7 @@ export class AuthService {
     const resetPasswordPayload: ResetPasswordPayload = {token, newPassword}
 
     await firstValueFrom(this.http.patch<JwtResponse>(
-      `${this.baseUrl}/auth/reset-password`,
+      `${this.baseUrl}/reset-password`,
       resetPasswordPayload,
       { withCredentials: true }
     ))

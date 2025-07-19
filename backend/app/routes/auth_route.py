@@ -63,6 +63,13 @@ async def verify_reset_token(
 ) -> str:
     return await AuthService.verify_reset_token(db, token)
 
+@router.post("/check-email", status_code=204)
+async def check_mail(
+        login_request: LoginRequest,
+        db: AsyncSession = Depends(get_db)
+):
+    await AuthService.check_mail(db, login_request)
+
 @router.patch("/complete-profile", status_code=200)
 async def complete_profile(
         request: CompleteProfileRequest,
@@ -86,11 +93,5 @@ async def reset_password(
 ) -> JSONResponse:
     return await AuthService.reset_password(db, request)
 
-@router.get("/check-email", status_code=204)
-async def check_mail(
-        login_request: LoginRequest,
-        db: AsyncSession = Depends(get_db)
-):
-    await AuthService.check_mail(db, login_request)
 
 

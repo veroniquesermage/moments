@@ -44,7 +44,6 @@ export class ResetPasswordComponent implements OnInit{
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.user = this.authService.incompleteUser();
     const contextParam = this.route.snapshot.queryParamMap.get('context') as 'change' | 'reset' | null;
     const token = this.route.snapshot.queryParamMap.get('token');
 

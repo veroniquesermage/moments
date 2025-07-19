@@ -5,7 +5,6 @@ import {LoadingComponent} from 'src/shared/components/loading/loading.component'
 import {GroupService} from 'src/core/services/group.service';
 import {FormsModule} from '@angular/forms';
 import {LoginRequest} from 'src/security/model/login-request.model';
-import {Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
@@ -39,8 +38,7 @@ export class WelcomeComponent {
   constructor(
     public auth: AuthService,
     public groupeService: GroupService,
-    public errorService: ErrorService,
-    private router: Router) {
+    public errorService: ErrorService) {
   }
 
   googleLogin() {
@@ -106,13 +104,17 @@ export class WelcomeComponent {
 
       switch (err.status) {
         case 401:
+          this.message = 'Ce n\'est pas le bon mot de passe ! <br> Vous pouvez bien entendu réessayer, avec le bon cette fois ou le réinitialiser ! <br> Attention vous n\'avez que 5 tentatives de connexion ! '
           this.showConfirmModal = true;
           break;
         case 403:
-          this.errorService.showError('Votre compte est temporairement bloqué.');
+          this.errorService.showError('On vous l\'avez dit ! Vous n\'aviez que 5 tentatives <br> Reposez-vous 15 minutes et réinitialisez le !');
           break;
         case 404:
-          this.errorService.showError('Aucun compte n’existe pour cette adresse.');
+          this.errorService.showError('Aucun compte n’existe pour cette adresse. <br> Il est temps d\'en créer un !');
+          break;
+        case 409:
+          this.errorService.showError('Ce compte existe bien, mais pas avec ce type de connexion. <br> Essayez avec gmail !');
           break;
         default:
           this.errorService.showError('Veuillez réessayer plus tard.');
@@ -149,6 +151,10 @@ export class WelcomeComponent {
     if (isInputField && (this.emailError || this.passwordError)) {
       event.preventDefault(); // on empêche juste le submit implicite
     }
+  }
+
+  asKeyboardEvent(event: Event): KeyboardEvent {
+    return event as KeyboardEvent;
   }
 
 }
