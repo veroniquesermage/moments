@@ -123,6 +123,11 @@ class MailService:
                     f"Erreur lors de l'envoi d'un mail de confirmation de compte",
                     {"token": token}
                 )
+
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Erreur d'envoi de la validation du mail : {response.json()}"
+                )
             else :
                 await TraceService.record_trace(
                     db,
@@ -134,3 +139,44 @@ class MailService:
         except Exception as e:
             logger.error(f"📨 Erreur d'envoi du mail de confirmation de compte")
             logger.exception(e)
+            raise HTTPException(
+                status_code=500,
+                detail="Une erreur est survenue lors de l’envoi du mail de confirmation de compte. Merci de réessayer plus tard."
+            )
+
+    @staticmethod
+    async def send_token_password(
+            db: AsyncSession,
+            email: str,
+            token: str
+    ):
+        try:
+            response = await MailjetAdapter.send_token_password(email, token)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{email}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail de réinitialisation de mot de passe",
+                    {"token": token}
+                )
+
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Erreur d'envoi du mail de réinitialisation du mot de passe : {response.json()}"
+                )
+            else :
+                await TraceService.record_trace(
+                    db,
+                    f"{email}",
+                    "RESET_PASSWORD",
+                    f"Envoi d'un mail de pour réinitialiser son mot de passe",
+                    {"token": token}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur lors de l'envoi d'un mail de réinitialisation de mot de passe")
+            logger.exception(e)
+            raise HTTPException(
+                status_code=500,
+                detail="Une erreur est survenue lors de l’envoi d'un mail de réinitialisation de mot de passe. Merci de réessayer plus tard."
+            )

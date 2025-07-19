@@ -9,6 +9,8 @@ import {HttpClient} from '@angular/common/http';
 import {LoginRequest} from 'src/security/model/login-request.model';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {IncompleteUser} from 'src/security/model/incomplete_user.model';
+import {RegisterRequest} from 'src/security/model/register-request.model';
+import {ResetPasswordPayload} from 'src/security/model/reset-password-payload.model';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -162,8 +164,8 @@ export class AuthService {
   }
 
   async registerWithCredentials(givenName: string, familyName: string | undefined, token: string | null) {
-    const registerRequest = {
-      token: token,
+    const registerRequest: RegisterRequest = {
+      token: token!,
       prenom: givenName,
       nom: familyName
     }
@@ -208,8 +210,52 @@ export class AuthService {
   }
 
   async loginWithCredentials(email: string, password: string, rememberMe: boolean): Promise<JwtResponse> {
-    const loginRequest = { email, password, remember_me: rememberMe };
+    const loginRequest: LoginRequest = { email, password, rememberMe };
     return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/auth/credentials`, loginRequest));
+  }
+
+
+  async submitPasswordChange(oldPassword: string, newPassword: string) {
+
+  }
+
+  async submitPasswordReset(token: string, newPassword: string) {
+    const resetPasswordPayload: ResetPasswordPayload = {token, newPassword}
+
+    await firstValueFrom(this.http.patch<JwtResponse>(
+      `${this.baseUrl}/auth/reset-password`,
+      resetPasswordPayload,
+      { withCredentials: true }
+    ))
+      .then(data => {
+        console.log('[Backend] Réponse reçue :', data);
+        if (data?.profile) {
+          this.profile.set(data.profile);
+          this.isLoggedIn.set(true);
+        }
+      })
+      .catch(err => console.error('[Backend] Erreur :', err));
+  }
+
+  async verifyResetToken(token: string): Promise<string> {
+    try {
+      const data = await firstValueFrom(
+        this.http.post<string>(
+          `${this.baseUrl}/auth/verify-reset-token`,
+          token,
+          { withCredentials: true }
+        )
+      );
+
+      console.log('[Backend] Réponse reçue :', data);
+
+      this.incompleteUser.set({ email: data });
+
+      return data;
+    } catch (err) {
+      console.error('[Backend] Erreur :', err);
+      throw err;
+    }
   }
 
 
