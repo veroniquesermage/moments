@@ -16,7 +16,7 @@
 
     <div class="or-separator">OU</div>
 
-    <div class="login-form" (keydown.enter)="preventIfInvalid($event)">
+    <div class="login-form" (keydown.enter)="preventIfInvalid(asKeyboardEvent($event))">
       <label for="email">Email</label>
       <input
         id="email"

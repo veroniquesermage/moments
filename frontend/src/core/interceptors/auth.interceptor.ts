@@ -20,12 +20,34 @@ export class AuthInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    // Récupérer le groupId si besoin
+
+    const ignoredAuthRoutes = [
+      '/auth/credentials',
+      '/auth/google',
+      '/auth/register-credentials',
+      '/auth/logout',
+      '/auth/request-password-reset',
+      '/auth/verify-reset-token',
+      '/auth/check-email',
+      '/auth/reset-password',
+    ];
+
+    if (ignoredAuthRoutes.some(url => req.url.includes(url))) {
+      const groupId = this.groupContextService.getGroupId();
+      const authReq = req.clone({
+        withCredentials: true,
+        setHeaders: groupId
+          ? {'X-Group-Id': groupId.toString()}
+          : {}
+      });
+      return next.handle(authReq);
+    }
+
     const groupId = this.groupContextService.getGroupId();
 
     // Cloner la requête pour ajouter le X-Group-Id et withCredentials
     const authReq = req.clone({
-      withCredentials: true,                // facultatif si withCredentials() est déjà global
+      withCredentials: true,
       setHeaders: groupId
         ? {'X-Group-Id': groupId.toString()}
         : {}

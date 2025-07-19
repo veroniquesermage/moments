@@ -5,10 +5,12 @@ import {ResetPasswordComponent} from 'src/pages/auth/reset-password/reset-passwo
 export const authRoutes: Routes = [
   {
     path: 'initialiser',
-    component: CompleteProfileComponent
+    component: CompleteProfileComponent,
+    data: { public: true }
   },
   {
     path: 'reset-password',
-    component: ResetPasswordComponent
+    component: ResetPasswordComponent,
+    data: { public: true }
   }
 ];
