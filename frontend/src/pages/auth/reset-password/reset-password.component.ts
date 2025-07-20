@@ -23,6 +23,8 @@ export class ResetPasswordComponent implements OnInit{
 
   composant = 'ResetPasswordComponent';
   showPassword = signal<boolean>(false);
+  showNewPassword = signal(false);
+  showConfirmPassword = signal(false);
   // entre 8 et 128 caractères, au moins 1 lettre et 1 chiffre
   passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,128}$/;
   passwordTouched = false;
@@ -142,4 +144,5 @@ export class ResetPasswordComponent implements OnInit{
 
     this.errorService.showError("Veuillez réessayer plus tard.");
   }
+
 }
