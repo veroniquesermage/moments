@@ -28,11 +28,17 @@
       <li *ngFor="let mail of invalidMails">{{ mail }}</li>
     </ul>
   </div>
-  <div class="modal-actions">
+  <div class="actions-invite">
     <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Envoyer les invitations</button>
-    <button (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
+    <button class="suppress" (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
+    <div class="help-msg">
+      ⚠️ <strong>Le nouveau code invalide l’ancien.</strong>
+      <br />
+      <span class="subtle">
+      Les anciens liens seront inutilisables (sauf comptes déjà créés).
+    </span>
+    </div>
   </div>
-
 </div>
 
 <app-terminal-modal
