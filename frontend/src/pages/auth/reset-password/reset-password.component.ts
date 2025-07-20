@@ -78,7 +78,7 @@ export class ResetPasswordComponent implements OnInit{
     if (!this.newPassword) {
       this.passwordError = 'Le mot de passe est requis.';
     } else if (!this.passwordRegex.test(this.newPassword)) {
-      this.passwordError = '8 caractères minimum, avec une lettre et un chiffre.';
+      this.passwordError = '🧠 8 caractères minimum, avec une lettre et un chiffre.';
     } else {
       this.passwordError = '';
     }
@@ -86,7 +86,7 @@ export class ResetPasswordComponent implements OnInit{
 
   onPasswordInput(): void {
     if (!this.isPasswordValid(this.newPassword)) {
-      this.passwordError = '8 caractères minimum, une lettre et un chiffre.';
+      this.passwordError = '🧠 8 caractères minimum, avec une lettre et un chiffre.';
     } else {
       this.passwordError = '';
     }
