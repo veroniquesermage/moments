@@ -155,7 +155,6 @@ class MailjetAdapter:
 
         # Log minimal pour voir si ça passe
         logger.info(f"📧 Mailjet response status: {response.status_code}")
-        logger.info(f"📧 Mailjet response body: {response.json()}")
 
     @staticmethod
     async def send_validation_email(
@@ -200,7 +199,6 @@ class MailjetAdapter:
 
         # Log minimal pour voir si ça passe
         logger.info(f"📧 Mailjet response status: {response.status_code}")
-        logger.info(f"📧 Mailjet response body: {response.json()}")
 
         return response
 
@@ -247,7 +245,6 @@ class MailjetAdapter:
 
         # Log minimal pour voir si ça passe
         logger.info(f"📧 Mailjet response status: {response.status_code}")
-        logger.info(f"📧 Mailjet response body: {response.json()}")
 
         return response
 
