@@ -140,7 +140,7 @@ input[type="checkbox"] {
 .login-form label input[type="checkbox"] {
   display: inline-block;
   width: auto;
-  margin-bottom: 0;
+  margin-bottom: 0.4rem;
 }
 
 .sebou-alert {
@@ -196,6 +196,7 @@ input.error {
 
 .form-hint {
   font-size: 0.85rem;
-  color: #666;
-  margin-top: 0.25rem;
+  color: var(--color-subtle, #bbb);
+  margin-top: -1.5rem;
+  margin-bottom: 1rem;
 }
