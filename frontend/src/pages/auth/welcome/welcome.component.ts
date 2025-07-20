@@ -104,17 +104,24 @@ export class WelcomeComponent {
 
       switch (err.status) {
         case 401:
-          this.message = 'Ce n\'est pas le bon mot de passe ! <br> Vous pouvez bien entendu réessayer, avec le bon cette fois ou le réinitialiser ! <br> Attention vous n\'avez que 5 tentatives de connexion ! '
+          this.message = '<strong>Ce n\'est pas le bon mot de passe !</strong><br>' +
+            'Vous pouvez réessayer (avec le bon, cette fois 😏) ou réinitialiser votre mot de passe.<br>' +
+            'Attention : vous n\'avez droit qu\'à <strong>5 tentatives</strong> !'
           this.showConfirmModal = true;
           break;
         case 403:
-          this.errorService.showError('On vous l\'avez dit ! Vous n\'aviez que 5 tentatives <br> Reposez-vous 15 minutes et réinitialisez le !');
+          this.errorService.showError('<strong>Oups, compte temporairement bloqué !</strong><br>' +
+            'On vous avait prévenu : 5 tentatives seulement...<br>' +
+            'Prenez une pause de 15 minutes et réinitialisez-le !');
           break;
         case 404:
-          this.errorService.showError('Aucun compte n’existe pour cette adresse. <br> Il est temps d\'en créer un !');
+          this.errorService.showError('<strong>Hmm... cette adresse ne nous dit rien !</strong><br>\n' +
+            'Aucun compte n\'existe pour cet email.<br>' +
+            'Et si c\'était le moment d\'en créer un ?');
           break;
         case 409:
-          this.errorService.showError('Ce compte existe bien, mais pas avec ce type de connexion. <br> Essayez avec gmail !');
+          this.errorService.showError('<strong>Ce compte existe bien, mais pas de mot de passe ici !</strong><br>' +
+            'Il est timide… il ne parle que Google. Cliquez sur le bouton juste au-dessus.');
           break;
         default:
           this.errorService.showError('Veuillez réessayer plus tard.');
@@ -140,7 +147,7 @@ export class WelcomeComponent {
       if (response){
         this.modalActions = [
           { label: 'OK', eventName: 'CANCEL', style: 'primary' }];
-        this.message = 'Vous allez recevoir un email pour réinitialiser votre mot de passe. <br> Cliquez sur le lien pour suivre la procédure.';
+        this.message = '<strong>Un email vient de partir !</strong> <br> Cliquez sur le lien qu’il contient pour réinitialiser votre mot de passe.';
       } else {
         this.showConfirmModal = false;
         this.errorService.showError('Oups! Un problème est survenu. <br> Veuillez réessayer plus tard');
