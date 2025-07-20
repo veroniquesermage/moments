@@ -13,7 +13,7 @@
 
   </div>
 
-  <button (click)="checkMail()">Vérifier les mails</button>
+  <button (click)="checkMail()">👀 Vérifier les mails</button>
 
   <div *ngIf="validMails?.emails!.length > 0">
     <p>✅ Mails valides :</p>
@@ -28,8 +28,20 @@
       <li *ngFor="let mail of invalidMails">{{ mail }}</li>
     </ul>
   </div>
+  <div class="actions-invite">
+    <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Envoyer les invitations</button>
+    <button class="suppress" (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
+    <div class="help-msg">
+      ⚠️ <strong>Le nouveau code invalide l’ancien.</strong>
+      <br />
+      <span class="subtle">
+      Les anciens liens seront inutilisables (sauf comptes déjà créés).
+    </span>
+    </div>
+  </div>
 
-  <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">Envoyer les invitations</button>
+
+
 </div>
 
 <app-terminal-modal

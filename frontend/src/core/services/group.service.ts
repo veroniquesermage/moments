@@ -111,6 +111,17 @@ export class GroupService {
 
   }
 
+  async regenererCodeInvitation(groupId: number): Promise<ApiResponse<any>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}/code-invitation`;
+    try {
+      await firstValueFrom(this.http.patch<void>(url, {}));
+      return {success: true, data: 'ok'};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la suppression du groupe', error);
+      return {success: false, message: "❌ Suppression impossible. Veuillez réessayer plus tard."};
+    }
+  }
 
   loadGroupesIfEmpty(): Promise<Result<GroupResume[]>> {
     if (this.groupes().length > 0) {
