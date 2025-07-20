@@ -38,13 +38,6 @@
   text-align: center;
 }
 
-.modal-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: left;
-  gap: 1.5rem;
-}
-
 textarea {
   width: 20rem;
   height: 2rem;
@@ -53,3 +46,29 @@ textarea {
 button {
   margin-right: 1rem;
 }
+
+.actions-invite {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.right-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.suppress {
+  background-color: var(--color-error);
+  color: var(--color-bg);
+}
+
+.help-msg {
+  font-size: 0.85em;
+  color: var(--color-subtle, #bbb);
+  max-width: 300px;
+  text-align: center;
+}
+
