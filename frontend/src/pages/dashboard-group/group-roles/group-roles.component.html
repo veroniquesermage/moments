@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <button (click)="confirmRole()">Confirmer les nouveaux rôles</button>
+  <button (click)="confirmRole()">✔️ Confirmer les nouveaux rôles</button>
 </div>
 
 <ng-container  *ngIf="showMemberModal">
@@ -31,7 +31,7 @@
       </ol>
       <div class="modal-actions">
         <button (click)="cancel()">Fermer</button>
-        <button *ngIf="changes.length>0" (click)="validation()">Valider les nouveaux rôles</button>
+        <button *ngIf="changes.length>0" (click)="validation()">✔️ Valider les nouveaux rôles</button>
       </div>
     </div>
   </div>
