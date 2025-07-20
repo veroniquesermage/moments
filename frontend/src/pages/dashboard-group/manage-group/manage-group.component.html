@@ -2,7 +2,9 @@
   <h2>> Gestion du groupe</h2>
   <app-group-info
   [groupId] = "groupId"></app-group-info>
-  <app-group-invite/>
+  <app-group-invite
+    [groupId]="groupId">
+  </app-group-invite>
   <app-group-roles
     [membersSignal]="membersSignal"
     [groupId]="groupId">

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.database import get_db
 from app.dependencies.current_user import get_current_user_from_cookie
 from app.models import User
@@ -66,3 +67,11 @@ async def get_group_details(
         current_user: User = Depends(get_current_user_from_cookie)
 ) -> GroupDetails:
     return await GroupService.get_group_details(db, current_user, groupId)
+
+@router.patch("/{groupId}/code-invitation", status_code=204 )
+async def update_code_invitation(
+        groupId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+):
+    await GroupService.update_code_invitation(db, current_user, groupId )
