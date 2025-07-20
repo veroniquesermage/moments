@@ -136,8 +136,16 @@ export class WelcomeComponent {
 
   async handleClicked(eventName: string) {
     if (eventName === ModalActionType.FORGOT) {
-      await this.auth.requestPasswordReset(this.email);
-      this.showConfirmModal = false;
+      const response = await this.auth.requestPasswordReset(this.email);
+      if (response){
+        this.modalActions = [
+          { label: 'OK', eventName: 'CANCEL', style: 'primary' }];
+        this.message = 'Vous allez recevoir un email pour réinitialiser votre mot de passe. <br> Cliquez sur le lien pour suivre la procédure.';
+      } else {
+        this.showConfirmModal = false;
+        this.errorService.showError('Oups! Un problème est survenu. <br> Veuillez réessayer plus tard');
+      }
+
     } else if (eventName === ModalActionType.CANCEL) {
       this.showConfirmModal = false;
     }

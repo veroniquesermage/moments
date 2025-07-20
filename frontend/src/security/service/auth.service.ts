@@ -212,7 +212,7 @@ export class AuthService {
 
   async loginWithCredentials(email: string, password: string, rememberMe: boolean): Promise<JwtResponse> {
     const loginRequest: LoginRequest = { email, password, rememberMe };
-    return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/credentials`, loginRequest, { withCredentials: true }));
+    return await firstValueFrom(this.http.post<JwtResponse>(`${this.baseUrl}/credentials`, loginRequest));
   }
 
   async submitPasswordChange(changePassword: ChangePassword) {
@@ -239,6 +239,7 @@ export class AuthService {
           { withCredentials: true }
         )
       );
+      return true;
     } catch (err) {
       console.error('[Backend] Erreur :', err);
       throw err;
