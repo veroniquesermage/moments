@@ -6,7 +6,8 @@ export const environment = {
   issuer: 'https://accounts.google.com',
 
   api: {
-    auth: '/auth/google',
+    auth: '/auth',
+    google: '/google',
     groupes: '/groupe',
     rejoindre: '/rejoindre',
     cadeaux: '/cadeaux',

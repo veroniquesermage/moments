@@ -37,28 +37,28 @@ export class DashboardComponent implements OnInit{
   }
 
   goToMesCadeaux() {
-    this.router.navigate(['dashboard', 'mes-cadeaux']);
+    void this.router.navigate(['dashboard', 'mes-cadeaux']);
   }
 
 
   goToListesMembres() {
-    this.router.navigate(['dashboard', 'leurs-cadeaux']);
+    void this.router.navigate(['dashboard', 'leurs-cadeaux']);
 
   }
 
   goToSuiviCadeaux() {
-    this.router.navigate(['dashboard', 'cadeaux-suivis']);
+    void this.router.navigate(['dashboard', 'cadeaux-suivis']);
   }
 
   goToIdeeCadeaux(){
-    this.router.navigate(['dashboard', 'idees']);
+    void this.router.navigate(['dashboard', 'idees']);
   }
 
   goToProfile() {
-    this.router.navigate(['profile']);
+    void this.router.navigate(['profile']);
   }
   goToGestionGroupe() {
-    this.router.navigate(['/groupe/admin']);
+    void this.router.navigate(['/groupe/admin']);
   }
 
 

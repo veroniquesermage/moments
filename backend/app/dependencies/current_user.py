@@ -25,7 +25,7 @@ async def get_current_user_from_cookie(
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
-        if user_id is None:
+        if user_id is None or payload.get("purpose") != 'access_token':
             raise HTTPException(status_code=401, detail="❌ Token invalide")
     except JWTError:
         raise HTTPException(status_code=401, detail="❌ Token corrompu ou expiré")

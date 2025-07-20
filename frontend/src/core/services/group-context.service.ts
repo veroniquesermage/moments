@@ -25,7 +25,7 @@ export class GroupContextService{
   getGroupId(): number {
     const id = localStorage.getItem('app_kdo.activeGroupId');
     if (!id || isNaN(Number(id))) {
-      this.router.navigate(['/onboarding']);
+      void this.router.navigate(['/onboarding']);
     }
     return Number(id);
   }

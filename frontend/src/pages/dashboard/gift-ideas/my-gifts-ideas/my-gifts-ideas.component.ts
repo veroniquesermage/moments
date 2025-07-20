@@ -91,17 +91,17 @@ export class MyGiftsIdeasComponent implements OnInit {
   }
 
   onRowClick(gift: GiftIdeasResponse) {
-    this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
+    void this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
       queryParams: {context: 'idee-cadeau'}
     });
   }
 
   return() {
-    this.router.navigate(['/dashboard']);
+    void this.router.navigate(['/dashboard']);
   }
 
   goToAjout() {
-    this.router.navigate(['/dashboard/idees/creer']);
+    void this.router.navigate(['/dashboard/idees/creer']);
   }
 
   async takeIt(id: number) {

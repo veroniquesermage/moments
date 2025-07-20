@@ -106,7 +106,6 @@ class MailjetAdapter:
 
         return mailjet.send.create(data=data)
 
-
     @staticmethod
     async def send_alert_update(
             gift_updated: Gift,
@@ -156,8 +155,98 @@ class MailjetAdapter:
 
         # Log minimal pour voir si ça passe
         logger.info(f"📧 Mailjet response status: {response.status_code}")
-        logger.info(f"📧 Mailjet response body: {response.json()}")
 
+    @staticmethod
+    async def send_validation_email(
+                email: str,
+                token: str):
+
+        sender_email = settings.mj_sender_email
+        invite_url = f"{settings.check_mail}{token}"
+
+        # Lecture du fichier HTML
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "verify_email.html"
+        template_str = template_path.read_text(encoding="utf-8")
+
+        # Création d’un template Jinja2
+        template = Template(template_str)
+
+        # Rendu avec les vraies données
+        html_rendered = template.render(
+            url_avec_code=invite_url
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": email,
+                        }
+                    ],
+                    "Subject": "(Moments) Validez votre email pour nous rejoindre",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+
+        # Log minimal pour voir si ça passe
+        logger.info(f"📧 Mailjet response status: {response.status_code}")
+
+        return response
+
+    @staticmethod
+    async def send_token_password(
+            email: str,
+            token: str):
+
+        sender_email = settings.mj_sender_email
+        password_url = f"{settings.reset_password}{token}"
+
+        # Lecture du fichier HTML
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "reset_password.html"
+        template_str = template_path.read_text(encoding="utf-8")
+
+        # Création d’un template Jinja2
+        template = Template(template_str)
+
+        # Rendu avec les vraies données
+        html_rendered = template.render(
+            url_avec_code=password_url
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": email,
+                        }
+                    ],
+                    "Subject": "(Moments) Réinitialisez votre mot de passe",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+
+        # Log minimal pour voir si ça passe
+        logger.info(f"📧 Mailjet response status: {response.status_code}")
+
+        return response
 
     @staticmethod
     def _get_mailjet_client():

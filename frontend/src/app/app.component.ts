@@ -58,7 +58,7 @@ export class AppComponent {
 
     if (result.success) {
       if (result.data.length === 1) {
-        this.groupContext.setGroupContext(result.data.at(0)?.id!);
+        await this.groupContext.setGroupContext(result.data.at(0)?.id!);
         if (!this.router.url.startsWith('/dashboard')) {
           await this.router.navigate(['/dashboard']);
         }

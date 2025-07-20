@@ -32,12 +32,28 @@ export class StartupService {
 
       } catch (error) {
         this.tokenService.clear();
-        this.router.navigate(['/']);
+        if (!this.isCurrentRoutePublic()) {
+          this.router.navigate(['/']);
+        }
       }
     } else {
       this.tokenService.clear();
-      this.router.navigate(['/']);
+      if (!this.isCurrentRoutePublic()) {
+        this.router.navigate(['/']);
+      }
     }
+  }
+
+  private isCurrentRoutePublic(): boolean {
+    const publicRoutes = [
+      '/auth/initialiser',
+      '/auth/reset-password'
+      // ajoute ici d'autres routes publiques si besoin
+    ];
+
+    const currentPath = window.location.pathname;
+    return publicRoutes.some(route => currentPath.startsWith(route));
+
   }
 
   private async redirectToCorrectPage(): Promise<void> {
