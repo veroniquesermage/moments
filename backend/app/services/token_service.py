@@ -10,20 +10,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.logger import logger
 from app.models import RefreshToken
-from app.utils.date_helper import is_expired
+from app.utils.date_helper import is_expired, now_paris
 
 
-class RefreshTokenService:
+class TokenService:
 
     SECRET_KEY = settings.jwt_secret
     ALGORITHM = "HS256"
     TZ = ZoneInfo("Europe/Paris")
+    EXPIRATION_MINUTES_SIGN_UP = 30
+    EXPIRATION_MINUTES_PASSWORD = 15
 
     @staticmethod
     def create_refresh_token(data: dict, expires_at: datetime) -> str:
         to_encode = data.copy()
-        to_encode.update({"exp": expires_at})
-        encoded_jwt = jwt.encode(to_encode, RefreshTokenService.SECRET_KEY, algorithm=RefreshTokenService.ALGORITHM)
+        to_encode.update({"purpose": 'refresh_token', "exp": expires_at})
+        encoded_jwt = jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
         return encoded_jwt
 
     @staticmethod
@@ -34,7 +36,7 @@ class RefreshTokenService:
     ) -> RefreshToken:
 
         logger.info(f"Enregistrement refresh token pour l'utilisateur {user_id}")
-        expires_at: datetime = (datetime.now(RefreshTokenService.TZ) +
+        expires_at: datetime = (datetime.now(TokenService.TZ) +
                                 (timedelta(days=30)))
 
         logger.info(f"Date d'expiration pour le refresh_token {expires_at}")
@@ -106,8 +108,44 @@ class RefreshTokenService:
             payload = jwt.decode(
                 token,
                 settings.jwt_secret,
-                algorithms=[RefreshTokenService.ALGORITHM]
+                algorithms=[TokenService.ALGORITHM]
             )
+
+            if payload['purpose'] != 'refresh_token':
+                raise HTTPException(status_code=401, detail="Token invalide.")
+
             return payload
         except JWTError:
             raise HTTPException(status_code=401, detail="❌ Token corrompu ou expiré")
+
+
+    @staticmethod
+    def generate_signup_token(email: str, hashed_pw: str, remember_me: bool) -> str:
+        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES_SIGN_UP)
+        to_encode = {"sub": email, "hashed_pw": hashed_pw, "remember_me": remember_me, "purpose": 'sign_up', "exp": exp}
+        return jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
+
+    @staticmethod
+    def decode_signup_token(token: str) -> dict:
+        token_data = jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])
+        if token_data.get('purpose') != 'sign_up':
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        return token_data
+
+    @staticmethod
+    def generate_password_token(email: str) -> str:
+        exp: datetime = now_paris() + timedelta(minutes=TokenService.EXPIRATION_MINUTES_PASSWORD)
+        to_encode = {"sub": email, "purpose": 'reset_password', "exp": exp}
+        return jwt.encode(to_encode, TokenService.SECRET_KEY, algorithm=TokenService.ALGORITHM)
+
+    @staticmethod
+    def decode_password_token(token: str) -> dict:
+
+        token_data = jwt.decode(token, TokenService.SECRET_KEY, algorithms=[TokenService.ALGORITHM])
+
+        if token_data['purpose'] != 'reset_password':
+            raise HTTPException(status_code=401, detail="Token invalide.")
+
+        return token_data
+

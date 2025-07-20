@@ -1,5 +1,5 @@
 import {Routes} from '@angular/router';
-import {WelcomeComponent} from 'src/pages/welcome/welcome.component';
+import {WelcomeComponent} from 'src/pages/auth/welcome/welcome.component';
 
 export const routes: Routes = [
   {
@@ -17,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadChildren: () => import('../pages/profile/profile.routes').then(m => m.profileRoutes)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('../pages/auth/auth.routes').then(m => m.authRoutes)
   },
   {
     path: '**',

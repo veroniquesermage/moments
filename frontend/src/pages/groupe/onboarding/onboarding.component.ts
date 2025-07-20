@@ -38,7 +38,7 @@ export class OnboardingComponent implements OnInit {
 
   async choisirGroupe(groupe: GroupResume): Promise<void> {
     await this.groupContextService.setGroupContext(groupe.id);
-    this.router.navigate(['/dashboard']);
+    void this.router.navigate(['/dashboard']);
   }
 
 }

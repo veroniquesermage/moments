@@ -1,36 +1,49 @@
 @startuml
-actor Utilisateur as User
-participant "Frontend" as FE
-participant "Backend" as BE
-participant "Google Auth" as Google
-database "Base de données" as DB
+actor Utilisateur
+participant Frontend
+participant Backend
 
-== Connexion ==
+== Connexion (détection) ==
+Utilisateur -> Frontend : Cliquer sur "Se connecter"
+Frontend -> Backend : POST /auth/check-user { email, isGoogleLogin }
 
-User -> FE : Se connecte via Google
-FE -> Google : Demande un id_token
-Google --> FE : Renvoie id_token
+alt Utilisateur trouvé
+  Backend -> Frontend : 200 OK
 
-FE -> BE : POST /auth/login {"mode": "google", "id_token": "..."}
+  alt isGoogleLogin = true
+    Frontend -> Google : Redirection OAuth2
+    Google -> Frontend : Code
+    Frontend -> Backend : POST /auth/google-login
+    Backend -> Backend : Vérification + JWT
+    Backend --> Frontend : Cookies + profil
+    Frontend -> Frontend : Récupération groupes → navigation
+  else isGoogleLogin = false
+    Frontend -> Backend : POST /auth/login { email, password }
+    alt mot de passe correct
+      Backend -> Backend : Vérification + JWT
+      Backend --> Frontend : Cookies + profil
+      Frontend -> Frontend : Récupération groupes → navigation
+    else mot de passe incorrect
+      Backend --> Frontend : 401 Unauthorized
+      Frontend -> Utilisateur : Affiche modale "Mot de passe incorrect"
+      Utilisateur -> Frontend : Clique "Mot de passe oublié ?"
+      Frontend -> Backend : POST /auth/password-reset-request { email }
+      Backend -> Backend : Génère token + envoi email
+      Utilisateur -> Backend : Clique sur lien reçu (token)
+      Frontend -> Utilisateur : Formulaire de nouveau mot de passe
+      Utilisateur -> Frontend : Envoie nouveau mot de passe
+      Frontend -> Backend : POST /auth/reset-password { token, newPassword }
+      Backend -> Backend : Mise à jour + email de confirmation
+    end
+  end
 
-BE -> Google : Vérifie id_token
-Google --> BE : OK (identité vérifiée)
-
-BE -> DB : Cherche utilisateur via email
-DB --> BE : Renvoie user ou None
-
-alt Utilisateur inconnu
-    BE -> DB : Crée un nouvel utilisateur
+else Utilisateur inconnu
+  Backend -> Frontend : 404 Not Found
+  Frontend -> Utilisateur : Affiche modale "Créer un compte ?"
+  Utilisateur -> Frontend : Clique sur "Créer mon compte"
+  Frontend -> Backend : POST /auth/register
+  Backend -> Backend : Création utilisateur
+  Backend --> Frontend : Cookies + profil
+  Frontend -> Frontend : Récupération groupes → navigation
 end
-
-BE -> BE : Génère un JWT maison (user_id, exp, etc.)
-BE --> FE : Renvoie token maison
-
-== Utilisation du token ==
-
-FE -> BE : Appels API avec Authorization: Bearer <JWT maison>
-BE -> BE : Décode JWT
-BE -> DB : Charge user_id depuis JWT
-DB --> BE : Données utilisateur
-BE --> FE : Réponse de l'API
 @enduml

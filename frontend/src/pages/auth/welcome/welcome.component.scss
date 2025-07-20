@@ -1,0 +1,202 @@
+/* Message d'invite */
+.command-accueil {
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Bouton Google */
+.google-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Bouton Email/Mdp */
+.options-wlc {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 0.5em auto;
+  padding: 1em 0;
+  font-family: inherit;
+  font-size: 1.05em;
+  background-color: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  text-align: center;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.options-wlc:hover,
+.terminal-btn:hover {
+  background-color: var(--color-border);
+  color: var(--color-bg);
+}
+
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  background-color: #F2F2F2;
+  border-radius: 4px;
+
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1F1F1F;
+
+  height: 40px;
+  padding: 0 16px;
+  cursor: pointer;
+
+  transition: box-shadow 0.2s ease;
+}
+
+.google-signin-btn:hover {
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
+}
+
+.or-separator {
+  margin: 2em 0 1.5em;
+  text-align: center;
+  font-size: 1em;
+  font-weight: 900;
+  display: block;
+  width: 100%;
+}
+
+/* === FORMULAIRE DE CONNEXION EMAIL/MDP === */
+
+.login-form {
+  max-width: 650px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 0.2em;
+  font-weight: bold;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"],
+.login-form input[type="text"] {
+  display: block;
+  width: 95%;
+  margin-bottom: 2rem;
+  padding: 0.6em;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+}
+
+/* Affichage mot de passe */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.password-wrapper input {
+  flex: 1;
+}
+
+.toggle-password {
+  font-size: 0.85em;
+  background: none;
+  border: none;
+  color: var(--color-accent, #ff80df);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 3rem;
+}
+
+/* Message d’aide mot de passe */
+.help-msg {
+  font-size: 0.85em;
+  color: var(--color-subtle, #bbb);
+  margin-top: -2rem;
+  margin-bottom: 2rem;
+}
+
+/* Case à cocher + Sébou */
+input[type="checkbox"] {
+  transform: scale(1.4);
+  margin-right: 0.6em;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.login-form label input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  margin-bottom: 0.4rem;
+}
+
+.sebou-alert {
+  background-color: var(--color-bg);
+  border: 1px dashed var(--color-highlight);
+  padding: 1.2em 1.4em;
+  margin-top: 1em;
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.95em;
+  line-height: 1.6em;
+  text-align: justify;
+  text-align-last: center;
+}
+
+.sebou-alert .intro {
+  font-style: italic;
+  margin-bottom: 0.7em;
+  display: block;
+}
+
+.sebou-alert .middle {
+  opacity: 0.85;
+  margin-bottom: 0.7em;
+  display: block;
+}
+
+.sebou-alert .final {
+  color: var(--color-highlight);
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  margin-top: 0.8em;
+}
+
+/* Message d'erreur */
+.error-msg {
+  font-size: 0.9em;
+  color: var(--color-warning, #ff4d6d);
+  margin-top: 0.3em;
+  font-weight: bold;
+}
+
+input.error {
+  border: 2px solid #dc3545; /* rouge erreur */
+}
+
+.form-error {
+  color: #dc3545;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: var(--color-subtle, #bbb);
+  margin-top: -1.5rem;
+  margin-bottom: 1rem;
+}

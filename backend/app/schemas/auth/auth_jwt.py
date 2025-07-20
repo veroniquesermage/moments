@@ -3,3 +3,4 @@ from app.schemas.user import UserSchema
 
 class AuthResponse(CamelModel):
     profile: UserSchema
+    is_new_user: bool = False
