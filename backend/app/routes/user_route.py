@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/utilisateurs", tags=["utilisateurs"])
 async def get_user_in_group(
         current_user: User = Depends(get_current_user_from_cookie) ) -> UserSchema:
 
-    user: UserSchema = UserSchema.model_validate(current_user)
+    user: UserSchema = UserSchema.from_user(current_user)
     return user
 
 @router.get("/groupe/{groupId}", response_model=list[UserDisplaySchema])

@@ -113,7 +113,7 @@ class AuthService:
             await TokenService.revoke_refresh_token(db, jti, user_id)
 
             return await AuthService.create_tokens(
-                db, UserSchema.model_validate(user), remember_me
+                db, user, remember_me
             )
         else:
             logger.info(f"Refresh invalide pour le jti {jti} et l'utilisateur {user_id}")
@@ -199,7 +199,7 @@ class AuthService:
             raise HTTPException(status_code=401, detail="Mauvais mot de passe.")
 
         await LoginAttemptService.reset_attempts(db, request.email)
-        return await AuthService.create_tokens(db, UserSchema.model_validate(user), request.remember_me, False)
+        return await AuthService.create_tokens(db, UserSchema.from_user(user), request.remember_me, False)
 
     @staticmethod
     async def change_password(db: AsyncSession, current_user: User, request: ChangePassword):
