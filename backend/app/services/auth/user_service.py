@@ -23,7 +23,7 @@ class UserService:
         user = result.scalars().first()
 
         if user:
-            return UserSchema.model_validate(user), False
+            return UserSchema.from_user(user), False
 
         new_user = User(email=email, prenom=prenom, nom=nom, google_id=google_id)
         db.add(new_user)
@@ -38,7 +38,7 @@ class UserService:
             {"user_id": new_user.id, "email": email},
         )
 
-        return UserSchema.model_validate(new_user), True
+        return UserSchema.from_user(new_user), True
 
     @staticmethod
     async def create_user(
@@ -68,7 +68,7 @@ class UserService:
             {"user_id": new_user.id, "email": email},
         )
 
-        return UserSchema.model_validate(new_user)
+        return UserSchema.from_user(new_user)
 
     @staticmethod
     async def get_user_by_id(db: AsyncSession, user_id: int) -> UserSchema:
@@ -80,7 +80,7 @@ class UserService:
         if not user:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
 
-        return UserSchema.model_validate(user)
+        return UserSchema.from_user(user)
 
     @staticmethod
     async def ensure_mail_available(db: AsyncSession, mail: str) -> bool:
@@ -127,7 +127,7 @@ class UserService:
         await db.commit()
         await db.refresh(existing)
 
-        return UserSchema.model_validate(existing)
+        return UserSchema.from_user(existing)
 
     @staticmethod
     async def reset_password( db: AsyncSession, mail: str, new_password: str) -> UserSchema:
@@ -150,7 +150,7 @@ class UserService:
         await db.commit()
         await db.refresh(existing)
 
-        return UserSchema.model_validate(existing)
+        return UserSchema.from_user(existing)
 
 
     @staticmethod
