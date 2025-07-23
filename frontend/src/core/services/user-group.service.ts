@@ -8,24 +8,13 @@ import {UserDisplay} from 'src/core/models/user-display.model';
 @Injectable({providedIn: 'root'})
 export class UserGroupService {
 
-  private apiUrl = environment.backendBaseUrl + environment.api.utilisateur;
+  private apiUrl = environment.backendBaseUrl + environment.api.utilisateurGroupe;
 
   constructor(private http: HttpClient,) {
   }
 
-  async fetchUserGroup(idGroup: number): Promise<ApiResponse<UserDisplay[]>> {
-    try {
-      const url = `${this.apiUrl + environment.api.groupes}/${idGroup}`;
-      const users = await firstValueFrom(this.http.get<UserDisplay[]>(url));
-      return {success: true, data: users};
-    } catch (error) {
-      console.error('[UserGroupService] Erreur lors de la récupération des membres du groupe', error);
-      return {success: false, message: "❌ Groupe inexistant."};
-    }
-  }
-
   async updateNickname(groupId: number, nickname: string): Promise<ApiResponse<any>> {
-    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}/surnom`;
+    const url = `${ this.apiUrl}/${groupId}/surnom`;
     try{
       await firstValueFrom(this.http.patch(url, {nickname}));
       return {success: true, data: 'ok'}
@@ -36,7 +25,7 @@ export class UserGroupService {
   }
 
   async deleteUserInGroup(groupId: number, userId?: number): Promise<ApiResponse<any>> {
-    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}`;
+    const url = `${ this.apiUrl}/${groupId}`;
 
     let params = new HttpParams();
     if (userId != null) {
@@ -55,7 +44,7 @@ export class UserGroupService {
   }
 
   async updateRoleUsers(groupId: number, rolesUpdate: UserDisplay[]): Promise<ApiResponse<UserDisplay[]>> {
-    const url = `${ environment.backendBaseUrl + environment.api.utilisateurGroupe}/${groupId}/update`;
+    const url = `${ this.apiUrl}/${groupId}/update`;
     try {
       const result = await firstValueFrom(this.http.patch<UserDisplay[]>(url, rolesUpdate));
       return {success: true, data: result};
@@ -64,6 +53,5 @@ export class UserGroupService {
       return {success: false, message: "❌ Impossible de mettre à jour les rôles. Veuillez réessayer."};
     }
   }
-
 
 }

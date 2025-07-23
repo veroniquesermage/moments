@@ -26,7 +26,7 @@ async def get_gifts(
     logger.info(f"L'utilisateur concerné est {effective_user_id}")
     return await GiftService.get_my_gifts(db, effective_user_id)
 
-@router.post("", response_model=GiftResponse)
+@router.post("", response_model=GiftResponse, status_code=201)
 async def create_gift(
         gift: GiftCreate,
         db: AsyncSession = Depends(get_db),

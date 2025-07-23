@@ -56,7 +56,7 @@ class MailService:
             current_user: User
     ) -> None:
 
-        group: GroupResponse = await GroupService.get_group(db, current_user, group_id)
+        group: GroupResponse = await GroupService.get_group(db, group_id)
         existing_users = await UserGroupService.get_existing_users_in_group(db, group_id, invites_request)
         valid_email = [mail for mail in invites_request.emails if mail not in existing_users]
 

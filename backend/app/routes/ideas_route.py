@@ -12,7 +12,7 @@ from app.services import GiftIdeasService
 
 router = APIRouter(prefix="/api/idees", tags=["idees"])
 
-@router.post("", response_model=GiftIdeasResponse)
+@router.post("", response_model=GiftIdeasResponse, status_code=201)
 async def create_gift_idea(
         gift_idea: GiftIdeaCreate,
         db: AsyncSession = Depends(get_db),
