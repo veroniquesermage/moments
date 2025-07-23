@@ -3,9 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.core.logger import logger
+from app.models import UserGroup
 from app.models.user import User
-from app.schemas import UserSchema
+from app.schemas import UserSchema, UserTiersResponse
 from app.schemas.auth import CompleteProfileRequest
+from app.schemas.user_tiers_request import UserTiersRequest
+from app.services import UserGroupService
 from app.services.trace_service import TraceService
 
 
@@ -177,3 +180,53 @@ class UserService:
         await db.commit()
 
         return user
+
+    @staticmethod
+    async def create_managed_account(request: UserTiersRequest, current_user: User, group_id: int, db: AsyncSession) -> UserTiersResponse:
+
+        if current_user.is_compte_tiers:
+            raise HTTPException(status_code=403, detail="❌ Un compte-tiers ne peut pas créer de compte-tiers")
+
+        new_user = User( prenom = request.prenom.strip(),
+                         nom = request.nom.strip() if request.nom else None,
+                         is_compte_tiers= True,
+                         gere_par=current_user.id)
+
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+
+        user_group: UserGroup = await UserGroupService.get_user_group(db, current_user.id, group_id)
+        if not user_group:
+            raise HTTPException(status_code=403, detail="L'utilisateur n'appartient pas au groupe demandé")
+        await UserGroupService.add_user_to_group(db, group_id, new_user.id, request.surnom)
+
+        return UserTiersResponse.model_validate(new_user)
+
+    @staticmethod
+    async def get_managed_account(current_user, group_id, db) -> list[UserTiersResponse]:
+        result = await db.execute(
+            select(User, UserGroup.surnom)
+            .join(UserGroup, User.id == UserGroup.utilisateur_id)
+            .where(
+                User.gere_par == current_user.id,
+                UserGroup.groupe_id == group_id
+            )
+        )
+        rows = result.all()
+        managed_accounts = [
+            UserTiersResponse(
+                id=user.id,
+                nom=user.nom,
+                prenom=user.prenom,
+                surnom=surnom,
+                is_compte_tiers=user.is_compte_tiers
+            )
+            for user, surnom in rows
+        ]
+
+        return managed_accounts
+
+
+
+

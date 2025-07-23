@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadChildren: () => import('../pages/auth/auth.routes').then(m => m.authRoutes)
   },
   {
+    path: 'compte-tiers',
+    loadChildren: () => import('../pages/compte-tiers/compte-tiers.routes').then(m => m.compteTiersRoutes)
+  },
+  {
     path: '**',
     redirectTo: '/404',
   },

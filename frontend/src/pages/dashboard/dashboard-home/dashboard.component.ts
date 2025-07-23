@@ -62,4 +62,7 @@ export class DashboardComponent implements OnInit{
   }
 
 
+  goToComptesTiers() {
+    void this.router.navigate(['/compte-tiers']);
+  }
 }

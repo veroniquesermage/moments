@@ -10,7 +10,7 @@ from app.services.group_service import GroupService
 router = APIRouter(prefix="/api/groupe", tags=["groupe"])
 
 
-@router.post("", response_model=GroupResponse)
+@router.post("", response_model=GroupResponse, status_code=201)
 async def create_group(
         group: GroupCreate,
         db: AsyncSession = Depends(get_db),
@@ -41,7 +41,7 @@ async def get_group(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user_from_cookie)
 ) -> GroupResponse:
-    return await GroupService.get_group(db, current_user, groupId )
+    return await GroupService.get_group(db, groupId )
 
 @router.patch("/{groupId}", response_model=GroupResponse)
 async def update_group(
