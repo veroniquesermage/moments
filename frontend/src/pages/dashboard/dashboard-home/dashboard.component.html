@@ -1,6 +1,6 @@
 <div class="terminal" aria-labelledby="Menu principal">
-  <h1>> Bienvenue dans le groupe : {{ selectedGroup!.groupe.nomGroupe }}</h1>
-  <h2 *ngIf="selectedGroup!.groupe.description">> Description du groupe : </h2> <em> {{selectedGroup!.groupe.description}}</em>
+  <h1> Bienvenue dans le groupe : {{ selectedGroup!.groupe.nomGroupe }}</h1>
+  <h2 *ngIf="selectedGroup!.groupe.description"> Description du groupe : </h2> <em> {{selectedGroup!.groupe.description}}</em>
 
   <section class="intro-bloc" aria-label="Introduction pour la page Menu principal">
   <p>> Que souhaitez-vous faire ?</p>
@@ -8,22 +8,25 @@
 
   <ul class="command-list">
     <li>
-      <button (click)="goToMesCadeaux()">[1] Gérer mes cadeaux</button>
+      <button (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
     </li>
     <li>
-      <button (click)="goToListesMembres()">[2] Voir les listes des autres membres</button>
+      <button (click)="goToListesMembres()">📃 Voir les listes des autres membres</button>
     </li>
     <li>
-      <button (click)="goToSuiviCadeaux()">[3] Suivi des cadeaux réservés/pris</button>
+      <button (click)="goToSuiviCadeaux()">🛍️ Suivi des cadeaux réservés/pris</button>
     </li>
     <li>
-      <button (click)="goToIdeeCadeaux()">[4] Mes idées de cadeaux pour autrui</button>
+      <button (click)="goToIdeeCadeaux()">💡 Mes idées de cadeaux pour autrui</button>
     </li>
     <li>
-      <button (click)="goToProfile()">[5] Mon profil, mes groupes, déconnexion</button>
+      <button (click)="goToProfile()">⚙️ Mon profil, mes groupes, déconnexion</button>
+    </li>
+    <li>
+      <button (click)="goToComptesTiers()">🧩 Gérer un compte tiers (enfant, proche…)</button>
     </li>
     <li *ngIf="isAdmin">
-      <button (click)="goToGestionGroupe()">[*] Gérer le groupe</button>
+      <button (click)="goToGestionGroupe()">🛠️ Gérer le groupe</button>
     </li>
   </ul>
 </div>

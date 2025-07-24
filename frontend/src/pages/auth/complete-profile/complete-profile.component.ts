@@ -26,7 +26,7 @@ export class CompleteProfileComponent implements OnInit{
   givenName: string | undefined ='';
   familyName: string | undefined ='';
   user: IncompleteUser | null = null;
-  context: 'google' | 'credentials' | 'compte-mandataire' = 'google';
+  context: 'google' | 'credentials' = 'google';
   token: string | null = null;
   private route = inject(ActivatedRoute);
 
@@ -41,8 +41,8 @@ export class CompleteProfileComponent implements OnInit{
     this.familyName = this.user ? this.user.nom : '';
 
     const contexteBrut = this.route.snapshot.queryParamMap.get('context');
-    const contextValide = ['google', 'credentials', 'compte-mandataire'].includes(contexteBrut ?? '');
-    this.context = (contextValide ? contexteBrut : 'google') as 'google' | 'credentials' | 'compte-mandataire';
+    const contextValide = ['google', 'credentials'].includes(contexteBrut ?? '');
+    this.context = (contextValide ? contexteBrut : 'google') as 'google' | 'credentials';
 
     console.log(this.context);
     this.token = this.route.snapshot.queryParamMap.get('token');

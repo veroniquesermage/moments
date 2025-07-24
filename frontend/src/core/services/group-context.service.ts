@@ -1,18 +1,18 @@
 import {Injectable, Signal, signal} from '@angular/core';
-import {UserGroupService} from 'src/core/services/user-group.service';
 import {Router} from '@angular/router';
 import {UserDisplay} from 'src/core/models/user-display.model';
+import {UserService} from 'src/core/services/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class GroupContextService{
 
   membersSignal = signal<UserDisplay[]>([]);
 
-  constructor(private userGroupService: UserGroupService,
+  constructor(private userService: UserService,
               private router: Router) {}
 
   async setGroupContext(id: number): Promise<void> {
-    const groupUsers = await this.userGroupService.fetchUserGroup(id);
+    const groupUsers = await this.userService.fetchUserGroup(id);
     if (groupUsers.success) {
       this.membersSignal.set(groupUsers.data);
     } else {
@@ -36,7 +36,7 @@ export class GroupContextService{
 
   async updateMemberSignal() {
     const id = this.getGroupId();
-    const groupUsers = await this.userGroupService.fetchUserGroup(id);
+    const groupUsers = await this.userService.fetchUserGroup(id);
     if (groupUsers.success) {
       this.membersSignal.set(groupUsers.data);
     }

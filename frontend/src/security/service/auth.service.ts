@@ -86,7 +86,7 @@ export class AuthService {
         console.log('[Backend] Réponse reçue :', data);
         if (data?.isNewUser && data?.profile) {
           this.incompleteUser.set({
-            email: data.profile.email,
+            email: data.profile.email!,
             nom: data.profile.nom,
             prenom: data.profile.prenom
           })
