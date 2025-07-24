@@ -82,10 +82,9 @@ class GroupService:
     @staticmethod
     async def get_group(
         db: AsyncSession,
-        current_user: User,
         group_id: int
     ) -> GroupResponse:
-        """Retourne la liste des Group dont current_user est membre."""
+
         result = (await db.execute(
             select(Group)
             .where(Group.id == group_id)
@@ -254,3 +253,5 @@ class GroupService:
         if me is None or me.role != RoleEnum.ADMIN:
             raise HTTPException(status_code=403, detail="❌ Vous n'avez pas les droits pour supprimer ce groupe.")
         return group
+
+

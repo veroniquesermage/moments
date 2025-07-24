@@ -13,7 +13,6 @@
       [(ngModel)]="givenName"
       type="text"
       required
-      [attr.aria-describedby]="givenName"
     />
 
     <label for="familyName">Nom</label>
@@ -21,7 +20,6 @@
       id="familyName"
       [(ngModel)]="familyName"
       type="text"
-      [attr.aria-describedby]="familyName"
     />
 
     <div class="sebou-alert">
@@ -37,8 +35,8 @@
     </div>
 
     <div class="options">
-      <button *ngIf="context=='google'" (click)="submitName()">💾 Valider vos informations</button>
-      <button *ngIf="context=='credentials'" (click)="registerWithCredentials()">🌟 Finaliser mon inscription</button>
+      <button type="button" *ngIf="context=='google'" (click)="submitName()">💾 Valider vos informations</button>
+      <button type="button" *ngIf="context=='credentials'" (click)="registerWithCredentials()">🌟 Finaliser mon inscription</button>
     </div>
   </div>
 

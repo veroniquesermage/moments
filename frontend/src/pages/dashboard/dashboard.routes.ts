@@ -15,6 +15,7 @@ import {GiftSharingComponent} from 'src/pages/dashboard/sharing/gift-sharing/gif
 import {MyGiftsIdeasComponent} from 'src/pages/dashboard/gift-ideas/my-gifts-ideas/my-gifts-ideas.component';
 import {IdeasCreateComponent} from 'src/pages/dashboard/gift-ideas/ideas-create/ideas-create.component';
 import {IdeasUpdateComponent} from 'src/pages/dashboard/gift-ideas/ideas-update/ideas-update.component';
+import {ManagedAccountsComponent} from 'src/pages/compte-tiers/managed-accounts/managed-accounts.component';
 
 export const dashboardRoutes: Routes = [
   { path: '', component: DashboardComponent},
@@ -29,4 +30,5 @@ export const dashboardRoutes: Routes = [
   { path: 'idees', component: MyGiftsIdeasComponent },
   { path: 'idees/creer', component: IdeasCreateComponent},
   { path: 'idees/modifier/:id', component: IdeasUpdateComponent},
+  { path: 'comptes-tiers', component: ManagedAccountsComponent},
 ];

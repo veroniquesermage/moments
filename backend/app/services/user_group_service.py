@@ -238,4 +238,23 @@ class UserGroupService:
         result = await db.execute(stmt)
         return [row[0] for row in result.fetchall()]
 
+    @staticmethod
+    async def add_user_to_group(db: AsyncSession, group_id: int, user_id: int, surnom: str) -> UserGroup:
+        result = await db.execute(
+            select(UserGroup).where(UserGroup.groupe_id == group_id).where(UserGroup.utilisateur_id == user_id))
+        existing_user_group = result.scalars().first()
 
+        if existing_user_group:
+            raise HTTPException(status_code=409, detail="Cet utilisateur appartient déjà à ce groupe")
+
+        user_group = UserGroup(
+            groupe_id=group_id,
+            utilisateur_id=user_id,
+            role=RoleEnum.MEMBRE,
+            surnom=surnom
+        )
+
+        db.add(user_group)
+        await db.commit()
+        await db.refresh(user_group)
+        return user_group

@@ -1,0 +1,81 @@
+<div class="terminal">
+  <h2>🧩 Comptes tiers</h2>
+
+  <section class="intro-bloc">
+    <p>
+      Les comptes tiers vous permettent de gérer les souhaits d’un enfant, d’un proche ou de toute personne que vous accompagnez — sans qu’elle ait besoin d’utiliser l’application elle-même.
+    </p>
+
+    <p>
+      C’est l’idéal, par exemple, pour préparer les surprises des plus jeunes membres de la famille, ou simplifier l’organisation pour une personne moins à l’aise avec les outils numériques.
+    </p>
+
+    <p>
+      <strong>À savoir :</strong> ces comptes disposent de droits limités. Vous pouvez leur créer une liste de cadeaux, mais vous ne pourrez pas prendre ou réserver un cadeau en leur nom. En somme, ce sont des invités discrets sous votre supervision.
+    </p>
+  </section>
+
+  <section class="actions">
+    <hr class="block-separator" />
+    <div class="block-title">👭 Créer un compte tiers </div>
+    <hr class="block-separator" />
+    <div class="sebou-alert">
+      <span class="intro">
+        <em>Le prénom et le nom du compte tiers seront partagés entre tous les groupes où il sera ajouté.</em>
+      </span>
+      <span class="middle">
+        En revanche, vous pouvez personnaliser un surnom spécifique à chaque groupe — y compris celui-ci.
+      </span>
+      <span class="final">
+        C’est le moment idéal pour définir ce surnom dans le groupe actif.
+      </span>
+    </div>
+
+    <div class="login-form">
+      <label for="givenName">Prénom</label>
+      <input
+        id="givenName"
+        [(ngModel)]="givenName"
+        type="text"
+        required
+        autocomplete="off"
+      />
+
+      <label for="familyName">Nom</label>
+      <input
+        id="familyName"
+        [(ngModel)]="familyName"
+        type="text"
+        autocomplete="off"
+      />
+
+      <label for="nickname">Surnom</label>
+      <input
+        id="nickname"
+        [(ngModel)]="nickname"
+        type="text"
+        autocomplete="off"
+      />
+    </div>
+
+    <button type="button" (click)="goToCreateCompteTiers()">➕ Créer un nouveau compte tiers</button>
+  </section>
+
+  <section class="liste-comptes" aria-live="polite">
+    <hr class="block-separator" />
+    <div class="block-title">📋 Comptes actuellement gérés</div>
+    <hr class="block-separator" />
+    <ul *ngIf="managedAccounts().length > 0; else noAccounts">
+      <li *ngFor="let account of managedAccounts()">
+        <span>{{ account.prenom }} {{ account.nom || '' }}</span>
+        <button (click)="switchToAccount(account.id)">👤 Se connecter en tant que</button>
+      </li>
+    </ul>
+
+    <ng-template #noAccounts>
+      <p>Vous ne gérez actuellement aucun compte tiers.</p>
+    </ng-template>
+  </section>
+
+
+</div>
