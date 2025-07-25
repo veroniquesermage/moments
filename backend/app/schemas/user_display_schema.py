@@ -5,7 +5,7 @@ from app.schemas import CamelModel
 
 class UserDisplaySchema(CamelModel):
     id: int
-    nom: str
+    nom: Optional[str] = None
     prenom: str
     surnom: Optional[str] = None
     role: Optional[str] = None

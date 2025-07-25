@@ -5,11 +5,11 @@ from starlette.responses import JSONResponse
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id
 from app.main import get_db
 from app.models import User
-from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, CompleteProfileRequest, RegisterRequest
 from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
 from app.schemas.auth.reset_password_payload import ResetPasswordPayload
+from app.schemas.user import UserSchema
 from app.services.auth.auth_service import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])

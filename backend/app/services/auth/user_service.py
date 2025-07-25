@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -21,7 +23,7 @@ class UserService:
             prenom: str,
             nom: str,
             google_id: str
-    ) -> tuple[UserSchema, bool]:
+    ) -> tuple[UserSchema, bool] | tuple[Any, bool]:
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
 
@@ -50,7 +52,7 @@ class UserService:
             prenom: str,
             nom: str,
             password: str
-    ) -> UserSchema:
+    ) -> User:
 
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
@@ -204,7 +206,7 @@ class UserService:
         return UserTiersResponse.model_validate(new_user)
 
     @staticmethod
-    async def get_managed_account(current_user, group_id, db) -> list[UserTiersResponse]:
+    async def get_managed_account(current_user: User, group_id: int, db: AsyncSession) -> list[UserTiersResponse]:
         result = await db.execute(
             select(User, UserGroup.surnom)
             .join(UserGroup, User.id == UserGroup.utilisateur_id)

@@ -11,10 +11,10 @@ class UserSchema(CamelModel):
     id: int
     email: Optional[str] = None
     prenom: str
-    nom: Optional[str]
+    nom: Optional[str] = None
     date_creation: datetime
     is_compte_tiers: bool
-    has_password: bool
+    has_password: Optional[bool] = False
 
     @classmethod
     def from_user(cls, user: User) -> "UserSchema":

@@ -13,11 +13,11 @@ from app.core.google_jwt import verify_google_id_token
 from app.core.jwt import create_access_token
 from app.core.logger import logger
 from app.models import RefreshToken, User
-from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileRequest, RegisterRequest
 from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
 from app.schemas.auth.reset_password_payload import ResetPasswordPayload
+from app.schemas.user import UserSchema
 from app.services import UserGroupService
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.login_attempt_service import LoginAttemptService
@@ -276,7 +276,7 @@ class AuthService:
         if not user_group:
             raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
 
-        return await AuthService.create_tokens(db, UserSchema.model_validate(user_tiers), False, False)
+        return await AuthService.create_tokens(db, user_tiers, False, False)
 
 
 

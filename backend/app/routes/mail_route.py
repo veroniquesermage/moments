@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id
 from app.models import User
 from app.schemas.mailing import FeedbackRequest
@@ -17,7 +17,7 @@ async def send_feedback_mail(
         current_user: User = Depends(get_current_user_from_cookie) ) :
 
 
-    return await MailService.send_feedback(feedbackRequest, current_user, db)
+    return await MailService.send_feedback(feedbackRequest, db, current_user)
 
 @router.post("/invitation", status_code=204)
 async def send_feedback_mail(

@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
 from app.database import get_db
-from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id
+from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id, \
+    get_current_user_from_cookie_with_tiers
 from app.models.user import User
 from app.schemas import UserSchema, UserDisplaySchema
 from app.schemas.user_tiers_request import UserTiersRequest
@@ -31,7 +32,7 @@ async def get_managed_account(current_user: User = Depends(get_current_user_from
 @router.post("/compte-tiers", response_model=UserTiersResponse, status_code=201)
 async def create_managed_account(
         request: UserTiersRequest,
-        current_user: User = Depends(get_current_user_from_cookie),
+        current_user: User = get_current_user_from_cookie_with_tiers(),
         group_id: int = Depends(get_current_group_id),
         db: AsyncSession = Depends(get_db)) -> UserTiersResponse:
 
