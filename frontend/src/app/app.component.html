@@ -1,3 +1,8 @@
+<div *ngIf="auth.profile()?.isCompteTiers" class="sr-only" aria-live="polite" role="status">
+  Vous êtes connecté en tant que compte tiers. Certaines fonctionnalités sont désactivées.
+</div>
+
+
 <router-outlet/>
 
 <app-terminal-modal
