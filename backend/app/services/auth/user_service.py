@@ -74,7 +74,7 @@ class UserService:
         return UserSchema.from_user(new_user)
 
     @staticmethod
-    async def get_user_by_id(db: AsyncSession, user_id: int) -> UserSchema:
+    async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
         logger.info(f"Récupération de l'utilisateur avec l'id {user_id}")
 
         result = await db.execute(select(User).where(User.id == user_id))
@@ -83,7 +83,7 @@ class UserService:
         if not user:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
 
-        return UserSchema.from_user(user)
+        return user
 
     @staticmethod
     async def ensure_mail_available(db: AsyncSession, mail: str) -> bool:
