@@ -18,6 +18,7 @@ from app.schemas.auth import GoogleAuthRequest, AuthResponse, CompleteProfileReq
 from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
 from app.schemas.auth.reset_password_payload import ResetPasswordPayload
+from app.services import UserGroupService
 from app.services.auth.google_auth_service import exchange_code_for_tokens
 from app.services.auth.login_attempt_service import LoginAttemptService
 from app.services.auth.user_service import UserService
@@ -62,7 +63,12 @@ class AuthService:
         refresh_token = TokenService.create_refresh_token(refresh_payload, refresh_token_stored.expires_at)
 
         access_token_duration = now_paris() + timedelta(minutes=30)
-        access_token = create_access_token(data={"sub": str(user.id)}, expires_at=access_token_duration)
+        access_payload = {
+            "sub": str(user.id),
+            "exp": access_token_duration,
+        }
+
+        access_token = create_access_token(data=access_payload, expires_at=access_token_duration)
 
         # Création de la réponse JSON avec cookies
         content = jsonable_encoder(AuthResponse(profile=user, is_new_user=is_new_user))
@@ -113,7 +119,7 @@ class AuthService:
             await TokenService.revoke_refresh_token(db, jti, user_id)
 
             return await AuthService.create_tokens(
-                db, user, remember_me
+                db, UserSchema.from_user(user), remember_me
             )
         else:
             logger.info(f"Refresh invalide pour le jti {jti} et l'utilisateur {user_id}")
@@ -257,6 +263,22 @@ class AuthService:
             raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
 
         return user
+
+    @staticmethod
+    async def switch_to_tiers(db: AsyncSession, user_tiers_id: int, current_user: User, group_id: int) -> JSONResponse:
+        user_tiers: User = await UserService.get_user_by_id(db, user_tiers_id)
+
+        if not user_tiers.gere_par == current_user.id :
+            raise HTTPException(status_code=401, detail="utilisateur non géré par le current_user.")
+
+        user_group = await UserGroupService.get_user_group(db, user_tiers_id, group_id)
+
+        if not user_group:
+            raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
+
+        return await AuthService.create_tokens(db, UserSchema.model_validate(user_tiers), False, False)
+
+
 
 
 

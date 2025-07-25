@@ -33,7 +33,7 @@ async def get_current_user_from_cookie(
     # Récupérer l'utilisateur depuis la DB
     from app.services.auth.user_service import UserService
     user = await UserService.get_user_by_id(db, int(user_id))
-    return user
+    return UserSchema.from_user(user)
 
 async def get_current_group_id(x_group_id: int = Header(...)) -> int:
     if not x_group_id:
