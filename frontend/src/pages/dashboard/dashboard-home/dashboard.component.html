@@ -8,7 +8,7 @@
 
   <ul class="command-list">
     <li>
-      <button (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
+      <button data-allow-tiers (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
     </li>
     <li>
       <button (click)="goToListesMembres()">📃 Voir les listes des autres membres</button>
@@ -23,7 +23,7 @@
       <button (click)="goToProfile()">⚙️ Mon profil, mes groupes, déconnexion</button>
     </li>
     <li>
-      <button (click)="goToComptesTiers()">🧩 Gérer un compte tiers (enfant, proche…)</button>
+      <button data-allow-tiers (click)="goToComptesTiers()">🧩 Gérer un compte tiers (enfant, proche…)</button>
     </li>
     <li *ngIf="isAdmin">
       <button (click)="goToGestionGroupe()">🛠️ Gérer le groupe</button>

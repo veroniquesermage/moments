@@ -4,6 +4,8 @@ import {UserTiersRequest} from 'src/core/models/user-tiers-request.model';
 import {CommonModule} from '@angular/common';
 import {UserService} from 'src/core/services/user.service';
 import {ErrorService} from 'src/core/services/error.service';
+import {AuthService} from 'src/security/service/auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-managed-accounts',
@@ -23,7 +25,9 @@ export class ManagedAccountsComponent implements OnInit{
   managedAccounts = computed(() => this.userService.userTiersResponse());
 
   constructor(private userService: UserService,
-              private errorService: ErrorService) {
+              private errorService: ErrorService,
+              private authService: AuthService,
+              public router: Router) {
   }
 
   async ngOnInit() {
@@ -53,7 +57,13 @@ export class ManagedAccountsComponent implements OnInit{
 
   }
 
-  switchToAccount(id: number) {
+  async switchToAccount(id: number) {
+    try{
+      await this.authService.switchToAccount(id);
+      void this.router.navigate(['dashboard']);
 
+    } catch (e) {
+      this.errorService.showError("Une erreur s'est produite, veuillez réessayer.")
+    }
   }
 }
