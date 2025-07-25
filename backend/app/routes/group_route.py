@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.current_user import get_current_user_from_cookie
+from app.dependencies.current_user import get_current_user_from_cookie, get_current_user_from_cookie_with_tiers
 from app.models import User
 from app.schemas.group import GroupResponse, GroupCreate, GroupDetails, GroupUpdate
 from app.services.group_service import GroupService
@@ -64,7 +64,7 @@ async def delete_group(
 async def get_group_details(
         groupId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie)
+        current_user: User = get_current_user_from_cookie_with_tiers()
 ) -> GroupDetails:
     return await GroupService.get_group_details(db, current_user, groupId)
 

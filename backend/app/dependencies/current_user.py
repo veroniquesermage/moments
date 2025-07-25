@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.database import get_db
-from app.schemas import UserSchema
+from app.models import User
 
 SECRET_KEY = settings.jwt_secret
 ALGORITHM = "HS256"
@@ -16,7 +16,7 @@ async def get_current_user_from_cookie(
         request: Request,
         allow_tiers: bool = False,
         db: AsyncSession = Depends(get_db)
-) -> UserSchema:
+) -> User:
 
     token = request.cookies.get("access_token")
 
@@ -43,7 +43,16 @@ async def get_current_user_from_cookie(
             detail="Les comptes tiers ne sont pas autorisés à accéder à cette ressource."
         )
 
-    return UserSchema.from_user(user)
+    return user
+
+def get_current_user_from_cookie_with_tiers():
+    async def wrapper(
+            request: Request,
+            db: AsyncSession = Depends(get_db)
+    ):
+        return await get_current_user_from_cookie(request, allow_tiers=True, db=db)
+
+    return Depends(wrapper)
 
 async def get_current_group_id(x_group_id: int = Header(...)) -> int:
     if not x_group_id:

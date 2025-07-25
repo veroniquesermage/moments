@@ -10,7 +10,7 @@ from app.services.sharing_service import SharingService
 router = APIRouter(prefix="/api/partage", tags=["partage"])
 
 @router.patch("/rembourse", response_model=GiftDetailResponse)
-async def verify_eligibility(
+async def set_gift_refund(
         shared: GiftSharedSchema,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user_from_cookie),
