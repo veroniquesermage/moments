@@ -5,6 +5,8 @@ import {CommonModule} from '@angular/common';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {GroupDetail} from 'src/core/models/group/group-detail.model';
+import {AuthService} from 'src/security/service/auth.service';
+import {ErrorService} from 'src/core/services/error.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,17 +20,24 @@ export class DashboardComponent implements OnInit{
   composant: string = "DashboardComponent";
   selectedGroup: GroupDetail | undefined = undefined;
   isAdmin = false;
+  isManagedTiers = false;
 
   constructor(
     public groupService: GroupService,
     public router: Router,
-    public groupContextService: GroupContextService
+    public groupContextService: GroupContextService,
+    private authService: AuthService,
+    public errorService: ErrorService
   ) {
   }
 
   async ngOnInit() {
     const groupId = this.groupContextService.getGroupId();
     const result = await this.groupService.getGroupDetail(groupId);
+
+    if (this.authService.profile()?.isCompteTiers) {
+      this.isManagedTiers = true;
+    }
 
     if(result.success){
       this.selectedGroup = result.data;
@@ -64,5 +73,14 @@ export class DashboardComponent implements OnInit{
 
   goToComptesTiers() {
     void this.router.navigate(['/compte-tiers']);
+  }
+
+  async switchToParent() {
+    try{
+      await this.authService.switchToParent();
+      this.isManagedTiers = false;
+    } catch (e) {
+      this.errorService.showError("Une erreur s'est produite, veuillez réessayer.")
+    }
   }
 }

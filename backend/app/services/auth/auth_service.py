@@ -272,11 +272,21 @@ class AuthService:
             raise HTTPException(status_code=401, detail="utilisateur non géré par le current_user.")
 
         user_group = await UserGroupService.get_user_group(db, user_tiers_id, group_id)
-
         if not user_group:
             raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
 
-        return await AuthService.create_tokens(db, user_tiers, False, False)
+        return await AuthService.create_tokens(db, UserSchema.from_user(user_tiers), False, False)
+
+    @staticmethod
+    async def switch_to_parent(db: AsyncSession, current_user: User, group_id: int) -> JSONResponse:
+        user_parent: User = await UserService.get_user_by_id(db, current_user.gere_par)
+
+        user_group = await UserGroupService.get_user_group(db, user_parent.id, group_id)
+        if not user_group:
+            raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
+
+        return await AuthService.create_tokens(db, UserSchema.from_user(user_parent), False, False)
+
 
 
 

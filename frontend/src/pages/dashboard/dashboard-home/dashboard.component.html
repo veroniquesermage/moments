@@ -10,6 +10,9 @@
     <li>
       <button data-allow-tiers (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
     </li>
+    <li *ngIf="isManagedTiers">
+      <button data-allow-tiers (click)="switchToParent()">🔁 Revenir au compte principal</button>
+    </li>
     <li>
       <button (click)="goToListesMembres()">📃 Voir les listes des autres membres</button>
     </li>
@@ -23,7 +26,7 @@
       <button (click)="goToProfile()">⚙️ Mon profil, mes groupes, déconnexion</button>
     </li>
     <li>
-      <button data-allow-tiers (click)="goToComptesTiers()">🧩 Gérer un compte tiers (enfant, proche…)</button>
+      <button (click)="goToComptesTiers()">🧩 Gérer un compte tiers (enfant, proche…)</button>
     </li>
     <li *ngIf="isAdmin">
       <button (click)="goToGestionGroupe()">🛠️ Gérer le groupe</button>

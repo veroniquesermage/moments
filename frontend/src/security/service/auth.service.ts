@@ -285,12 +285,27 @@ export class AuthService {
       .catch(err => console.error('[Backend] Erreur :', err));
   }
 
-  async switchToAccount(userTiersId: number) {
+  async switchToTiers(userTiersId: number) {
     const idEnc = encodeURIComponent(userTiersId);
     const url = `${this.baseUrl}/switch-to-tiers/${idEnc}`;
     try {
       const data = await firstValueFrom(this.http.post<JwtResponse>(url, {}, { withCredentials: true }));
       console.log('[Backend] Réponse reçue :', data);
+      if (data?.profile) {
+        this.profile.set(data.profile);
+      }
+    } catch (err) {
+      console.error('[Backend] Erreur :', err);
+      throw err;
+    }
+  }
+
+  async switchToParent() {
+    const url = `${this.baseUrl}/switch-to-parent`;
+    try {
+      const data = await firstValueFrom(this.http.post<JwtResponse>(url, {}, { withCredentials: true }));
+      console.log('[Backend] Réponse reçue :', data);
+      void await this.router.navigate(['/dashboard']);
       if (data?.profile) {
         this.profile.set(data.profile);
       }
