@@ -16,14 +16,14 @@
 
     <td (click)="$event.stopPropagation()" class=" col-actions">
       <ng-container *ngIf="userIsTabbing$ | async; else dragHandle">
-        <button class="drag-handle"
+        <button data-allow-tiers class="drag-handle"
                 (click)="changeOrder(i, 'up')"
                 attr.aria-label="Monter la priorité de {{ gift.nom }}"
                 (keydown.enter)="$event.stopPropagation()"
                 (keydown.space)="$event.stopPropagation()">
           ⬆️
         </button>
-        <button class="drag-handle"
+        <button data-allow-tiers class="drag-handle"
                 (click)="changeOrder(i, 'down')"
                 attr.aria-label="Descendre la priorité de {{ gift.nom }}"
                 (keydown.enter)="$event.stopPropagation()"
@@ -32,7 +32,8 @@
         </button>
       </ng-container>
       <ng-template #dragHandle>
-        <button class="drag-handle"
+        <button data-allow-tiers
+                class="drag-handle"
                 cdkDragHandle
                 attr.aria-label="Changer la priorité de {{ gift.nom }}">
           ↕️
@@ -46,7 +47,7 @@
   </tbody>
 </table>
 
-<button *ngIf="hasOrderChanged" (click)="recPriorities()"> Valider les priorités</button>
+<button data-allow-tiers *ngIf="hasOrderChanged" (click)="recPriorities()"> Valider les priorités</button>
 
 <app-terminal-modal
   *ngIf="errorService.errorMessage()"

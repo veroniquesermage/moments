@@ -40,6 +40,16 @@ export class AppComponent {
           this.loadGroupsAfterLogin();
         }
       });
+
+      this.watchCompteTiersStatus();
+    });
+
+  }
+
+  private watchCompteTiersStatus() {
+    effect(() => {
+      const user = this.auth.profile();
+      document.body.classList.toggle('compte-tiers', !!user?.isCompteTiers);
     });
   }
 

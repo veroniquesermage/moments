@@ -8,7 +8,10 @@
 
   <ul class="command-list">
     <li>
-      <button (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
+      <button data-allow-tiers (click)="goToMesCadeaux()">🎁 Gérer mes cadeaux</button>
+    </li>
+    <li *ngIf="isManagedTiers">
+      <button data-allow-tiers (click)="switchToParent()">🔁 Revenir au compte principal</button>
     </li>
     <li>
       <button (click)="goToListesMembres()">📃 Voir les listes des autres membres</button>

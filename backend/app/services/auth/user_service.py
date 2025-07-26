@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -21,7 +23,7 @@ class UserService:
             prenom: str,
             nom: str,
             google_id: str
-    ) -> tuple[UserSchema, bool]:
+    ) -> tuple[UserSchema, bool] | tuple[Any, bool]:
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
 
@@ -50,7 +52,7 @@ class UserService:
             prenom: str,
             nom: str,
             password: str
-    ) -> UserSchema:
+    ) -> User:
 
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
@@ -74,7 +76,7 @@ class UserService:
         return UserSchema.from_user(new_user)
 
     @staticmethod
-    async def get_user_by_id(db: AsyncSession, user_id: int) -> UserSchema:
+    async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
         logger.info(f"Récupération de l'utilisateur avec l'id {user_id}")
 
         result = await db.execute(select(User).where(User.id == user_id))
@@ -83,7 +85,7 @@ class UserService:
         if not user:
             raise HTTPException(status_code=401, detail="❌ Utilisateur non trouvé")
 
-        return UserSchema.from_user(user)
+        return user
 
     @staticmethod
     async def ensure_mail_available(db: AsyncSession, mail: str) -> bool:
@@ -204,7 +206,7 @@ class UserService:
         return UserTiersResponse.model_validate(new_user)
 
     @staticmethod
-    async def get_managed_account(current_user, group_id, db) -> list[UserTiersResponse]:
+    async def get_managed_account(current_user: User, group_id: int, db: AsyncSession) -> list[UserTiersResponse]:
         result = await db.execute(
             select(User, UserGroup.surnom)
             .join(UserGroup, User.id == UserGroup.utilisateur_id)
