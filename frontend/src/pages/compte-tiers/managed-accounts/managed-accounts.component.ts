@@ -59,11 +59,14 @@ export class ManagedAccountsComponent implements OnInit{
 
   async switchToAccount(id: number) {
     try{
-      await this.authService.switchToAccount(id);
+      await this.authService.switchToTiers(id);
       void this.router.navigate(['dashboard']);
-
     } catch (e) {
       this.errorService.showError("Une erreur s'est produite, veuillez réessayer.")
     }
+  }
+
+  return() {
+    void this.router.navigate(['/dashboard']);
   }
 }
