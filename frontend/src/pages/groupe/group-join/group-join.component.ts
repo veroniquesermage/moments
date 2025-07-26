@@ -50,4 +50,8 @@ export class GroupJoinComponent implements OnInit{
         this.errorService.showError(result.message);
       }
   }
+
+  return() {
+    void this.router.navigate(['/groupe/onboarding']);
+  }
 }

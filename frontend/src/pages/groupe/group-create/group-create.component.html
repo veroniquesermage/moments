@@ -1,18 +1,35 @@
 <div class="form-container">
+  <section class="intro-section"  aria-label="Introduction pour la page de création de groupe">
+    <h1 class="dashboard-title">
+      ➕ Création de groupe
+    </h1>
+    <p>
+      Un groupe bien présenté est un groupe qui donne envie de participer.
+    </p>
+    <p class="emphase-douce">
+      Titre clair, description soignée… c’est l’occasion d’indiquer le type d’événement, une date de clôture des listes, un budget indicatif… <br>
+      bref, tout ce qu’un convive prévenant glisserait dans une belle enveloppe.
+    </p>
+  </section>
 
-  <h1>> Création de groupe </h1>
-  <p class="command">> pour créer un nouveau groupe merci de remplir ce formulaire.</p>
 
   <form [formGroup]="groupeForm" (ngSubmit)="onSubmit()">
     <label>Nom du groupe</label>
-    <input formControlName="nomGroupe" type="text"/>
+    <input formControlName="nomGroupe" type="text" placeholder="Wishlist Noël 2025"/>
 
     <label>Description</label>
-    <textarea formControlName="description"></textarea>
+    <textarea class="desc-groupe" formControlName="description"
+    placeholder="Listes à remplir avant le 28 novembre (Black Friday, oblige).
+Chacun a sa petite liste personnelle, merci de la remplir avec sérieux… et une touche d’espièglerie.
+Pensez à indiquer le nom du cadeau, sa taille si besoin, un lien utile, le prix estimé… et une version abordable. (La magie de Noël, oui, mais version budget raisonnable)
+Envie d’offrir un cadeau ?
+Consultez les listes et réservez directement dans l’appli pour éviter les doublons.
+Que l’esprit de Noël soit avec vous (et que les cadeaux arrivent à temps)."></textarea>
 
     <button type="submit">Créer le groupe</button>
-
+    <button type="button" (click)="return()">↩ Retour</button>
   </form>
+
 
   <app-terminal-modal
     *ngIf="errorService.errorMessage()"

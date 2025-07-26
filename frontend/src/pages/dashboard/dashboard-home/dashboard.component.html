@@ -1,9 +1,20 @@
 <div class="terminal" aria-labelledby="Menu principal">
-  <h1> Bienvenue dans le groupe : {{ selectedGroup!.groupe.nomGroupe }}</h1>
-  <h2 *ngIf="selectedGroup!.groupe.description"> Description du groupe : </h2> <em> {{selectedGroup!.groupe.description}}</em>
+  <section class="intro-section" aria-labelledby="titre-groupe">
+    <h1 class="dashboard-title">
+      🪶 Bienvenue dans le salon de <strong>{{ selectedGroup!.groupe.nomGroupe }}</strong>
+    </h1>
+    <p class="dashboard-subtitle">
+      Rien ne presse ici. Sauf peut-être l’envie de partager.
+    </p>
 
-  <section class="intro-bloc" aria-label="Introduction pour la page Menu principal">
-  <p>> Que souhaitez-vous faire ?</p>
+    <p *ngIf="selectedGroup!.groupe.description">
+      <em>Ce groupe a été décrit — probablement avec soin et une tasse de thé — comme suit :</em><br />
+      <span class="emphase-douce">« {{ selectedGroup!.groupe.description }} »</span>
+    </p>
+
+    <p class="question">
+      👉 Que souhaitez-vous faire aujourd’hui ?
+    </p>
   </section>
 
   <ul class="command-list">

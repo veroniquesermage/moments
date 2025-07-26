@@ -8,3 +8,9 @@ input:focus {
   border: 1px solid var(--color-border);
   box-shadow: 0 0 0 2px var(--color-focus-shadow); /* doux halo */
 }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
