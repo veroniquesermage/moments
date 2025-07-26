@@ -1,12 +1,12 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator" />
   <div class="block-title"> 🎯 Infos du groupe </div>
   <hr class="block-separator" />
 
-  <p>> Nom : {{currentGroup?.nomGroupe}}</p>
-  <p>> Description : {{currentGroup?.description}}</p>
+  <p> Nom : {{currentGroup?.nomGroupe}}</p>
+  <p> Description : {{currentGroup?.description}}</p>
 
-  <button (click)="modify()">🖋️ Modifier</button>
+  <button (click)="modify()">✒️ Modifier</button>
 </div>
 
 <ng-container *ngIf="showModal">

@@ -1,17 +1,18 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator" />
   <div class="block-title">🎁 {{ gift.nom }}</div>
   <hr class="block-separator" />
 
-  <p>> Description : {{ gift.description }}</p>
-  <p>> Marque : {{ gift.marque }}</p>
-  <p>> Magasin : {{ gift.magasin }}</p>
-  <p *ngIf="gift.url">> URL :
-    <a [href]="gift.url" target="_blank">{{ gift.url }}</a>
+  <p><span class="key-label">Description : </span> <span class="value-text">{{ gift.description }}</span></p>
+  <p><span class="key-label">Marque : </span> <span class="value-text">{{ gift.marque }}</span></p>
+  <p><span class="key-label">Magasin : </span> <span class="value-text">{{ gift.magasin }}</span></p>
+  <p class="key-label" *ngIf="gift.url"> URL :
+    <a class="value-text" [href]="gift.url" target="_blank">{{ gift.url }}</a>
   </p>
-  <p>> Quantité : {{ gift.quantite }}</p>
-  <p>> Prix : {{ gift.prix }} €</p>
-  <p>> Frais de port : {{ gift.fraisPort }} €</p>
-  <p>> Commentaire : {{ gift.commentaire }}</p>
-  <p>> Priorité : {{ gift.priorite }}</p>
+
+  <p><span class="key-label">Quantité : </span> <span class="value-text">{{ gift.quantite }}</span></p>
+  <p><span class="key-label">Prix : </span> <span class="value-text">{{ gift.prix }}</span></p>
+  <p><span class="key-label">Frais de port : </span> <span class="value-text">{{ gift.fraisPort }}</span></p>
+  <p><span class="key-label">Commentaire : </span> <span class="value-text">{{ gift.commentaire }}</span></p>
+  <p><span class="key-label">Priorité : </span> <span class="value-text">{{ gift.priorite }}</span></p>
 </div>

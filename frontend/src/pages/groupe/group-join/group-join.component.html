@@ -1,14 +1,21 @@
 <div class="form-container">
-  <h1>> Rejoindre un groupe </h1>
-  <p class="command">> Pour rejoindre un groupe avec un code d'invitation, indiquez votre code ci-dessous.</p>
+  <section class="intro-section"  aria-label="Introduction pour la page de création de groupe">
+    <h1 class="dashboard-title">
+      🔗 Rejoindre un groupe
+    </h1>
+    <p class="emphase-douce">
+      Pour rejoindre un groupe avec un code d'invitation, indiquez votre code ci-dessous.
+    </p>
+  </section>
 
     <div>
     <label for="codeInvitation">Code d'invitation</label>
     <input id="codeInvitation" type="text" [(ngModel)]="codeInvitation" />
     </div>
-
+  <div class="options">
     <button (click)="rejoindre()">Rejoindre</button>
-
+    <button type="button" (click)="return()">↩ Retour</button>
+  </div>
 
   <app-terminal-modal
     *ngIf="errorService.errorMessage()"
