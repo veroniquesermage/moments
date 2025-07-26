@@ -2,14 +2,15 @@ from fastapi import APIRouter, Depends, Request, Body
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
-from app.dependencies.current_user import get_current_user_from_cookie
+from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id, \
+    get_current_user_from_cookie_with_tiers
 from app.main import get_db
 from app.models import User
-from app.schemas import UserSchema
 from app.schemas.auth import GoogleAuthRequest, CompleteProfileRequest, RegisterRequest
 from app.schemas.auth.change_password import ChangePassword
 from app.schemas.auth.login_request import LoginRequest
 from app.schemas.auth.reset_password_payload import ResetPasswordPayload
+from app.schemas.user import UserSchema
 from app.services.auth.auth_service import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])
@@ -93,5 +94,21 @@ async def reset_password(
 ) -> JSONResponse:
     return await AuthService.reset_password(db, request)
 
+@router.post("/switch-to-parent", status_code=200)
+async def switch_to_parent(
+        groupId: int = Depends(get_current_group_id),
+        current_user: User = get_current_user_from_cookie_with_tiers() ,
+        db: AsyncSession = Depends(get_db)
+):
+    return await AuthService.switch_to_parent(db, current_user, groupId)
+
+@router.post("/switch-to-tiers/{userTiersId}", status_code=200)
+async def switch_to_tiers(
+        userTiersId: int,
+        groupId: int = Depends(get_current_group_id),
+        current_user: User = Depends(get_current_user_from_cookie),
+        db: AsyncSession = Depends(get_db)
+):
+    return await AuthService.switch_to_tiers(db, userTiersId, current_user, groupId)
 
 
