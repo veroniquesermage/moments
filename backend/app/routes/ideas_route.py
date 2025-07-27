@@ -12,13 +12,14 @@ from app.services import GiftIdeasService
 
 router = APIRouter(prefix="/api/idees", tags=["idees"])
 
-@router.post("", response_model=GiftIdeasResponse, status_code=201)
+@router.post("", status_code=204)
 async def create_gift_idea(
         gift_idea: GiftIdeaCreate,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie) ) -> GiftIdeasResponse:
+        current_user: User = Depends(get_current_user_from_cookie) ):
 
-    return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea)
+    await GiftIdeasService.create_gift_idea(db, current_user, gift_idea)
+    return
 
 @router.get("/{groupId}", response_model=list[GiftIdeasResponse])
 async def get_my_ideas(
@@ -43,14 +44,15 @@ async def change_visibility(
     await GiftIdeasService.change_visibility(db, current_user, ideaId, visibility)
     return
 
-@router.post("/{ideaId}", response_model=GiftIdeasResponse)
+@router.post("/{ideaId}", status_code=204)
 async def duplicate_gift_idea(
         ideaId: int,
         payload: DuplicationPayload,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie)) -> GiftIdeasResponse:
+        current_user: User = Depends(get_current_user_from_cookie)):
 
-    return await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, payload.new_dest_id)
+    await GiftIdeasService.duplicate_gift_idea(db, current_user, ideaId, payload.new_dest_id)
+    return
 
 @router.delete("/{ideaId}", status_code=204)
 async def delete_gift_idea(

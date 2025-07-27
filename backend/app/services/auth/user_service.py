@@ -52,7 +52,7 @@ class UserService:
             prenom: str,
             nom: str,
             password: str
-    ) -> User:
+    ) -> UserSchema:
 
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()
@@ -229,6 +229,11 @@ class UserService:
 
         return managed_accounts
 
+    @staticmethod
+    async def get_users_with_shared_groups(db, current_user) -> list[UserSchema]:
 
+        groups_of_mine = await UserGroupService.get_all_groups_for_user(db, current_user.id)
 
+        users = await UserGroupService.get_users_with_shared_groups(db, groups_of_mine, current_user.id)
 
+        return list({u.id: UserSchema.from_user(u) for u in users}.values())
