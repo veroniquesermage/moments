@@ -15,7 +15,7 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title">
-      <h2 id="modal-title">Sélectionner la personne que vous souhaitez expulser</h2>
+      <h2 id="modal-title">Fenêtre de confirmation</h2>
       <select id="selectDest" [(ngModel)]="selectedMemberID">
         <option [ngValue]="undefined" disabled selected hidden>Choisissez un membre</option>
         <option *ngFor="let member of membersSignal()" [value]="member.id">{{member.prenom}} {{member.nom | uppercase }}
