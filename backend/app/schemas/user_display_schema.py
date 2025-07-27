@@ -9,3 +9,4 @@ class UserDisplaySchema(CamelModel):
     prenom: str
     surnom: Optional[str] = None
     role: Optional[str] = None
+    is_compte_tiers: bool = False

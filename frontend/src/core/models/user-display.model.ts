@@ -3,5 +3,6 @@ export interface UserDisplay {
   nom?: string,
   prenom: string,
   surnom?: string,
-  role?: string
+  role?: string,
+  isCompteTiers: boolean
 }
