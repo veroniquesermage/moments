@@ -1,21 +1,26 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator"/>
   <div class="block-title">{{ getEmojiStatut(giftDetailResponse.gift.statut) }} {{ giftDetailResponse.gift.statut }}
   </div>
   <hr class="block-separator"/>
 
   <p *ngIf="giftDetailResponse.gift.statut !== GiftStatus.DISPONIBLE">
-    > {{ getLabelPreneur(giftDetailResponse.gift.statut) }} : {{ giftDetailResponse.gift.reservePar | displayName }}</p>
-
-  <p *ngIf="giftDetailResponse.gift.statut == GiftStatus.RESERVE">
-    > Date d'expiration de la réservation : {{giftDetailResponse.gift.expirationReservation | date: "d MMMM y 'à' HH'h'" }}
+    <span class="key-label">{{ getLabelPreneur(giftDetailResponse.gift.statut) }}  :
+    </span> <span class="value-text">{{ giftDetailResponse.gift.reservePar | displayName }}</span>
   </p>
+  <p *ngIf="giftDetailResponse.gift.statut == GiftStatus.RESERVE">
+    <span class="key-label">ate d'expiration de la réservation  : </span>
+    <span class="value-text">{{giftDetailResponse.gift.expirationReservation | date: "d MMMM y 'à' HH'h'" }}</span>
+  </p>
+
 
   <ng-container *ngIf="context === 'suivi'">
     <ng-container *ngIf="isPreneur">
       <p class="legend-icon"> Cliquez sur les icônes pour changer le statut.</p>
       <p *ngFor="let share of partage">
-        > {{ share.participant | displayName }} : {{ share.montant }} €
+        <span class="key-label">
+          {{ share.participant | displayName }} :</span>
+        <span class="value-text"> {{ share.montant }} €</span>
         <span
           class="emoji-action"
           role="button"
@@ -30,10 +35,10 @@
       <p *ngFor="let share of partage">
         <ng-container *ngIf="share.participant.id === currentUserId">
           <span *ngIf="share.rembourse">
-          > ✅ Vous avez remboursé {{ share.montant }} €</span>
+          ✅ Vous avez remboursé {{ share.montant }} €</span>
 
           <span *ngIf="!share.rembourse">
-          > 🕒 Vous devez {{ share.montant }} € </span>
+          🕒 Vous devez {{ share.montant }} € </span>
         </ng-container>
       </p>
     </ng-container>
@@ -41,7 +46,7 @@
 
 
   <ng-container *ngIf="!isPreneur && !isParticipant && (partage == undefined || partage.length > 0 )">
-    <p>> Ce cadeau est partagé avec d'autres utilisateurs</p>
+    <p class="emphase-douce">Ce cadeau est partagé avec d'autres utilisateurs</p>
   </ng-container>
 
 </div>

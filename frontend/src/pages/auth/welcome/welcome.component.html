@@ -1,12 +1,14 @@
 <div class="terminal">
-  <h1>
-    <span class="bounce">🎁</span> Bienvenue sur (Moments) <span class="bounce">🎁</span>
-  </h1>
+  <section class="intro-section" aria-labelledby="titre-groupe">
+    <h1 class="dashboard-title">
+      <span class="bounce">🎁</span> Bienvenue sur (Moments) <span class="bounce">🎁</span>
+    </h1>
+  </section>
 
   <app-loading *ngIf="groupeService.isLoading()"></app-loading>
 
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
-    <p class="command-accueil">&gt; Veuillez vous connecter :</p>
+    <p class="command-accueil"> Veuillez vous connecter :</p>
     <div class="google-btn">
       <button class="google-signin-btn" (click)="googleLogin()">
         <img ngSrc="assets/web_neutral_sq_na.svg" alt="Google logo" width="39" height="39"/>

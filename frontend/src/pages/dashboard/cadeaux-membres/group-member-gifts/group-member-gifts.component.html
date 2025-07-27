@@ -1,9 +1,13 @@
 <div class="terminal">
-  <h2>> Listes des autres membres</h2>
-
-  <section class="intro-bloc" aria-label="Introduction pour la page Listes des autres membres">
-  <p>> Cliquez sur un membre pour obtenir sa liste de cadeaux</p>
+  <section class="intro-section"  aria-label="Introduction pour la page Listes des autres membres">
+    <h1 class="dashboard-title">
+      📃 Listes des autres membres
+    </h1>
+    <p class="emphase-douce">
+      Cliquez sur un membre pour obtenir sa liste de cadeaux.
+    </p>
   </section>
+
   <div class="user-buttons">
     <button
       *ngFor="let user of membersSignal()"
@@ -15,7 +19,7 @@
   </div>
 
   <section class="intro-bloc" aria-label="Explication du fonctionnement de la liste">
-  <p>> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
+  <p class="emphase-douce"> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
   </section>
   <table   aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
@@ -28,7 +32,7 @@
         <!-- Insère le sous-titre si c’est le premier 'proposé' -->
         <tr *ngIf="gift.priorite === 0 && (i === 0 || giftPublic[i-1].priorite !== 0)">
           <td colspan="5" class="separator-row">
-            > Idées proposées par les autres membres
+            Idées proposées par les autres membres
           </td>
         </tr>
 

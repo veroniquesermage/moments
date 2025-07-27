@@ -1,19 +1,19 @@
 <div class="terminal" style="position: relative;">
-  <h2>> Détail du cadeau</h2>
+  <h2> Détail du cadeau</h2>
 
   <div *ngIf="gift">
-    <p>> <strong>Destinataire :</strong> {{ gift.gift.destinataire | displayName  }}</p>
-    <p>> <strong>Nom :</strong> {{ gift.gift.nom }}</p>
-    <p>> <strong>Description :</strong> {{ gift.gift.description }}</p>
-    <p>> <strong>Marque :</strong> {{ gift.gift.marque }}</p>
-    <p>> <strong>Magasin :</strong> {{ gift.gift.magasin }}</p>
-    <p *ngIf="gift.gift.url">> <strong>URL : </strong>
+    <p> <strong>Destinataire :</strong> {{ gift.gift.destinataire | displayName  }}</p>
+    <p> <strong>Nom :</strong> {{ gift.gift.nom }}</p>
+    <p> <strong>Description :</strong> {{ gift.gift.description }}</p>
+    <p> <strong>Marque :</strong> {{ gift.gift.marque }}</p>
+    <p> <strong>Magasin :</strong> {{ gift.gift.magasin }}</p>
+    <p *ngIf="gift.gift.url"> <strong>URL : </strong>
       <a [href]="gift.gift.url" target="_blank">{{ gift.gift.url }}</a>
     </p>
-    <p>> <strong>Commentaire :</strong> {{ gift.gift.commentaire }}</p>
-    <p>> <strong>Quantité :</strong> {{ gift.gift.quantite }}</p>
-    <p>> <strong>Prix réel :</strong> {{ gift.delivery?.prixReel }} €</p>
-    <p>> <strong>Statut :</strong> {{ gift.gift.statut }}</p>
+    <p> <strong>Commentaire :</strong> {{ gift.gift.commentaire }}</p>
+    <p> <strong>Quantité :</strong> {{ gift.gift.quantite }}</p>
+    <p> <strong>Prix réel :</strong> {{ gift.delivery?.prixReel }} €</p>
+    <p> <strong>Statut :</strong> {{ gift.gift.statut }}</p>
   </div>
   <div class="options">
     <button (click)="back()">↩ Retour à la liste</button>

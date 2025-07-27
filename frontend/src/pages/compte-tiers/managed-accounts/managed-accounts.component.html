@@ -1,19 +1,18 @@
 <div class="terminal">
-  <h2>🧩 Comptes tiers</h2>
 
-  <section class="intro-bloc">
-    <p>
-      Les comptes tiers vous permettent de gérer les souhaits d’un enfant, d’un proche ou de toute personne que vous accompagnez — sans qu’elle ait besoin d’utiliser l’application elle-même.
-    </p>
+    <section class="intro-section">
+      <h1>🧩 Comptes tiers</h1>
+      <p>
+        Les comptes tiers vous permettent de gérer les souhaits d’un enfant, d’un proche ou de toute personne que vous accompagnez — sans qu’elle ait besoin d’utiliser l’application elle-même.
+      </p>
+      <p>
+        ✨ C’est l’idéal, par exemple, pour préparer les surprises des plus jeunes membres de la famille, ou simplifier l’organisation pour une personne moins à l’aise avec les outils numériques.
+      </p>
+      <p class="emphase-douce">
+        ⚠️ <strong>À savoir :</strong> ces comptes disposent de droits limités. Vous pouvez leur créer une liste de cadeaux, mais vous ne pourrez pas prendre ou réserver un cadeau en leur nom.
+      </p>
+    </section>
 
-    <p>
-      C’est l’idéal, par exemple, pour préparer les surprises des plus jeunes membres de la famille, ou simplifier l’organisation pour une personne moins à l’aise avec les outils numériques.
-    </p>
-
-    <p>
-      <strong>À savoir :</strong> ces comptes disposent de droits limités. Vous pouvez leur créer une liste de cadeaux, mais vous ne pourrez pas prendre ou réserver un cadeau en leur nom. En somme, ce sont des invités discrets sous votre supervision.
-    </p>
-  </section>
 
   <section class="actions">
     <hr class="block-separator" />
@@ -67,8 +66,8 @@
     <hr class="block-separator" />
     <ul *ngIf="managedAccounts().length > 0; else noAccounts">
       <li *ngFor="let account of managedAccounts()">
-        <span>{{ account.prenom }} {{ account.nom || '' }}</span>
-        <button (click)="switchToAccount(account.id)">👤 Se connecter en tant que</button>
+        <span class="account-name">{{ account.prenom }} {{ account.nom || '' }}</span>
+        <button (click)="switchToAccount(account.id)">🎭 Se connecter en tant que</button>
       </li>
     </ul>
 
