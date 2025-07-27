@@ -16,6 +16,7 @@ import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {UserService} from 'src/core/services/user.service';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -43,6 +44,7 @@ export class MyGiftsIdeasComponent implements OnInit {
   showDuplicationModal = false;
   membersSignal: Signal<UserDisplay[]>;
   composant: string = "MyGiftsIdeasComponent";
+  membersSharedGroup: UserDisplay[] = [];
 
 
   constructor(private ideaService: IdeaService,
@@ -50,12 +52,19 @@ export class MyGiftsIdeasComponent implements OnInit {
               private groupContextService : GroupContextService,
               private router: Router,
               public errorService: ErrorService,
-              private toastr: ToastrService) {
+              private toastr: ToastrService,
+              private userService: UserService) {
     this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
     await this.loadIdeas();
+    const result = await this.userService.getUsersWithSharedGroups();
+    if (result.success) {
+      this.membersSharedGroup = result.data;
+    } else {
+      console.warn('[UserService] Échec du fetch des membres partageant un groupe');
+    }
   }
 
   changeVisibility(actualVisibility: boolean, ideaId: number) {

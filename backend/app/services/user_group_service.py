@@ -260,3 +260,32 @@ class UserGroupService:
         await db.commit()
         await db.refresh(user_group)
         return user_group
+
+    @staticmethod
+    async def get_all_groups_for_user(db: AsyncSession, user_id: int) -> list[int]:
+
+        result = await db.execute(select(UserGroup.groupe_id)
+                         .where(UserGroup.utilisateur_id == user_id))
+
+        groups: list[int] = result.scalars().all()
+
+        return groups
+
+    @staticmethod
+    async def get_users_with_shared_groups(db: AsyncSession, groups_id: list[int], user_id: int) -> list[User]:
+        result = await db.execute(
+            select(UserGroup)
+            .where(
+                and_(
+                    UserGroup.groupe_id.in_(groups_id),
+                    UserGroup.utilisateur_id != user_id
+                )
+            )
+            .options(selectinload(UserGroup.utilisateur))
+        )
+
+        user_groups: list[UserGroup] = result.scalars().all()
+        users = [ug.utilisateur for ug in user_groups]
+
+        return list({u.id: u for u in users}.values())
+

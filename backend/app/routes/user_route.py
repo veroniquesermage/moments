@@ -21,6 +21,14 @@ async def get_user_in_group(
     user: UserSchema = UserSchema.from_user(current_user)
     return user
 
+
+@router.get("/en-commun", response_model=list[UserSchema])
+async def get_users_with_shared_groups(
+        current_user: User = Depends(get_current_user_from_cookie),
+        db: AsyncSession = Depends(get_db) ) -> list[UserSchema]:
+    logger.info(f"Récupération de tous les utilisateurs qui partagent un groupe avec l'utilisateur {current_user.id}")
+    return await UserService.get_users_with_shared_groups(db, current_user)
+
 @router.get("/me/comptes-tiers", response_model=list[UserTiersResponse])
 async def get_managed_account(current_user: User = Depends(get_current_user_from_cookie),
                               group_id: int = Depends(get_current_group_id),
