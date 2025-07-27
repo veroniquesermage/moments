@@ -27,6 +27,17 @@ export class UserService {
     }
   }
 
+  async getUsersWithSharedGroups(): Promise<ApiResponse<UserDisplay[]>> {
+    try {
+      const url = `${this.apiUrl}/en-commun`;
+      const users = await firstValueFrom(this.http.get<UserDisplay[]>(url));
+      return {success: true, data: users};
+    } catch (error) {
+      console.error('[UserGroupService] Erreur lors de la récupération des membres qui partagent un groupe en commun avec l\'utilisateur', error);
+      return {success: false, message: "❌ Erreur lors de la récupération des membres qui partagent un groupe en commun avec l\'utilisateur."};
+    }
+  }
+
   async createUserTiers(userTiers: UserTiersRequest): Promise<ApiResponse<UserTiersResponse>> {
     const url = `${this.apiUrl}/compte-tiers`;
     try{

@@ -30,11 +30,11 @@ export class IdeaService {
     }
   }
 
-  async createIdeas(giftIdeaCreate: GiftIdeaCreate): Promise<ApiResponse<GiftIdeasResponse>> {
+  async createIdeas(giftIdeaCreate: GiftIdeaCreate): Promise<ApiResponse<void>> {
     try {
-      const giftIdeaResponse = await firstValueFrom(this.http.post<GiftIdeasResponse>(this.apiUrl, giftIdeaCreate));
+      await firstValueFrom(this.http.post<void>(this.apiUrl, giftIdeaCreate));
 
-      return {success: true, data: giftIdeaResponse};
+      return {success: true, data: undefined};
 
     } catch (error) {
       console.error('[IdeaService] Erreur lors de la création de l\'idée', error);
@@ -57,14 +57,14 @@ export class IdeaService {
     }
   }
 
-  async duplicateIdea(ideaId: number, newDestId: number) : Promise<ApiResponse<GiftIdeasResponse>> {
+  async duplicateIdea(ideaId: number, newDestId: number) : Promise<ApiResponse<void>> {
     const idEnc = encodeURIComponent(ideaId);
     const url = `${this.apiUrl}/${idEnc}`;
 
     try {
-      const result = await firstValueFrom(this.http.post<GiftIdeasResponse>(url, {newDestId}));
+      await firstValueFrom(this.http.post<void>(url, {newDestId}));
 
-      return {success: true, data: result };
+      return {success: true, data: undefined };
     } catch (error) {
       console.error('[IdeaService] Erreur lors de la duplication de l\'idée', error);
       return {success: false, message: "❌ Impossible de dupliquer l'idée."};
