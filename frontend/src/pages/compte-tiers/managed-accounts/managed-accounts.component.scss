@@ -2,6 +2,7 @@
   max-width: 650px;
   margin: 0 auto;
   text-align: left;
+  margin-top: 1rem;
 }
 
 .login-form label {
@@ -13,7 +14,7 @@
 .login-form input[type="text"] {
   display: block;
   width: 95%;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   padding: 0.6em;
   border: 1px solid var(--color-border);
   border-radius: 4px;
@@ -22,35 +23,10 @@
   font-family: inherit;
 }
 
-.sebou-alert {
-  background-color: var(--color-bg);
-  border: 1px dashed var(--color-highlight);
-  padding: 1.2em 1.4em;
-  margin-top: 1em;
-  border-radius: 6px;
-  color: var(--color-text);
-  font-size: 0.95em;
-  line-height: 1.6em;
-  text-align: justify;
-  text-align-last: center;
+.button-bloc {
+  margin-bottom: 1rem;
 }
 
-.sebou-alert .intro {
-  font-style: italic;
-  margin-bottom: 0.7em;
-  display: block;
-}
-
-.sebou-alert .middle {
-  opacity: 0.85;
-  margin-bottom: 0.7em;
-  display: block;
-}
-
-.sebou-alert .final {
-  color: var(--color-highlight);
-  font-weight: bold;
-  display: block;
-  text-align: center;
-  margin-top: 0.8em;
+.account-name {
+  margin-right: 1rem;
 }

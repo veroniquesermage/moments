@@ -1,23 +1,26 @@
 <div class="terminal">
-  <h2>> Les listes des cadeaux réservés ou pris</h2>
-
-  <section class="intro-bloc" aria-label="Introduction pour la page Listes des cadeaux réservés ou pris">
-  <p>> Cliquez sur un cadeau pour obtenir son détail et le gérer</p>
-  <p *ngIf="isPortrait" class="orientation-hint">
-    > 📱 Pour plus de fonctionnalités, passez en mode paysage.
-  </p>
+  <section class="intro-section"  aria-label="Introduction pour la page Listes des autres membres">
+    <h1 class="dashboard-title">
+      🛍️ Les listes des cadeaux réservés ou pris
+    </h1>
+    <p class="emphase-douce">
+      Cliquez sur un cadeau pour obtenir son détail et le gérer.
+    </p>
+    <p *ngIf="isPortrait" class="orientation-hint">
+    📱 Pour plus de fonctionnalités, passez en mode paysage.
+    </p>
   </section>
 
-  <p class="total">> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
+  <p class="total"> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
     }} €</p>
 
-  <p class="table-legend" role="group" aria-labelledby="table-legend-title">
+  <p class="table-legend emphase-douce" role="group" aria-labelledby="table-legend-title">
     <strong id="table-legend-title" class="visually-hidden">Légende du tableau</strong>
     <span><span class="legend-dot recu" aria-hidden="true"></span> Cadeau reçu</span>
     <span><span class="legend-dot partage" aria-hidden="true"></span> Cadeau partagé</span>
   </p>
 
-  <table   aria-describedby="table-priorite-explication" class="gift-table">
+  <table aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
     <tr>
       <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
