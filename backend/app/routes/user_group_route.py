@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.current_user import get_current_user_from_cookie
+from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id
 from app.models import User
 from app.schemas import UserDisplaySchema
 from app.services import UserGroupService
@@ -44,3 +44,13 @@ async def update_roles(
         current_user: User = Depends(get_current_user_from_cookie)
 ) -> list[UserDisplaySchema] :
     return await UserGroupService.update_role(db, groupId, current_user, payload)
+
+@router.delete("/compte-tiers/{user_id}", status_code=204)
+async def remove_tiers_from_group(
+        user_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie),
+        group_id: int = Depends(get_current_group_id)
+):
+    await UserGroupService.remove_tiers_from_group(db, current_user, group_id, user_id)
+    return

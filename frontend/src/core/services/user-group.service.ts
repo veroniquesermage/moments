@@ -54,4 +54,15 @@ export class UserGroupService {
     }
   }
 
+  async removeTiersFromGroup(userId: number): Promise<ApiResponse<void>> {
+    const idEnc = encodeURIComponent(userId);
+    const url = `${this.apiUrl}/compte-tiers/${idEnc}`;
+    try{
+      await firstValueFrom(this.http.delete<void>(url));
+      return {success: true, data: undefined}
+    } catch (error) {
+      console.error('[UserGroupService] Erreur lors de la suppression d\'un compte tiers', error);
+      return {success: false, message: "❌ Erreur lors de la suppression d\'un compte tiers."};
+    }
+  }
 }
