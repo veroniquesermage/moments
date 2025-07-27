@@ -3,14 +3,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.enum import GiftStatusEnum
 from app.core.logger import logger
 from app.models import GiftIdeas, Gift, User, UserGroup
-from app.schemas import UserSchema
-from app.schemas.gift import GiftIdeasResponse, GiftCreate
-from app.schemas.gift import GiftPublicResponse
-from app.schemas.gift import GiftIdeasSchema
 from app.schemas.gift import GiftIdeaCreate
+from app.schemas.gift import GiftIdeasResponse, GiftCreate
 from app.services.builders import build_gift_public_response, build_gift_idea_schema
 from app.services.trace_service import TraceService
 
@@ -55,7 +51,7 @@ class GiftIdeasService:
     @staticmethod
     async def create_gift_idea(db: AsyncSession,
                                current_user: User,
-                               gift_idea: GiftIdeaCreate) -> GiftIdeasResponse:
+                               gift_idea: GiftIdeaCreate):
         logger.info(f"Création d'une idée de cadeau pour l'utilisateur {current_user}")
 
         if current_user.id == gift_idea.gift.destinataire_id:
@@ -89,10 +85,6 @@ class GiftIdeasService:
             {"idea_id": idea.id, "gift_id": gift.id, "user_id": current_user.id},
         )
 
-        return GiftIdeasResponse(
-            gift=await build_gift_public_response(gift, gift.destinataire_id, db),
-            gift_idea=await build_gift_idea_schema(idea, db)
-        )
 
     @staticmethod
     async def change_visibility( db: AsyncSession,
@@ -134,7 +126,7 @@ class GiftIdeasService:
     async def duplicate_gift_idea(db: AsyncSession,
                                     current_user: User,
                                     ideaId: int,
-                                    new_dest_id: int) -> GiftIdeasResponse:
+                                    new_dest_id: int):
 
             logger.info(f"Dupliquer l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
 
@@ -170,8 +162,7 @@ class GiftIdeasService:
                 f"Duplication de l'idee {ideaId}",
                 {"idea_id": ideaId, "new_dest_id": new_dest_id, "user_id": current_user.id},
             )
-
-            return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
+            await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
 
     @staticmethod
     async def delete_gift_idea(db: AsyncSession,
