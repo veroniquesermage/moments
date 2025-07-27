@@ -11,6 +11,7 @@ from app.core.logger import logger
 from app.models import User, UserGroup
 from app.schemas import UserDisplaySchema
 from app.schemas.mailing.invite_request import InviteRequest
+from app.services.auth.user_service import UserService
 from app.services.trace_service import TraceService
 
 
@@ -288,4 +289,40 @@ class UserGroupService:
         users = [ug.utilisateur for ug in user_groups]
 
         return list({u.id: u for u in users}.values())
+
+    @staticmethod
+    async def remove_tiers_from_group(db: AsyncSession, current_user: User, group_id: int, user_id: int):
+        logger.info(f"[User:{current_user.id}] removed managed account [User:{user_id}] from group [Group:{group_id}]")
+
+        try:
+            managed_account = await UserService.get_user_by_id(db, user_id)
+        except HTTPException:
+            raise HTTPException(status_code=409, detail="Le compte tiers n'existe pas")
+
+        if managed_account.gere_par != current_user.id:
+            raise HTTPException(status_code=403, detail=f"Le compte tiers n'appartient pas à l'utilisateur {current_user.id}")
+
+        user_group: UserGroup = await UserGroupService.get_user_group(db, user_id, group_id)
+
+        if user_group is None:
+            raise HTTPException(status_code=409, detail="Le compte tiers n'existe pas dans le groupe courant")
+
+        await db.delete(user_group)
+        await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "DELETE_MANAGED_USER",
+            f"Suppression d'un compte tiers dans groupe courant",
+            {"group_id": group_id, "managed_user": user_id},
+        )
+
+    @staticmethod
+    async def delete_user_from_all_groups(db: AsyncSession, user_id: int):
+        result = await db.execute(select(UserGroup).where(UserGroup.utilisateur_id == user_id))
+        user_groups: list[UserGroup] = result.scalars().all()
+
+        await db.delete(user_groups)
+        await db.commit()
 

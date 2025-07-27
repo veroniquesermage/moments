@@ -48,6 +48,17 @@ async def create_managed_account(
 
     return await UserService.create_managed_account(request, current_user, group_id, db)
 
+@router.delete("/compte-tiers/{user_id}", status_code=204)
+async def delete_managed_account(
+        user_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie),
+        group_id: int = Depends(get_current_group_id)
+):
+
+    await UserService.delete_managed_account(user_id, current_user, group_id, db)
+    return
+
 @router.get("/groupe/{groupId}", response_model=list[UserDisplaySchema])
 async def get_users(
         groupId: int,
