@@ -27,7 +27,9 @@ async def build_user_display(user_id: int, group_id: int, db: AsyncSession) -> U
         id=user_group.utilisateur.id,
         nom=user_group.utilisateur.nom,
         prenom=user_group.utilisateur.prenom,
-        surnom=user_group.surnom if user_group.surnom else None
+        surnom=user_group.surnom if user_group.surnom else None,
+        role= user_group.role,
+        is_compte_tiers= user_group.utilisateur.is_compte_tiers
     )
 
 async def build_gift_public_response(gift: Gift, group_id: int, db: AsyncSession) -> GiftPublicResponse:
