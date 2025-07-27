@@ -6,6 +6,10 @@
     <p class="emphase-douce">
       Cliquez sur un membre pour obtenir sa liste de cadeaux.
     </p>
+    <p>
+      Les comptes précédés par 🧩 sont gérés par un autre membre.<br>
+      <em>(Ce sont ce qu’on appelle des comptes tiers.)</em>
+    </p>
   </section>
 
   <div class="user-buttons">
@@ -14,7 +18,9 @@
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
     >
-      {{ user  | displayName }}
+      <span *ngIf="user.isCompteTiers"
+            aria-label="Compte tiers"
+            title="Compte tiers">🧩 </span>{{ user  | displayName }}
     </button>
   </div>
 

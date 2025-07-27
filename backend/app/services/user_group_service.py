@@ -37,7 +37,8 @@ class UserGroupService:
             nom= result.utilisateur.nom,
             prenom= result.utilisateur.prenom,
             surnom= result.surnom if result.surnom else None,
-            role= result.role
+            role= result.role,
+            is_compte_tiers= result.utilisateur.is_compte_tiers
             )
             for result in results ]
 
@@ -63,7 +64,8 @@ class UserGroupService:
                 nom= result.utilisateur.nom,
                 prenom= result.utilisateur.prenom,
                 surnom= result.surnom if result.surnom else None,
-                role= result.role
+                role= result.role,
+                is_compte_tiers= result.utilisateur.is_compte_tiers
             )
             for result in results ]
 
