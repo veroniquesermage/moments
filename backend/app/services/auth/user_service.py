@@ -1,16 +1,16 @@
 from typing import Any
 
 from fastapi import HTTPException
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.core.logger import logger
-from app.models import UserGroup
+from app.models import UserGroup, Gift, GiftIdeas, GiftShared, RefreshToken
 from app.models.user import User
 from app.schemas import UserSchema, UserTiersResponse
 from app.schemas.auth import CompleteProfileRequest
 from app.schemas.user_tiers_request import UserTiersRequest
-from app.services import UserGroupService
 from app.services.trace_service import TraceService
 
 
@@ -197,7 +197,7 @@ class UserService:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
-
+        from app.services.user_group_service import UserGroupService
         user_group: UserGroup = await UserGroupService.get_user_group(db, current_user.id, group_id)
         if not user_group:
             raise HTTPException(status_code=403, detail="L'utilisateur n'appartient pas au groupe demandé")
@@ -231,9 +231,39 @@ class UserService:
 
     @staticmethod
     async def get_users_with_shared_groups(db, current_user) -> list[UserSchema]:
-
+        from app.services.user_group_service import UserGroupService
         groups_of_mine = await UserGroupService.get_all_groups_for_user(db, current_user.id)
 
         users = await UserGroupService.get_users_with_shared_groups(db, groups_of_mine, current_user.id)
 
         return list({u.id: UserSchema.from_user(u) for u in users}.values())
+
+    @staticmethod
+    async def delete_managed_account(user_id: int, current_user: User, group_id: int, db: AsyncSession):
+        logger.info(f"[User:{current_user.id}] removed managed account [User:{user_id}] from group [Group:{group_id}]")
+
+        try:
+            managed_account = await UserService.get_user_by_id(db, user_id)
+        except HTTPException:
+            raise HTTPException(status_code=409, detail="Le compte tiers n'existe pas")
+
+        if managed_account.gere_par != current_user.id:
+            raise HTTPException(status_code=403, detail=f"Le compte tiers n'appartient pas à l'utilisateur {current_user.id}")
+
+        await UserService.delete_user_fully(db, user_id)
+
+    @staticmethod
+    async def delete_user_fully(db: AsyncSession, user_id: int):
+        user = await UserService.get_user_by_id(db, user_id)
+        await db.execute(delete(UserGroup).where(UserGroup.utilisateur_id == user_id))
+        await db.execute(delete(Gift).where(Gift.destinataire_id == user_id))
+        await db.execute(delete(Gift).where(Gift.reserve_par_id == user_id))
+        await db.execute(delete(GiftIdeas).where(GiftIdeas.proposee_par_id == user_id))
+        await db.execute(delete(GiftShared).where(GiftShared.preneur_id == user_id))
+        await db.execute(delete(GiftShared).where(GiftShared.participant_id == user_id))
+        await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))
+
+        # Supprimer enfin le user
+        await db.delete(user)
+        await db.commit()
+

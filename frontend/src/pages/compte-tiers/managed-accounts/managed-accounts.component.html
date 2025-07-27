@@ -65,10 +65,20 @@
     <div class="block-title">📋 Comptes actuellement gérés</div>
     <hr class="block-separator" />
     <ul *ngIf="managedAccounts().length > 0; else noAccounts">
-      <li *ngFor="let account of managedAccounts()">
-        <span class="account-name">{{ account.prenom }} {{ account.nom || '' }}</span>
-        <button (click)="switchToAccount(account.id)">🎭 Se connecter en tant que</button>
+      <li *ngFor="let account of managedAccounts(); let i = index" class="compte-tiers-bloc">
+        <div class="nom-tiers">
+            <span class="emoji">
+              {{ i % 2 === 0 ? '💿' : '📀' }}
+            </span>
+          <strong>{{ account.prenom }} {{ account.nom || '' }}</strong>
+        </div>
+        <div class="act">
+          <p><button type="button" (click)="switchToAccount(account.id)">🎭 Se connecter en tant que</button></p>
+          <p><button type="button"  (click)="deleteFromGroup(account.id)">🗑️ Supprimer du groupe</button></p>
+          <p><button type="button"  (click)="deleteGlobally(account.id)">❌ Supprimer définitivement</button></p>
+        </div>
       </li>
+
     </ul>
 
     <ng-template #noAccounts>
@@ -80,3 +90,19 @@
     <button data-allow-tiers (click)="return()">↩ Retour au Menu</button>
   </div>
 </div>
+
+<app-terminal-modal
+  *ngIf="showModal"
+  [message]="message"
+  [actions]="modalActions"
+  (actionClicked)="handleClicked($event)"
+/>
+
+
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>
+
