@@ -74,6 +74,7 @@
         </div>
         <div class="act">
           <p><button type="button" (click)="switchToAccount(account.id)">🎭 Se connecter en tant que</button></p>
+          <p><button type="button" (click)="addToAnotherGroup(account.id)">📤 Ajouter à un autre groupe</button></p>
           <p><button type="button"  (click)="deleteFromGroup(account.id)">🗑️ Supprimer du groupe</button></p>
           <p><button type="button"  (click)="deleteGlobally(account.id)">❌ Supprimer définitivement</button></p>
         </div>
@@ -98,11 +99,35 @@
   (actionClicked)="handleClicked($event)"
 />
 
-
 <app-terminal-modal
   *ngIf="errorService.errorMessage()"
   [message]="errorService.errorMessage()!"
   [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
   (actionClicked)="errorService.clearError()"
 ></app-terminal-modal>
+
+<ng-container *ngIf="showExportUser">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+
+      <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
+      <p>A quel groupe souhaitez ajouter ce compte tiers ?</p>
+
+      <select id="selectDest" [(ngModel)]="selectedGroupId">
+        <option [ngValue]="undefined" disabled selected hidden>Choisissez un groupe</option>
+        <option *ngFor="let group of groupFiltered()" [value]="group.id">{{group.nomGroupe}}</option>
+      </select>
+
+
+      <div class="modal-actions">
+        <button (click)="confirmExport()">Valider</button>
+        <button (click)="cancelExport()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
 
