@@ -1,17 +1,18 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ContextBannerService } from 'src/core/services/context-banner.service';
-import { effect } from '@angular/core';
+import {AfterViewInit, Component, computed, effect, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
+import {ContextBannerService} from 'src/core/services/context-banner.service';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-global-header-context',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    NgIf
+  ],
   templateUrl: './global-header-context.component.html',
   styleUrl: './global-header-context.component.scss'
 })
 export class GlobalHeaderContextComponent implements AfterViewInit {
-  message = this.bannerService.message;
+  message = computed(() => this.bannerService.message());
 
   @ViewChild('banner') bannerRef?: ElementRef<HTMLDivElement>;
   @Output() heightChange = new EventEmitter<number>();

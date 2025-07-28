@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ToastrService } from 'src/core/services/toastr.service';
-import { effect } from '@angular/core';
+import {AfterViewInit, Component, effect, ElementRef, EventEmitter, Output, Signal, ViewChild} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Toast, ToastrService} from 'src/core/services/toastr.service';
 
 @Component({
   selector: 'app-global-toastr',
@@ -11,12 +10,15 @@ import { effect } from '@angular/core';
   styleUrl: './global-toastr.component.scss'
 })
 export class GlobalToastrComponent implements AfterViewInit {
-  toasts = this.toastrService.toastsSignal();
+
 
   @ViewChild('container') containerRef?: ElementRef<HTMLDivElement>;
   @Output() heightChange = new EventEmitter<number>();
+  toasts: Signal<Toast[]>;
 
-  constructor(private toastrService: ToastrService) {}
+  constructor(private toastrService: ToastrService) {
+    this.toasts = this.toastrService.toastsSignal();
+  }
 
   ngAfterViewInit() {
     effect(() => {
