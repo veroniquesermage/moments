@@ -10,6 +10,11 @@ import {UserGroupService} from 'src/core/services/user-group.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
+import {GroupService} from 'src/core/services/group.service';
+import {ExportManagedAccountRequest} from 'src/core/models/export-managed-account-request.model';
+import {ToastrService} from 'ngx-toastr';
+import {GroupResume} from 'src/core/models/group/group-resume.model';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-managed-accounts',
@@ -31,12 +36,19 @@ export class ManagedAccountsComponent implements OnInit{
   showModal: boolean = false;
   message: string = '';
   modalActions:  TerminalModalAction[] = [];
-  selectedAccount: number = 0;
+  selectedAccount?: number;
+  showExportUser: boolean = false;
+  selectedGroupId: number | undefined;
+  groupes = computed(() => this.groupService.groupes());
+  groupFiltered = computed(() => this.groupes().filter(gr => gr.id !== this.groupContextService.getGroupId()));
 
   constructor(private userService: UserService,
+              private groupService: GroupService,
+              private groupContextService :GroupContextService,
               private userGroupService: UserGroupService,
               public errorService: ErrorService,
               private authService: AuthService,
+              private toastr: ToastrService,
               public router: Router) {
   }
 
@@ -45,6 +57,11 @@ export class ManagedAccountsComponent implements OnInit{
     if (!success) {
       this.errorService.showError("Impossible de charger les comptes tiers.");
     }
+    const groupesResult = await this.groupService.loadGroupesIfEmpty();
+    if (!groupesResult.success) {
+      this.errorService.showError("Impossible de charger les groupes.");
+    }
+
   }
 
   async goToCreateCompteTiers() {
@@ -76,11 +93,12 @@ export class ManagedAccountsComponent implements OnInit{
     }
   }
 
-  return() {
-    void this.router.navigate(['/dashboard']);
+  addToAnotherGroup(id: number) {
+    this.selectedAccount = id;
+    this.showExportUser = true;
   }
 
-  async deleteFromGroup(id: number) {
+  deleteFromGroup(id: number) {
     this.selectedAccount = id;
     this.showModal = true;
     const user =  this.managedAccounts().find(account => account.id == id)
@@ -93,7 +111,7 @@ export class ManagedAccountsComponent implements OnInit{
       { label: 'Annuler', eventName: 'CANCEL', style: 'primary' }];
   }
 
-  async deleteGlobally(id: number) {
+  deleteGlobally(id: number) {
     this.selectedAccount = id;
     this.showModal = true;
     const user =  this.managedAccounts().find(account => account.id == id)
@@ -112,8 +130,13 @@ export class ManagedAccountsComponent implements OnInit{
   }
 
   async confirmDeleteFromGroup(){
-    const result = await this.userGroupService.removeTiersFromGroup(this.selectedAccount)
+    if(!this.selectedAccount){
+      this.errorService.showError("Une erreur est survenue, veuillez réessayer.")
+      return;
+    }
+    const result = await this.userGroupService.removeTiersFromGroup(this.selectedAccount!)
     if(result.success){
+      this.selectedAccount = undefined;
       const success = await this.userService.loadAllUserTiers();
       if (!success) {
         this.errorService.showError("Impossible de charger les comptes tiers.");
@@ -124,8 +147,13 @@ export class ManagedAccountsComponent implements OnInit{
   }
 
   async confirmDeleteGlobally() {
-    const result = await this.userService.deleteManagedAccount(this.selectedAccount);
+    if(!this.selectedAccount){
+      this.errorService.showError("Une erreur est survenue, veuillez réessayer.")
+      return;
+    }
+    const result = await this.userService.deleteManagedAccount(this.selectedAccount!);
     if(result.success){
+      this.selectedAccount = undefined;
       const success = await this.userService.loadAllUserTiers();
       if (!success) {
         this.errorService.showError("Impossible de charger les comptes tiers.");
@@ -134,4 +162,33 @@ export class ManagedAccountsComponent implements OnInit{
       this.errorService.showError(result.message);
     }
   }
+
+  async confirmExport() {
+    if(!this.selectedAccount || !this.selectedGroupId){
+      this.errorService.showError("Une erreur est survenue, veuillez réessayer.");
+      return;
+    }
+    const request: ExportManagedAccountRequest = {
+      userId: this.selectedAccount!,
+      groupId: this.selectedGroupId!
+    }
+    const result = await this.userGroupService.exportTiersToGroup(request);
+    if(result.success){
+      this.toastr.success("L'opération s'est terminée avec succès !");
+      this.showExportUser = false;
+    } else {
+      this.showExportUser = false;
+      this.errorService.showError(result.message);
+    }
+  }
+
+  cancelExport() {
+    this.selectedAccount = undefined;
+    this.showExportUser = false;
+  }
+
+  return() {
+    void this.router.navigate(['/dashboard']);
+  }
+
 }

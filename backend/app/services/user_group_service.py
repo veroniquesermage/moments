@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, UserGroup
-from app.schemas import UserDisplaySchema
+from app.schemas import UserDisplaySchema, ExportManagedAccountRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.auth.user_service import UserService
 from app.services.trace_service import TraceService
@@ -325,4 +325,29 @@ class UserGroupService:
 
         await db.delete(user_groups)
         await db.commit()
+
+    @staticmethod
+    async def export_tiers_to_group( db: AsyncSession, request: ExportManagedAccountRequest, current_user: User):
+        user: User = await UserService.get_user_by_id(db, request.user_id)
+
+        if user.gere_par != current_user.id:
+            raise HTTPException(status_code=403, detail=f"Le compte tiers {request.user_id} n'est pas géré par l'utilisateur {current_user.id}")
+
+        user_group = UserGroup(
+            utilisateur_id=user.id,
+            groupe_id= request.group_id,
+            role=RoleEnum.MEMBRE
+        )
+
+        db.add(user_group)
+        await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "EXPORT_MANAGED_ACCOUNT",
+            f"Export d'un compte tiers dans autre groupe",
+            {"group_id": request.group_id, "managed_user": user.id},
+        )
+
 
