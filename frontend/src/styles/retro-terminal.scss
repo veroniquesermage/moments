@@ -48,6 +48,7 @@ button {
   font-family: inherit;
   cursor: pointer;
   margin-top: 1rem;
+  text-align: left;
 }
 
 button:hover {
@@ -224,29 +225,6 @@ body.compte-tiers {
   clip: rect(0 0 0 0);
   overflow: hidden;
   white-space: nowrap;
-}
-// Rendre les toasts visuellement cohérents avec ton thème
-.toast {
-  background-color: var(--color-toast-bg);
-  color: var(--color-toast-success);
-  border: 1px solid var(--color-toast-success);
-  font-family: monospace;
-  padding: 10px 20px;
-  border-radius: 4px;
-  box-shadow: 0 0 5px var(--color-toast-success);
-  max-width: 300px;
-}
-
-.toast-success {
-  background-color: var(--color-toast-success);
-  color: black;
-  font-weight: bold;
-}
-
-.toast-error {
-  background-color: var(--color-error);
-  color: white;
-  font-weight: bold;
 }
 
 .intro-section {

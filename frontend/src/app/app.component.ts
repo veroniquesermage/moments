@@ -1,4 +1,4 @@
-import {Component, effect, inject, Injector, runInInjectionContext} from '@angular/core';
+import {Component, effect, inject, Injector, runInInjectionContext, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AuthService} from 'src/security/service/auth.service';
 import {GroupService} from 'src/core/services/group.service';
@@ -7,14 +7,27 @@ import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {ThemeService} from 'src/core/services/theme.service';
+import {GlobalHeaderContextComponent} from 'src/shared/components/global-header-context/global-header-context.component';
+import {GlobalToastrComponent} from 'src/shared/components/global-toastr/global-toastr.component';
+import {ContextBannerService} from 'src/core/services/context-banner.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, TerminalModalComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    TerminalModalComponent,
+    GlobalHeaderContextComponent,
+    GlobalToastrComponent,
+  ],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
+
+  offset = signal(0);
+  private headerHeight = signal(0);
+  private toastHeight = signal(0);
 
   constructor(
     public auth: AuthService,
@@ -47,9 +60,16 @@ export class AppComponent {
   }
 
   private watchCompteTiersStatus() {
+    const banner = inject(ContextBannerService);
     effect(() => {
       const user = this.auth.profile();
-      document.body.classList.toggle('compte-tiers', !!user?.isCompteTiers);
+      const isTiers = !!user?.isCompteTiers;
+      document.body.classList.toggle('compte-tiers', isTiers);
+      if (isTiers) {
+        banner.show('Connecté en tant que compte tiers');
+      } else {
+        banner.clear();
+      }
     });
   }
 
@@ -83,6 +103,20 @@ export class AppComponent {
     }
 
     this.groupService.isLoading.set(false);
+  }
+
+  updateHeaderHeight(h: number) {
+    this.headerHeight.set(h);
+    this.computeOffset();
+  }
+
+  updateToastrHeight(h: number) {
+    this.toastHeight.set(h);
+    this.computeOffset();
+  }
+
+  private computeOffset() {
+    this.offset.set(this.headerHeight() + this.toastHeight());
   }
 
 }
