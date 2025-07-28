@@ -9,6 +9,8 @@
   <router-outlet></router-outlet>
 </div>
 
+<app-global-footer></app-global-footer>
+
 <app-terminal-modal
   *ngIf="errorService.errorMessage()"
   [message]="errorService.errorMessage()!"
