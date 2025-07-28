@@ -203,6 +203,14 @@ class UserService:
             raise HTTPException(status_code=403, detail="L'utilisateur n'appartient pas au groupe demandé")
         await UserGroupService.add_user_to_group(db, group_id, new_user.id, request.surnom)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "CREATE_MANAGED_ACCOUNT",
+            f"Création d'un compte tiers dans groupe courant",
+            {"group_id": group_id, "managed_user": new_user.id},
+        )
+
         return UserTiersResponse.model_validate(new_user)
 
     @staticmethod
@@ -251,6 +259,13 @@ class UserService:
             raise HTTPException(status_code=403, detail=f"Le compte tiers n'appartient pas à l'utilisateur {current_user.id}")
 
         await UserService.delete_user_fully(db, user_id)
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "DELETE_MANAGED_USER",
+            f"Suppression d'un compte tiers",
+            {"group_id": group_id, "managed_user": user_id},
+        )
 
     @staticmethod
     async def delete_user_fully(db: AsyncSession, user_id: int):

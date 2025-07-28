@@ -4,6 +4,7 @@ import {environment} from 'src/environments/environment';
 import {firstValueFrom} from 'rxjs';
 import {ApiResponse} from 'src/core/models/api-response.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
+import {ExportManagedAccountRequest} from 'src/core/models/export-managed-account-request.model';
 
 @Injectable({providedIn: 'root'})
 export class UserGroupService {
@@ -63,6 +64,17 @@ export class UserGroupService {
     } catch (error) {
       console.error('[UserGroupService] Erreur lors de la suppression d\'un compte tiers', error);
       return {success: false, message: "❌ Erreur lors de la suppression d\'un compte tiers."};
+    }
+  }
+
+  async exportTiersToGroup(request: ExportManagedAccountRequest): Promise<ApiResponse<void>> {
+    const url = `${this.apiUrl}/export-compte-tiers`;
+    try{
+      await firstValueFrom(this.http.post<void>(url, request));
+      return {success: true, data: undefined}
+    } catch (error) {
+      console.error('[UserGroupService] Erreur lors de l\'export d\'un compte tiers', error);
+      return {success: false, message: "❌ Erreur lors de l\'export d\'un compte tiers."};
     }
   }
 }
