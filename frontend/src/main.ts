@@ -8,7 +8,6 @@ import {routes} from 'src/app/app.routes';
 import {registerLocaleData} from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {provideToastr} from 'ngx-toastr';
 import {StartupService} from 'src/core/services/startup.service';
 import {AuthInterceptor} from 'src/core/interceptors/auth.interceptor';
 
@@ -23,7 +22,6 @@ bootstrapApplication(AppComponent, {
     ),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     importProvidersFrom(OAuthModule.forRoot(), BrowserAnimationsModule),
-    provideToastr({ positionClass: 'toast-bottom-right' }),
     provideAppInitializer(async () => {
       const startup = inject(StartupService);
       await startup.handleAppStartup();

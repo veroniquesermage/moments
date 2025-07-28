@@ -7,7 +7,7 @@ import {AuthService} from 'src/security/service/auth.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChangePassword} from 'src/security/model/change-password.model';
-import {ToastrService} from 'ngx-toastr';
+import {ToastrService} from 'src/core/services/toastr.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -41,7 +41,7 @@ export class ResetPasswordComponent implements OnInit{
   constructor(
     private authService: AuthService,
     public errorService: ErrorService,
-    private toastr: ToastrService,
+    private toastrService: ToastrService,
     public router: Router
   ) {}
 
@@ -124,7 +124,7 @@ export class ResetPasswordComponent implements OnInit{
       }
       try {
         await this.authService.submitPasswordChange(changePassword);
-        this.toastr.success('Changement de mot de passe confirmé 👍');
+        this.toastrService.show({ message: 'Changement de mot de passe confirmé 👍', type: 'success' });
         void this.router.navigate(['profile']);
         return;
       } catch (err) {

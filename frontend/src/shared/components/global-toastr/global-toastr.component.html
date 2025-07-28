@@ -1,0 +1,9 @@
+<div class="toastr-container" #container>
+  <div
+    *ngFor="let toast of toasts()"
+    class="toast toast-{{ toast.type }}"
+    [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+  >
+    {{ toast.message }}
+  </div>
+</div>
