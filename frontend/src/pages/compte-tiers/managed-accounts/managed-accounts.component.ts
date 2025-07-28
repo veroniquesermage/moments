@@ -40,7 +40,7 @@ export class ManagedAccountsComponent implements OnInit{
   showExportUser: boolean = false;
   selectedGroupId: number | undefined;
   groupes = computed(() => this.groupService.groupes());
-  groupFiltered: GroupResume[] = [];
+  groupFiltered = computed(() => this.groupes().filter(gr => gr.id !== this.groupContextService.getGroupId()));
 
   constructor(private userService: UserService,
               private groupService: GroupService,
@@ -57,8 +57,10 @@ export class ManagedAccountsComponent implements OnInit{
     if (!success) {
       this.errorService.showError("Impossible de charger les comptes tiers.");
     }
-    const groupId = this.groupContextService.getGroupId();
-    this.groupFiltered = this.groupes().filter(gr => gr.id != groupId);
+    const groupesResult = await this.groupService.loadGroupesIfEmpty();
+    if (!groupesResult.success) {
+      this.errorService.showError("Impossible de charger les groupes.");
+    }
 
   }
 
@@ -130,6 +132,7 @@ export class ManagedAccountsComponent implements OnInit{
   async confirmDeleteFromGroup(){
     if(!this.selectedAccount){
       this.errorService.showError("Une erreur est survenue, veuillez réessayer.")
+      return;
     }
     const result = await this.userGroupService.removeTiersFromGroup(this.selectedAccount!)
     if(result.success){
@@ -146,6 +149,7 @@ export class ManagedAccountsComponent implements OnInit{
   async confirmDeleteGlobally() {
     if(!this.selectedAccount){
       this.errorService.showError("Une erreur est survenue, veuillez réessayer.")
+      return;
     }
     const result = await this.userService.deleteManagedAccount(this.selectedAccount!);
     if(result.success){
@@ -162,6 +166,7 @@ export class ManagedAccountsComponent implements OnInit{
   async confirmExport() {
     if(!this.selectedAccount || !this.selectedGroupId){
       this.errorService.showError("Une erreur est survenue, veuillez réessayer.");
+      return;
     }
     const request: ExportManagedAccountRequest = {
       userId: this.selectedAccount!,
