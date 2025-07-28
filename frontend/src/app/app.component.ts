@@ -9,6 +9,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {ThemeService} from 'src/core/services/theme.service';
 import {GlobalHeaderContextComponent} from 'src/shared/components/global-header-context/global-header-context.component';
 import {GlobalToastrComponent} from 'src/shared/components/global-toastr/global-toastr.component';
+import {GlobalFooterComponent} from 'src/shared/components/global-footer/global-footer.component';
 import {ContextBannerService} from 'src/core/services/context-banner.service';
 
 @Component({
@@ -20,6 +21,7 @@ import {ContextBannerService} from 'src/core/services/context-banner.service';
     TerminalModalComponent,
     GlobalHeaderContextComponent,
     GlobalToastrComponent,
+    GlobalFooterComponent,
   ],
   templateUrl: './app.component.html',
 })
