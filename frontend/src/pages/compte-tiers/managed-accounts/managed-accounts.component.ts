@@ -12,7 +12,7 @@ import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
 import {GroupService} from 'src/core/services/group.service';
 import {ExportManagedAccountRequest} from 'src/core/models/export-managed-account-request.model';
-import {ToastrService} from 'ngx-toastr';
+import {ToastrService} from 'src/core/services/toastr.service';
 import {GroupResume} from 'src/core/models/group/group-resume.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 
@@ -48,7 +48,7 @@ export class ManagedAccountsComponent implements OnInit{
               private userGroupService: UserGroupService,
               public errorService: ErrorService,
               private authService: AuthService,
-              private toastr: ToastrService,
+              private toastrService: ToastrService,
               public router: Router) {
   }
 
@@ -174,7 +174,7 @@ export class ManagedAccountsComponent implements OnInit{
     }
     const result = await this.userGroupService.exportTiersToGroup(request);
     if(result.success){
-      this.toastr.success("L'opération s'est terminée avec succès !");
+      this.toastrService.show({ message: "L'opération s'est terminée avec succès !", type: 'success' });
       this.showExportUser = false;
     } else {
       this.showExportUser = false;

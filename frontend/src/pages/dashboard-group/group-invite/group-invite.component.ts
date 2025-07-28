@@ -6,7 +6,7 @@ import {ErrorService} from 'src/core/services/error.service';
 import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GroupService} from 'src/core/services/group.service';
-import {ToastrService} from 'ngx-toastr';
+import {ToastrService} from 'src/core/services/toastr.service';
 
 @Component({
   selector: 'app-group-invite',
@@ -30,7 +30,7 @@ export class GroupInviteComponent {
   constructor(private mailingService: MailingService,
               public errorService: ErrorService,
               private groupeService: GroupService,
-              private toastr: ToastrService) {
+              private toastrService: ToastrService) {
   }
 
   private isValidEmail(email: string): boolean {
@@ -86,7 +86,7 @@ export class GroupInviteComponent {
     }
     const result = await this.groupeService.regenererCodeInvitation(this.groupId);
     if(result.success){
-      this.toastr.success('Le code d\'invitation du groupe a bien été modifié 👍');
+      this.toastrService.show({ message: "Le code d'invitation du groupe a bien été modifié 👍", type: 'success' });
     } else {
       this.errorService.showError('Veuillez réessayer plus tard.');
     }

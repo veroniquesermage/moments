@@ -11,7 +11,7 @@ import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
 import {FormsModule} from '@angular/forms';
-import {ToastrService} from 'ngx-toastr';
+import {ToastrService} from 'src/core/services/toastr.service';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
@@ -52,7 +52,7 @@ export class MyGiftsIdeasComponent implements OnInit {
               private groupContextService : GroupContextService,
               private router: Router,
               public errorService: ErrorService,
-              private toastr: ToastrService,
+              private toastrService: ToastrService,
               private userService: UserService) {
     this.membersSignal = this.groupContextService.getMembersSignal();
   }
@@ -145,7 +145,7 @@ export class MyGiftsIdeasComponent implements OnInit {
 
     if(result.success){
       await this.loadIdeas()
-      this.toastr.success('Duplication confirmée 👍');
+      this.toastrService.show({ message: 'Duplication confirmée 👍', type: 'success' });
       this.showDuplicationModal = false;
       await this.router.navigate(['/dashboard/idees'])
     } else {
