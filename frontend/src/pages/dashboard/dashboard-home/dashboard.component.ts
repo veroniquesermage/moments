@@ -32,17 +32,11 @@ export class DashboardComponent implements OnInit{
   }
 
   async ngOnInit() {
-    const groupId = this.groupContextService.getGroupId();
-    const result = await this.groupService.getGroupDetail(groupId);
-
+    await this.loadGroupDetail();
     if (this.authService.profile()?.isCompteTiers) {
       this.isManagedTiers = true;
     }
 
-    if(result.success){
-      this.selectedGroup = result.data;
-      this.isAdmin = this.selectedGroup.role == 'ADMIN';
-    }
   }
 
   goToMesCadeaux() {
@@ -78,9 +72,20 @@ export class DashboardComponent implements OnInit{
   async switchToParent() {
     try{
       await this.authService.switchToParent();
+      await this.loadGroupDetail();
       this.isManagedTiers = false;
     } catch (e) {
       this.errorService.showError("Une erreur s'est produite, veuillez réessayer.")
+    }
+  }
+
+  async loadGroupDetail(){
+    const groupId = this.groupContextService.getGroupId();
+    const result = await this.groupService.getGroupDetail(groupId);
+
+    if(result.success){
+      this.selectedGroup = result.data;
+      this.isAdmin = this.selectedGroup.role == 'ADMIN';
     }
   }
 }
