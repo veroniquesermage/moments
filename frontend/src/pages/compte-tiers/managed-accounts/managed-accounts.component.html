@@ -119,7 +119,7 @@
 
       <select id="selectDest" [(ngModel)]="selectedGroupId">
         <option [ngValue]="undefined" disabled selected hidden>Choisissez un groupe</option>
-        <option *ngFor="let group of groupFiltered" [value]="group.id">{{group.nomGroupe}}</option>
+        <option *ngFor="let group of groupFiltered()" [value]="group.id">{{group.nomGroupe}}</option>
       </select>
 
 
