@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 export interface ToastOptions {
@@ -7,7 +7,7 @@ export interface ToastOptions {
   duration?: number;
 }
 
-interface Toast extends ToastOptions {
+export interface Toast extends ToastOptions {
   id: number;
   type: ToastType;
   duration: number;
