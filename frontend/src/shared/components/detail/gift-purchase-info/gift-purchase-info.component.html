@@ -1,0 +1,10 @@
+<div class="block">
+  <hr class="block-separator"/>
+  <div class="block-title"> 🔎 Vos informations complémentaires</div>
+  <hr class="block-separator"/>
+
+  <p><span class="key-label">Prix payé : </span> <span class="value-text">{{ purchaseInfo.prixReel }} €</span></p>
+  <p *ngIf="purchaseInfo.commentaire"><span class="key-label">Commentaire : </span> <span class="value-text">{{ purchaseInfo.commentaire }}</span></p>
+  <p *ngIf="purchaseInfo.compteTiers"><span class="key-label">Pris au nom de : </span> <span class="value-text">{{ purchaseInfo.compteTiers | displayName}}</span></p>
+
+</div>

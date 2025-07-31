@@ -9,8 +9,9 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import GiftActionEnum, GiftStatusEnum, RoleUtilisateur
 from app.core.logger import logger
 from app.core.message import *
-from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup
+from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup, GiftPurchaseInfo
 from app.models.gift import Gift
+from app.schemas.gift import GiftPurchaseInfoSchema, GiftPurchaseUpdate
 from app.schemas.gift.eligibility_response import EligibilityResponse
 from app.schemas.gift.gift_create import GiftCreate
 from app.schemas.gift.gift_delivery_schema import GiftDeliverySchema
@@ -23,7 +24,8 @@ from app.schemas.gift.gift_response import GiftResponse
 from app.schemas.gift.gift_shared import GiftSharedSchema
 from app.schemas.gift.gift_status import GiftStatus
 from app.schemas.gift.gift_update import GiftUpdate
-from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema
+from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema, \
+    build_gift_purchase_info_schema
 from app.services.mailing.mail_service import MailService
 from app.services.sharing_service import SharingService
 from app.services.trace_service import TraceService
@@ -422,7 +424,8 @@ class GiftService:
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea))
+                selectinload(Gift.gift_idea),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers))
         )
         gifts = result_gift.scalars().all()
 
@@ -432,7 +435,8 @@ class GiftService:
                     gift=await build_gift_public_response(gift, group_id, db),
                     delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
                                                                from_attributes=True) if gift.gift_delivery else None,
-                    partage=None  # à remplir si tu en as besoin
+                    partage=None,
+                    purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
                 )
                 for gift in gifts
             ]
@@ -449,21 +453,31 @@ class GiftService:
                 UserGroup.groupe_id == group_id
             )
             .options(
+                selectinload(Gift.gift_delivery),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery))
+            )
         )
+
         rows = result_gift_shared.all()
         if rows:
-            gifts_shared = [
-                GiftFollowed(
-                    gift=await build_gift_public_response(gift, group_id, db),
-                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                               from_attributes=True) if gift.gift_delivery else None,
-                    partage=await build_gift_shared_schema(gift_shared, group_id, db)
-                )
-                for gift, gift_shared in rows
-            ]
+            for gift, gift_shared in rows:
+                gift_schema = await build_gift_public_response(gift, group_id, db)
+                partage_schema = await build_gift_shared_schema(gift_shared, group_id, db)
+                delivery_schema = GiftDeliverySchema.model_validate(
+                    gift.gift_delivery, from_attributes=True
+                ) if gift.gift_delivery else None
+                purchase_info_schema = GiftPurchaseInfoSchema.from_model(
+                    gift.gift_purchase_info
+                ) if gift.gift_purchase_info else None
+
+                gifts_shared.append(GiftFollowed(
+                    gift=gift_schema,
+                    delivery=delivery_schema,
+                    partage=partage_schema,
+                    purchase_info=purchase_info_schema
+                ))
 
         return gifts_followed + gifts_shared
 
@@ -478,6 +492,7 @@ class GiftService:
             delivery=GiftDeliverySchema.model_validate(gift.gift_delivery) if gift.gift_delivery else None,
             partage=partage,
             ideas = await build_gift_idea_schema(gift.gift_idea, group_id, db) if gift.gift_idea else None,
+            purchase_info= await build_gift_purchase_info_schema(gift.gift_purchase_info, group_id, db) if gift.gift_purchase_info else None,
             est_partage=gift.statut == GiftStatusEnum.PARTAGE,
             droits_utilisateur=GiftService.define_user_role(current_user, gift, partage)
         )
@@ -491,7 +506,8 @@ class GiftService:
                 selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par)
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
             )
         )).scalars().first()
         if result is None:
@@ -513,3 +529,51 @@ class GiftService:
             return RoleUtilisateur.PARTICIPANT
         else:
             return RoleUtilisateur.SPECTATEUR
+
+    @staticmethod
+    async def update_gift_purchase( db: AsyncSession,
+                                    current_user: User,
+                                    giftId: int,
+                                    giftPurchaseUpdate: GiftPurchaseUpdate):
+        gift: Gift | None = (
+            await db.execute(
+                select(Gift)
+                .options(
+                    selectinload(Gift.reserve_par),
+                    selectinload(Gift.gift_purchase_info)
+                )
+                .where(Gift.id == giftId)
+            )
+        ).scalars().first()
+
+        if not gift:
+            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+
+        # 2. Check autorisation
+        if not gift.reserve_par or gift.reserve_par.id != current_user.id:
+            raise HTTPException(status_code=403, detail="Accès interdit à la livraison de ce cadeau.")
+
+        purchase : GiftPurchaseInfo = gift.gift_purchase_info
+        if not purchase:
+            purchase = GiftPurchaseInfo(gift_id=giftId)
+
+        purchase.prix_reel = (giftPurchaseUpdate.prix_reel if giftPurchaseUpdate.prix_reel is not None else None)
+        purchase.commentaire = (giftPurchaseUpdate.commentaire if giftPurchaseUpdate.commentaire else None)
+        purchase.compte_tiers_id = (
+            giftPurchaseUpdate.compte_tiers.id
+            if giftPurchaseUpdate.compte_tiers
+            else None
+        )
+
+
+        db.add(purchase)
+        await db.commit()
+        await db.refresh(purchase)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_PURCHASE_UPDATED",
+            f"Information complémentaires d'achat du cadeau {giftId} mise a jour",
+            {"gift_id": giftId, "user_id": current_user.id},
+        )
