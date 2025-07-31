@@ -1,3 +1,4 @@
+from .duplication_payload import DuplicationPayload
 from .eligibility_response import EligibilityResponse
 from .gift_create import GiftCreate
 from .gift_delivery_schema import GiftDeliverySchema
@@ -9,9 +10,11 @@ from .gift_ideas_response import GiftIdeasResponse
 from .gift_ideas_schema import GiftIdeasSchema
 from .gift_priority import GiftPriority
 from .gift_public_response import GiftPublicResponse
+from .gift_purchase_info import GiftPurchaseInfoSchema
+from .gift_purchase_info import GiftPurchaseInfoSchema
+from .gift_purchase_update import GiftPurchaseUpdate
 from .gift_response import GiftResponse
 from .gift_shared import GiftSharedSchema
 from .gift_status import GiftStatus
 from .gift_update import GiftUpdate
 from .recu_payload import RecuPayload
-from .duplication_payload import DuplicationPayload

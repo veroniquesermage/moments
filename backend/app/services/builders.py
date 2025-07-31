@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import UserGroup, Gift, GiftIdeas, GiftShared
-from app.schemas import UserDisplaySchema
+from app.models import UserGroup, Gift, GiftIdeas, GiftShared, GiftPurchaseInfo
+from app.schemas import UserDisplaySchema, UserTiersResponse
 from app.schemas.gift import GiftPublicResponse, GiftIdeasSchema, GiftSharedSchema
 
 
@@ -31,6 +31,39 @@ async def build_user_display(user_id: int, group_id: int, db: AsyncSession) -> U
         role= user_group.role,
         is_compte_tiers= user_group.utilisateur.is_compte_tiers
     )
+
+
+async def build_user_tiers(user_id: int, group_id: int, db: AsyncSession) -> UserTiersResponse:
+    result = await db.execute(
+        select(UserGroup)
+        .where(
+            UserGroup.utilisateur_id == user_id,
+            UserGroup.groupe_id == group_id
+        )
+        .options(selectinload(UserGroup.utilisateur))
+    )
+
+    user_group = result.scalars().first()
+
+    if not user_group:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé dans le groupe.")
+
+    return UserTiersResponse(
+        id=user_group.utilisateur.id,
+        nom=user_group.utilisateur.nom,
+        prenom=user_group.utilisateur.prenom,
+        surnom=user_group.surnom if user_group.surnom else None,
+        is_compte_tiers= user_group.utilisateur.is_compte_tiers
+    )
+
+async def build_gift_purchase_info_schema(purchase: GiftPurchaseInfo, group_id: int, db: AsyncSession):
+    return {
+        "gift_id": purchase.gift_id,
+        "prix_reel": purchase.prix_reel,
+        "commentaire": purchase.commentaire,
+        "compte_tiers": await build_user_tiers(purchase.compte_tiers_id, group_id, db) if purchase.compte_tiers_id else None
+    }
+
 
 async def build_gift_public_response(gift: Gift, group_id: int, db: AsyncSession) -> GiftPublicResponse:
     return GiftPublicResponse(

@@ -1,0 +1,53 @@
+<div class="form-container">
+  <section class="intro-section" aria-labelledby="Introduction pour la page de gestion du détail d'un achat">
+    <h1 class="dashboard-title">
+      Détail de votre achat
+    </h1>
+    <p class="dashboard-subtitle">Ajoutez ici les infos cruciales (ou totalement accessoires) à propos de votre achat.</p>
+    <p class="emphase-douce">
+      🗨️ Ce champ est votre carnet de bord : vous pouvez y noter le prix réellement payé (n'oubliez pas les frais de port même les plus honteux), le lieu d’achat, ou si vous avez pris ce cadeau au nom d’un compte tiers.
+    </p>
+    <p>
+      <strong>🔐 Note :</strong> Ces informations ne sont visibles que par vous et les participants au cadeau s’il est partagé. On garde les secrets de bons plans entre nous.
+    </p>
+  </section>
+
+
+  <form [formGroup]="purchaseForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Prix payé (en euros)</label>
+      <p class="advice">Conseil : n'oubliez pas d'ajouter les frais de port et si le cadeau est partagé, indiquez le montant de votre part dans ce champ</p>
+      <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')">
+    </div>
+
+    <div class="form-group">
+      <label>Commentaire</label>
+      <textarea name="commentaire" formControlName="commentaire"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Prendre au nom de :</label>
+      <select formControlName="compteTiers">
+        <option [ngValue]="undefined" disabled selected hidden>Choisissez un compte tiers</option>
+        <option [ngValue]="null">– Aucun compte tiers –</option>
+        <option *ngFor="let user of managedAccounts()" [ngValue]="user">{{ user | displayName }}</option>
+      </select>
+    </div>
+
+    <button type="submit">✅ Valider les détails de l'achat</button>
+  </form>
+
+  <div class="options">
+    <button (click)="cancel()">↩ Retour</button>
+  </div>
+
+  <app-terminal-modal
+    *ngIf="errorService.errorMessage()"
+    [message]="errorService.errorMessage()!"
+    [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+    (actionClicked)="errorService.clearError()"
+  ></app-terminal-modal>
+</div>
+<app-feedback-test
+  [composant]="composant">
+</app-feedback-test>

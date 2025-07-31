@@ -30,6 +30,7 @@ class Gift(Base):
     gift_idea = relationship("GiftIdeas", back_populates="gift", uselist=False)
 
     gift_delivery = relationship("GiftDelivery", back_populates="gift", uselist=False, cascade="all, delete-orphan")
+    gift_purchase_info = relationship("GiftPurchaseInfo", back_populates="gift", uselist=False, cascade="all, delete-orphan")
     partages = relationship("GiftShared", back_populates="cadeau")
 
     __table_args__ = (

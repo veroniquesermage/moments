@@ -38,7 +38,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
     {key: 'destinataire', label: 'Destinataire', formatFn: (u: UserDisplay | null | undefined) => getDisplayName(u)},
     { key: 'nom', label: 'Nom' },
-    {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
+    {key: 'prixReel', label: 'Prix payé (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     { key: 'statut', label: 'Statut' }
   ];
 
@@ -47,7 +47,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     {key: 'nom', label: 'Nom'},
     {key: 'magasin', label: 'Magasin'},
     {key: 'quantite', label: 'Quantité'},
-    {key: 'prixReel', label: 'Prix réel (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
+    {key: 'prixReel', label: 'Prix payé (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
     {key: 'lieuLivraison', label: 'Lieu de livraison'},
     {key: 'dateLivraison', label: 'Date de livraison', formatFn: (v: string) => v ? formatDate(v, 'dd-MM-yyyy', 'fr-FR') : '—'},
     {key: 'statut', label: 'Statut'}
@@ -85,7 +85,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     if(g.partage){
       return g.partage.montant;
     }
-    return g.delivery?.prixReel ?? 0;
+    return g.purchaseInfo?.prixReel ?? 0;
   })
     .reduce((acc, val) => acc + val, 0);
 
@@ -122,7 +122,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
         rawValue = giftFollowed.gift.destinataire;
         break;
       case 'prixReel':
-        rawValue = giftFollowed.delivery?.prixReel;
+        rawValue = giftFollowed.purchaseInfo?.prixReel;
         break;
       case 'lieuLivraison':
         rawValue = giftFollowed.delivery?.lieuLivraison;

@@ -16,6 +16,7 @@ import {MyGiftsIdeasComponent} from 'src/pages/dashboard/gift-ideas/my-gifts-ide
 import {IdeasCreateComponent} from 'src/pages/dashboard/gift-ideas/ideas-create/ideas-create.component';
 import {IdeasUpdateComponent} from 'src/pages/dashboard/gift-ideas/ideas-update/ideas-update.component';
 import {ManagedAccountsComponent} from 'src/pages/compte-tiers/managed-accounts/managed-accounts.component';
+import {GiftPurchaseComponent} from 'src/pages/dashboard/suivi-cadeaux-reserves/gift-purchase/gift-purchase.component';
 
 export const dashboardRoutes: Routes = [
   { path: '', component: DashboardComponent},
@@ -25,6 +26,7 @@ export const dashboardRoutes: Routes = [
   { path: 'leurs-cadeaux', component: GroupMemberGiftsComponent},
   { path: 'cadeaux-suivis', component: MyGiftsFollowUpComponent},
   { path: 'cadeaux-suivis/livraison/:id', component: GiftDeliverComponent},
+  { path: 'cadeaux-suivis/details-achat/:id', component: GiftPurchaseComponent},
   { path: 'partage/:id', component: GiftSharingComponent},
   { path: 'cadeau/:id', component: GiftDetailPageComponent },
   { path: 'idees', component: MyGiftsIdeasComponent },
