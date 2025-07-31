@@ -21,11 +21,12 @@ import {IdeaService} from 'src/core/services/idea.service';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
 import {format} from 'date-fns';
 import {fr} from 'date-fns/locale';
+import {GiftPurchaseInfoComponent} from 'src/shared/components/detail/gift-purchase-info/gift-purchase-info.component';
 
 @Component({
   selector: 'app-gift-detail',
   standalone: true,
-  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent, GiftIdeaComponent],
+  imports: [CommonModule, TerminalModalComponent, GiftHeaderComponent, GiftDeliveryComponent, GiftSharedComponent, GiftActionsComponent, GiftIdeaComponent, GiftPurchaseInfoComponent],
   templateUrl: './gift-detail.component.html',
   styleUrl: './gift-detail.component.scss'
 })
@@ -90,6 +91,10 @@ export class GiftDetailComponent implements OnInit{
 
   gererLivraison(): void {
     void this.router.navigate(['/dashboard/cadeaux-suivis/livraison', this.giftDetail.gift.id]);
+  }
+
+  gererDetailsAchat(): void {
+    void this.router.navigate(['/dashboard/cadeaux-suivis/details-achat', this.giftDetail.gift.id]);
   }
 
   gererPartage(): void {

@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+from app.models.gift_purchase_info import GiftPurchaseInfo
 from app.utils.date_helper import now_paris
 
 
@@ -25,3 +26,9 @@ class User(Base):
     gift_ideas_created = relationship("GiftIdeas", foreign_keys="GiftIdeas.proposee_par_id", back_populates="proposee_par")
     cadeaux_partages = relationship("GiftShared", foreign_keys="[GiftShared.preneur_id]",  back_populates="preneur")
     cadeaux_participes = relationship("GiftShared", foreign_keys="[GiftShared.participant_id]", back_populates="participant")
+    cadeaux_pris_en_nom = relationship(
+        "GiftPurchaseInfo",
+        back_populates="compte_tiers",
+        foreign_keys=[GiftPurchaseInfo.compte_tiers_id]
+    )
+
