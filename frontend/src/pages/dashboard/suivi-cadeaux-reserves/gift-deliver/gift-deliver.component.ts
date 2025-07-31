@@ -62,7 +62,7 @@ export class GiftDeliverComponent implements OnInit {
         this.giftForm.patchValue({
           lieuLivraison: this.delivery.lieuLivraison ?? '',
           dateLivraison: this.delivery.dateLivraison ?? '',
-          prixReel: this.delivery.prixReel?.toString() ?? ''
+          prixReel: ''
         });
       }
     } else {

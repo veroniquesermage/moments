@@ -12,6 +12,7 @@
   <button *ngIf="canWithdraw" (click)="withdrawRequested.emit()">🔁 Retirer le cadeau</button>
 
   <button *ngIf="canManageDelivery" (click)="manageDeliveryRequested.emit()">🚚 Gérer la livraison</button>
+  <button *ngIf="canManageInfo" (click)="managePurchaseInfoRequested.emit()">📝 Ajouter des informations</button>
   <button *ngIf="canManageSharing" (click)="manageSharingRequested.emit()"> 🧑‍🤝‍🧑  Gérer le partage</button>
 
   <button data-allow-tiers *ngIf="canGoBack" (click)="backRequested.emit()">↩ Retour à la liste</button>

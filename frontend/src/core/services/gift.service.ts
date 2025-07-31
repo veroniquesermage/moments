@@ -15,6 +15,7 @@ import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.mode
 import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
 import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
+import {GiftPurchaseUpdate} from 'src/core/models/gift/gift-purchase-update.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
@@ -221,5 +222,21 @@ export class GiftService {
 
   clearGifts() {
     this.giftsResponse.set([]);
+  }
+
+  async updateGiftPurchase(updatedPurchase: GiftPurchaseUpdate): Promise<ApiResponse<void>> {
+
+    const idEnc = encodeURIComponent(updatedPurchase.giftId);
+    const url = `${this.apiUrl}/${idEnc}/detail-achat`;
+
+    try {
+      const result = await firstValueFrom(this.http.put<void>(url, updatedPurchase));
+
+      return {success: true, data: undefined};
+    } catch (error) {
+      console.error('[GiftService] Erreur lors de la mise à jour des informations complémentaires de l\'achat', error);
+      return {success: false, message: "❌ Impossible de mettre à jour les informations complémentaires de l\'achat."};
+    }
+
   }
 }

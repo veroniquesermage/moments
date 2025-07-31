@@ -10,7 +10,8 @@ from app.dependencies.current_user import get_current_user_from_cookie, get_curr
     get_current_user_from_cookie_with_tiers
 from app.models import User
 from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
-    GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, GiftFollowed
+    GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, GiftFollowed, \
+    GiftPurchaseUpdate
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
@@ -95,6 +96,15 @@ async def update_gift_delivery(
         current_user: User = Depends(get_current_user_from_cookie) ) -> GiftDeliveryUpdate:
 
     return await GiftService.update_gift_delivery(db, current_user, giftId, giftDeliveryUpdate)
+
+@router.put("/{giftId}/detail-achat", status_code=204)
+async def update_gift_purchase(
+        giftId: int,
+        giftPurchaseUpdate: GiftPurchaseUpdate,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie) ) :
+
+    await GiftService.update_gift_purchase(db, current_user, giftId, giftPurchaseUpdate)
 
 @router.get("/{giftId}/eligibilite", response_model=EligibilityResponse)
 async def verify_eligibility(

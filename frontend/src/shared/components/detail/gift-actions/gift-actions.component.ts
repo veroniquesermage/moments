@@ -29,12 +29,14 @@ export class GiftActionsComponent {
   @Output() cancelReservationRequested = new EventEmitter<void>();
   @Output() withdrawRequested = new EventEmitter<void>();
   @Output() manageDeliveryRequested = new EventEmitter<void>();
+  @Output() managePurchaseInfoRequested = new EventEmitter<void>();
   @Output() manageSharingRequested = new EventEmitter<void>();
   @Output() backRequested = new EventEmitter<void>();
   @Output() editIdeaRequested = new EventEmitter<void>();
   @Output() deleteIdeaRequested = new EventEmitter<void>();
 
   protected readonly GiftStatus = GiftStatus;
+
 
   constructor(public giftService: GiftService,
               public router: Router,
@@ -95,6 +97,10 @@ export class GiftActionsComponent {
   }
 
   get canManageDelivery(): boolean {
+    return this.context === 'suivi' && this.role === RoleUser.PRENEUR;
+  }
+
+  get canManageInfo(): boolean {
     return this.context === 'suivi' && this.role === RoleUser.PRENEUR;
   }
 

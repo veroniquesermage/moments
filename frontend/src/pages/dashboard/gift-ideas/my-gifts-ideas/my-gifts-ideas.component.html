@@ -79,7 +79,7 @@
 
         <select id="selectDest" [(ngModel)]="selectedDestId">
           <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
-          <option *ngFor="let user of membersSharedGroup" [value]="user.id">{{ user | displayName}}</option>
+          <option *ngFor="let user of membersSharedGroup" [value]="user.id">{{ user | displayName }}</option>
         </select>
 
 
