@@ -10,8 +10,9 @@ from app.dependencies.current_user import get_current_user_from_cookie, get_curr
     get_current_user_from_cookie_with_tiers
 from app.models import User
 from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
-    GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, GiftFollowed, \
+    GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, \
     GiftPurchaseUpdate
+from app.schemas.gift.gift_followed_by_account import GiftFollowedByAccount
 from app.schemas.gift.gift_update import GiftUpdate
 from app.services import GiftService
 
@@ -45,13 +46,13 @@ async def update_all_gifts(
     return await GiftService.update_all_gifts(db, current_user, gifts)
 
 
-@router.get("/suivis/{groupId}", response_model=list[GiftFollowed])
+@router.get("/suivis/{groupId}", response_model=list[GiftFollowedByAccount])
 async def get_followed_gifts(
         groupId: int,
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftFollowed]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftFollowedByAccount]:
 
-    return await GiftService.get_followed_gifts(db, current_user, groupId)
+    return await GiftService.get_gifts_by_account(db, current_user, groupId)
 
 @router.get("/membre/{user_id}", response_model=list[GiftPublicResponse])
 async def get_visible_gifts_for_member(

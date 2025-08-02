@@ -12,3 +12,4 @@ class GiftFollowed(CamelModel):
     delivery: Optional[GiftDeliverySchema] = None
     partage: Optional[GiftSharedSchema] = None
     purchase_info: Optional[GiftPurchaseInfoSchema] = None
+    est_partage: bool = False

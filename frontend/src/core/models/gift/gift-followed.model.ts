@@ -6,6 +6,7 @@ import {GiftPurchaseInfoSchema} from 'src/core/models/gift/gift-purchase-info.mo
 export interface GiftFollowed{
   gift: GiftPublicResponse,
   delivery?: GiftDelivery,
-  partage?: GiftShared
-  purchaseInfo?: GiftPurchaseInfoSchema
+  partage?: GiftShared,
+  purchaseInfo?: GiftPurchaseInfoSchema,
+  estPartage: boolean
 }
