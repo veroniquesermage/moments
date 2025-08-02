@@ -138,6 +138,10 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     return column.formatFn ? column.formatFn(rawValue, giftFollowed) : rawValue;
   }
 
+  isGroupRow(row: GiftFollowed | GroupRow): row is GroupRow {
+    return (row as GroupRow).title !== undefined;
+  }
+
   private buildTableRows(): void {
     const groups = new Map<number | null, { label: string; gifts: GiftFollowed[] }>();
     for (const gift of this.giftsFollowed) {
