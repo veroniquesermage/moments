@@ -13,16 +13,16 @@ import {GiftCreate} from 'src/core/models/gift/gift-create.model';
 import {GiftUpdate} from 'src/core/models/gift/gift-update.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
-import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {GiftPurchaseUpdate} from 'src/core/models/gift/gift-purchase-update.model';
+import {GiftFollowedByAccount} from 'src/core/models/gift/gift-followed-by-account.model';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.cadeaux;
   giftsResponse = signal<GiftResponse[]>([])
-  giftsFollowed = signal<GiftFollowed[]>([])
+  giftsFollowed = signal<GiftFollowedByAccount[]>([])
   isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient,
@@ -173,13 +173,13 @@ export class GiftService {
     }
   }
 
-  async getFollowedGifts(): Promise<ApiResponse<GiftFollowed[]>> {
+  async getFollowedGifts(): Promise<ApiResponse<GiftFollowedByAccount[]>> {
     const groupId = this.groupContextService.getGroupId()!;
     const idEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/suivis/${idEnc}`;
     try {
       const giftsFollowed = await firstValueFrom(
-        this.http.get<GiftFollowed[]>(url)
+        this.http.get<GiftFollowedByAccount[]>(url)
       );
 
       this.giftsFollowed.set(giftsFollowed);
