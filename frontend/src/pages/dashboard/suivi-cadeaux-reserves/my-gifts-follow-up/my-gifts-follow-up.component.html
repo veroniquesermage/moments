@@ -1,18 +1,17 @@
 <div class="terminal">
   <section class="intro-section"  aria-label="Introduction pour la page Listes des autres membres">
     <h1 class="dashboard-title">
-      🛍️ Les listes des cadeaux réservés ou pris
+      🛍️ Ma liste de cadeaux réservés ou pris
     </h1>
+    <p>Voici tous les cadeaux que vous avez réservés ou pris, pour vous ou un compte tiers.
+    <br> Le prix affiché correspond à ce que vous avez effectivement payé, y compris votre participation si le cadeau est partagé.</p>
     <p class="emphase-douce">
-      Cliquez sur un cadeau pour obtenir son détail et le gérer.
+      Cliquez sur un cadeau pour accéder à toutes ses infos et les gérer : livraison, partage, remboursement, notes, le prix réellement payé...
     </p>
     <p *ngIf="isPortrait" class="orientation-hint">
     📱 Pour plus de fonctionnalités, passez en mode paysage.
     </p>
   </section>
-
-  <p class="total"> Total des cadeaux : {{ Number(totalPrixReel.toFixed(2))
-    }} €</p>
 
   <p class="table-legend emphase-douce" role="group" aria-labelledby="table-legend-title">
     <strong id="table-legend-title" class="visually-hidden">Légende du tableau</strong>
@@ -23,23 +22,38 @@
   <table aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
     <tr>
-      <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
+      <th scope="col" *ngFor="let column of displayedColumns">
+        {{ column.label || column.key | titlecase }}
+      </th>
     </tr>
     </thead>
-    <tbody *ngIf="displayedColumns.length > 0 && giftsFollowed.length > 0">
-    <tr *ngFor="let gift of giftsFollowed" (click)="onGiftClicked(gift)"
-        [class.recu]="gift.delivery?.recu"
-        [class.partage]="gift.gift.statut === 'PARTAGE'"
-        [attr.aria-label]="getAriaLabel(gift)">
-      <td *ngFor="let column of displayedColumns"
-          tabindex="0"
-          (keydown.enter)="onGiftClicked(gift)"
-          (keydown.space)="onGiftClicked(gift)">
-        {{ getGiftValue(gift, column) }}
-      </td>
-    </tr>
+    <tbody *ngIf="giftsFollowedByAccount?.length">
+    <ng-container *ngFor="let group of giftsFollowedByAccount">
+      <!-- Ligne de séparation avec le label et le total -->
+      <tr class="separator-row">
+        <td [attr.colspan]="displayedColumns.length">
+          {{ group.accountLabel }} {{ group.total | number:'1.2-2' }} €
+        </td>
+      </tr>
+
+      <!-- Lignes cadeaux -->
+      <ng-container *ngFor="let gift of group.gifts">
+        <tr (click)="onGiftClicked(gift)"
+            [class.partage]="gift.partage || gift.estPartage"
+            [class.recu]="gift.delivery?.recu"
+            [attr.aria-label]="getAriaLabel(gift)">
+          <td *ngFor="let column of displayedColumns"
+              tabindex="0"
+              (keydown.enter)="onGiftClicked(gift)"
+              (keydown.space)="onGiftClicked(gift)">
+            {{ getGiftValue(gift, column) }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
     </tbody>
   </table>
+
 
   <div class="options">
     <button (click)="retour()">↩ Retour au Menu</button>

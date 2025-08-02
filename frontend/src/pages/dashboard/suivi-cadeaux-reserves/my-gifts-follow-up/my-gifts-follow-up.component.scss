@@ -30,7 +30,8 @@
   }
 
   .partage {
-    background-color: var(--color-sharing);
+    border: 2px solid var(--color-sharing);
+    background-color: transparent;
   }
 }
 
@@ -72,8 +73,8 @@
 }
 
 .gift-table tr.partage {
-  background-color: var(--color-sharing);
-  color: var(--color-text);
+  outline: 4px solid var(--color-sharing);
+  outline-offset: -4px;
 }
 
 .gift-table td:focus {
@@ -81,5 +82,13 @@
   background-color: var(--color-row-hover-bg);
 }
 
+.gift-table .separator-row td {
+  font-weight: bold;
+  font-style: italic;
+  padding-top: 1rem;
+  color: var(--color-highlight);
+  background-color: var(--color-bg);
+  border-top: 2px solid var(--color-alt-border);
+}
 
 
