@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import timedelta
 from typing import Optional
 
@@ -18,6 +19,7 @@ from app.schemas.gift.gift_delivery_schema import GiftDeliverySchema
 from app.schemas.gift.gift_delivery_update import GiftDeliveryUpdate
 from app.schemas.gift.gift_detail_response import GiftDetailResponse
 from app.schemas.gift.gift_followed import GiftFollowed
+from app.schemas.gift.gift_followed_by_account import GiftFollowedByAccount
 from app.schemas.gift.gift_priority import GiftPriority
 from app.schemas.gift.gift_public_response import GiftPublicResponse
 from app.schemas.gift.gift_response import GiftResponse
@@ -404,15 +406,26 @@ class GiftService:
         return GiftResponse.model_validate(gift)
 
     @staticmethod
-    async def get_followed_gifts(
+    async def get_gifts_by_account(
+            db: AsyncSession,
+            current_user: User,
+            group_id: int
+    ) -> list[GiftFollowedByAccount]:
+        gifts_followed = await GiftService._get_gifts_followed(db, current_user, group_id)
+        gifts_shared = await GiftService._get_gifts_shared(db, current_user, group_id)
+
+        all_gifts = gifts_followed + gifts_shared
+        grouped = GiftService._group_gifts_by_account(all_gifts)
+
+        return grouped
+
+    @staticmethod
+    async def _get_gifts_followed(
             db: AsyncSession,
             current_user: User,
             group_id: int
     ) -> list[GiftFollowed]:
-
-        # A. Cadeaux réservés ou pris PAR moi, créés PAR des membres du groupe courant
-        gifts_followed = []
-        result_gift = await db.execute(
+        result = await db.execute(
             select(Gift)
             .join(User, Gift.destinataire_id == User.id)
             .join(UserGroup, User.id == UserGroup.utilisateur_id)
@@ -425,25 +438,32 @@ class GiftService:
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
                 selectinload(Gift.gift_idea),
-                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers))
+                selectinload(Gift.partages),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
+            )
         )
-        gifts = result_gift.scalars().all()
 
-        if gifts:
-            gifts_followed = [
-                GiftFollowed(
-                    gift=await build_gift_public_response(gift, group_id, db),
-                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                               from_attributes=True) if gift.gift_delivery else None,
-                    partage=None,
-                    purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
-                )
-                for gift in gifts
-            ]
+        gifts = result.scalars().all()
 
-        # B. Cadeaux partagés AVEC moi, créés PAR des membres du groupe courant
-        gifts_shared = []
-        result_gift_shared = await db.execute(
+        return [
+            GiftFollowed(
+                gift=await build_gift_public_response(gift, group_id, db),
+                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery, from_attributes=True) if gift.gift_delivery else None,
+                partage=None,
+                est_partage= True if gift.partages else False,
+                purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
+            )
+            for gift in gifts
+        ]
+
+    @staticmethod
+    async def _get_gifts_shared(
+            db: AsyncSession,
+            current_user: User,
+            group_id: int
+    ) -> list[GiftFollowed]:
+
+        result = await db.execute(
             select(Gift, GiftShared)
             .join(GiftShared, Gift.id == GiftShared.cadeau_id)
             .join(User, Gift.destinataire_id == User.id)
@@ -460,26 +480,50 @@ class GiftService:
             )
         )
 
-        rows = result_gift_shared.all()
-        if rows:
-            for gift, gift_shared in rows:
-                gift_schema = await build_gift_public_response(gift, group_id, db)
-                partage_schema = await build_gift_shared_schema(gift_shared, group_id, db)
-                delivery_schema = GiftDeliverySchema.model_validate(
-                    gift.gift_delivery, from_attributes=True
-                ) if gift.gift_delivery else None
-                purchase_info_schema = GiftPurchaseInfoSchema.from_model(
-                    gift.gift_purchase_info
-                ) if gift.gift_purchase_info else None
+        rows = result.all()
+        return [
+            GiftFollowed(
+                gift=await build_gift_public_response(gift, group_id, db),
+                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery, from_attributes=True) if gift.gift_delivery else None,
+                partage=await build_gift_shared_schema(gift_shared, group_id, db),
+                est_partage= True,
+                purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
+            )
+            for gift, gift_shared in rows
+        ]
 
-                gifts_shared.append(GiftFollowed(
-                    gift=gift_schema,
-                    delivery=delivery_schema,
-                    partage=partage_schema,
-                    purchase_info=purchase_info_schema
-                ))
+    @staticmethod
+    def _group_gifts_by_account(gifts: list[GiftFollowed]) -> list[GiftFollowedByAccount]:
+        groupes_temp: dict[str, list[GiftFollowed]] = defaultdict(list)
 
-        return gifts_followed + gifts_shared
+        for gift in gifts:
+            label = GiftService._get_account_label(gift)
+            groupes_temp[label].append(gift)
+
+        result = []
+        for label, cadeaux in groupes_temp.items():
+            total = sum(GiftService._get_amount_paid(c) for c in cadeaux)
+            result.append(GiftFollowedByAccount(
+                account_label=label,
+                total=round(float(total), 2),
+                gifts=cadeaux
+            ))
+
+        return result
+
+    @staticmethod
+    def _get_account_label(gift: GiftFollowed) -> str:
+        compte = gift.purchase_info.compte_tiers if gift.purchase_info else None
+        return f"Montant total au nom de {compte.prenom} : " if compte else "Montant total en mon nom : "
+
+    @staticmethod
+    def _get_amount_paid(gift: GiftFollowed) -> float:
+        if gift.partage and gift.partage.montant is not None:
+            return gift.partage.montant
+        if gift.purchase_info and gift.purchase_info.prix_reel is not None:
+            return gift.purchase_info.prix_reel
+        return 0.0
+
 
     @staticmethod
     async def set_gift_detail(gift: Gift,
