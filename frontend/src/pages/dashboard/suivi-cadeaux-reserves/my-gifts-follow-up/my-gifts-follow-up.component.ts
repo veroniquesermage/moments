@@ -28,8 +28,8 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
   styleUrl: './my-gifts-follow-up.component.scss'
 })
 export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
-
   giftsFollowed: GiftFollowed[] = []
+  tableRows: Array<GiftFollowed | GroupRow> = [];
   displayedColumns: ColumnDefinition[] = [];
   portraitSub?: Subscription;
   isPortrait = false;
@@ -71,6 +71,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
     if(result.success){
       this.giftsFollowed = result.data;
+      this.buildTableRows();
     } else {
       this.errorService.showError(result.message);
     }
@@ -137,7 +138,48 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     return column.formatFn ? column.formatFn(rawValue, giftFollowed) : rawValue;
   }
 
+  private buildTableRows(): void {
+    const groups = new Map<number | null, { label: string; gifts: GiftFollowed[] }>();
+    for (const gift of this.giftsFollowed) {
+      const compte = gift.purchaseInfo?.compteTiers;
+      const key = compte?.id ?? null;
+      const label = compte ? getDisplayName(compte) : 'moi-même';
+      if (!groups.has(key)) {
+        groups.set(key, { label, gifts: [] });
+      }
+      groups.get(key)!.gifts.push(gift);
+    }
+
+    const rows: Array<GiftFollowed | GroupRow> = [];
+
+    const selfGroup = groups.get(null);
+    if (selfGroup) {
+      rows.push({ title: 'Cadeaux pris pour moi-même', total: this.getGroupTotal(selfGroup.gifts) });
+      selfGroup.gifts.forEach(g => rows.push(g));
+      groups.delete(null);
+    }
+
+    const otherGroups = Array.from(groups.values()).sort((a, b) => a.label.localeCompare(b.label));
+    for (const group of otherGroups) {
+      rows.push({ title: `Cadeaux pris pour ${group.label}`, total: this.getGroupTotal(group.gifts) });
+      group.gifts.forEach(g => rows.push(g));
+    }
+
+    this.tableRows = rows;
+  }
+
+  private getGroupTotal(gifts: GiftFollowed[]): number {
+    return gifts
+      .map(g => (g.partage ? g.partage.montant : g.purchaseInfo?.prixReel ?? 0))
+      .reduce((acc, val) => acc + val, 0);
+  }
+
 
   protected readonly Number = Number;
   composant: string = "MyGiftsFollowUpComponent";
+}
+
+interface GroupRow {
+  title: string;
+  total: number;
 }

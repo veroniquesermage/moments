@@ -26,18 +26,26 @@
       <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
     </tr>
     </thead>
-    <tbody *ngIf="displayedColumns.length > 0 && giftsFollowed.length > 0">
-    <tr *ngFor="let gift of giftsFollowed" (click)="onGiftClicked(gift)"
-        [class.recu]="gift.delivery?.recu"
-        [class.partage]="gift.gift.statut === 'PARTAGE'"
-        [attr.aria-label]="getAriaLabel(gift)">
-      <td *ngFor="let column of displayedColumns"
-          tabindex="0"
-          (keydown.enter)="onGiftClicked(gift)"
-          (keydown.space)="onGiftClicked(gift)">
-        {{ getGiftValue(gift, column) }}
-      </td>
-    </tr>
+    <tbody *ngIf="displayedColumns.length > 0 && tableRows.length > 0">
+      <ng-container *ngFor="let row of tableRows">
+        <tr *ngIf="row.title !== undefined" class="separator-row">
+          <td [attr.colspan]="displayedColumns.length">
+            {{ row.title }} — {{ Number(row.total.toFixed(2)) }} €
+          </td>
+        </tr>
+        <tr *ngIf="row.title === undefined"
+            (click)="onGiftClicked(row as GiftFollowed)"
+            [class.recu]="(row as GiftFollowed).delivery?.recu"
+            [class.partage]="(row as GiftFollowed).gift.statut === 'PARTAGE'"
+            [attr.aria-label]="getAriaLabel(row as GiftFollowed)">
+          <td *ngFor="let column of displayedColumns"
+              tabindex="0"
+              (keydown.enter)="onGiftClicked(row as GiftFollowed)"
+              (keydown.space)="onGiftClicked(row as GiftFollowed)">
+            {{ getGiftValue(row as GiftFollowed, column) }}
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 
