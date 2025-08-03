@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
 import {WelcomeComponent} from 'src/pages/auth/welcome/welcome.component';
+import {ThemeComponent} from 'src/pages/theme/theme.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
   {
     path: 'compte-tiers',
     loadChildren: () => import('../pages/compte-tiers/compte-tiers.routes').then(m => m.compteTiersRoutes)
+  },
+  {
+    path: 'theme',
+    component: ThemeComponent
   },
   {
     path: '**',

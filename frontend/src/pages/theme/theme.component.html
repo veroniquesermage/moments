@@ -1,0 +1,48 @@
+<div class="terminal">
+  <section class="intro-section" aria-labelledby="Introduction pour la page de choix du thème">
+    <h1 class="dashboard-title">
+      🎨 Choix du thème
+    </h1>
+    <p class="dashboard-subtitle">
+      L’ambiance visuelle, c’est comme le chocolat chaud : chacun a ses préférences.
+    </p>
+    <p class="emphase-douce">
+      Chez <strong>(Moments)</strong>, chaque thème a sa petite histoire. Choisissez celui qui vous ressemble – ou celui que vous avez envie d’habiter un moment. Un nom, un thème.
+    </p>
+  </section>
+
+  <div
+    *ngFor="let theme of themes"
+    class="theme-card"
+    [ngClass]="[
+      'theme-' + theme.value + '-preview',
+      selectedTheme === theme.value ? 'selected' : ''
+    ]"
+    (click)="onThemeChange(theme.value)"
+    tabindex="0"
+    role="button"
+    [attr.aria-pressed]="selectedTheme === theme.value"
+  >
+    <!-- Titre et badge sélection -->
+    <div class="theme-selector">
+      <span class="theme-title">{{ theme.label }}</span>
+    </div>
+
+    <!-- Description -->
+    <p class="theme-description">{{ theme.description }}</p>
+
+    <!-- Aperçu de la section d’accueil -->
+    <div class="section-intro">
+      <h2>L'histoire de ce thème</h2>
+      <p>
+        {{theme.histoire}}
+      </p>
+      <div class="section-hint">
+        {{theme.resume}}
+      </div>
+    </div>
+  </div>
+  <div class="options">
+    <button data-allow-tiers (click)="return()">↩ Retour</button>
+  </div>
+</div>

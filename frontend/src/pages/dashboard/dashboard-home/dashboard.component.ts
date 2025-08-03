@@ -64,9 +64,12 @@ export class DashboardComponent implements OnInit{
     void this.router.navigate(['/groupe/admin']);
   }
 
-
   goToComptesTiers() {
     void this.router.navigate(['/compte-tiers']);
+  }
+
+  goToTheme() {
+    void this.router.navigate(['/theme']);
   }
 
   async switchToParent() {
