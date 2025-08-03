@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {Theme, ThemeService} from 'src/core/services/theme.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
@@ -14,14 +13,7 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
 export class ProfileActionsComponent {
   composant: string = "ProfileActionsComponent";
 
-  constructor(private router: Router, public theme: ThemeService) {
-  }
-
-  get themes(): Theme[] {
-    return [
-      this.theme.current,
-      ...this.theme.availableThemes.filter(t => t !== this.theme.current)
-    ];
+  constructor(private router: Router) {
   }
 
   async changeGroup() {
