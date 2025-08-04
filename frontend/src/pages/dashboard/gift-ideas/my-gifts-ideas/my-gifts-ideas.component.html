@@ -18,7 +18,7 @@
     <tr>
       <th scope="col">Destinataire</th>
       <th scope="col">Nom</th>
-      <th scope="col" class="col-actions">Prix</th>
+      <th scope="col" class="col-actions">Prix unitaire (€)</th>
       <th scope="col" class="col-actions">Privé</th>
       <th scope="col" class="col-actions">Actions</th>
     </tr>
@@ -30,7 +30,7 @@
         (keydown.space)="onRowClick(gift)">
       <td tabindex="0">{{ gift.gift.destinataire | displayName }}</td>
       <td>{{ gift.gift.nom }}</td>
-      <td class="col-actions">{{ gift.gift.prix }} €</td>
+      <td class="col-actions">{{ gift.gift.prix | formatMontant}}</td>
       <td
         class="col-actions">
         {{ gift.giftIdea.visibilite ? 'NON' : 'OUI' }}
