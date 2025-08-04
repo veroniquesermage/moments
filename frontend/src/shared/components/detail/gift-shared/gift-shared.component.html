@@ -9,12 +9,12 @@
     </span> <span class="value-text">{{ giftDetailResponse.gift.reservePar | displayName }}</span>
   </p>
   <p *ngIf="giftDetailResponse.gift.statut == GiftStatus.RESERVE">
-    <span class="key-label">ate d'expiration de la réservation  : </span>
+    <span class="key-label">Date d'expiration de la réservation  : </span>
     <span class="value-text">{{giftDetailResponse.gift.expirationReservation | date: "d MMMM y 'à' HH'h'" }}</span>
   </p>
 
 
-  <ng-container *ngIf="context === 'suivi'">
+  <ng-container *ngIf="context === 'suivi' && partage!.length >0" >
     <ng-container *ngIf="isPreneur">
       <p class="legend-icon"> Cliquez sur les icônes pour changer le statut.</p>
       <p *ngFor="let share of partage">
