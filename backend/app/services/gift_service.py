@@ -219,6 +219,14 @@ class GiftService:
             await db.refresh(gift)
 
         sorted_gifts = sorted(gift_map.values(), key=lambda g: g.priorite)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_UPDATED",
+            f"Mise à jour de tous les cadeaux de l'utilisateur",
+            {"user_id": current_user.id},
+        )
         return [GiftResponse.model_validate(gm) for gm in sorted_gifts]
 
     @staticmethod
@@ -291,17 +299,17 @@ class GiftService:
 
     @staticmethod
     async def delete_gift(db: AsyncSession,
-                          giftId: int,
+                          gift_id: int,
                           current_user: User):
 
-        logger.info(f"Suppression du cadeau à l'id {giftId}")
+        logger.info(f"Suppression du cadeau à l'id {gift_id}")
 
         result: Gift | None = (await db.execute(
-            select(Gift).where(Gift.id == giftId)
+            select(Gift).where(Gift.id == gift_id)
         )).scalars().first()
 
         if result is None:
-            logger.info(f"Cadeau avec l'id {giftId} introuvable.")
+            logger.info(f"Cadeau avec l'id {gift_id} introuvable.")
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
         elif result.destinataire_id != current_user.id:
             logger.info(
@@ -315,17 +323,17 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_DELETED",
-            f"Suppression du cadeau {giftId}",
-            {"gift_id": giftId, "user_id": current_user.id},
+            f"Suppression du cadeau {gift_id}",
+            {"gift_id": gift_id, "user_id": current_user.id},
         )
 
     @staticmethod
     async def change_status(db: AsyncSession,
                             current_user: User,
-                            giftId: int,
+                            gift_id: int,
                             gift_status: GiftStatus) -> GiftResponse:
 
-        result: Gift = await GiftService.get_gift_or_raise(db, giftId)
+        result: Gift = await GiftService.get_gift_or_raise(db, gift_id)
 
         result.statut = gift_status.status
 
@@ -361,8 +369,8 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_STATUS_CHANGED",
-            f"Statut du cadeau {giftId} -> {gift_status.status}",
-            {"gift_id": giftId, "user_id": current_user.id, "status": gift_status.status},
+            f"Statut du cadeau {gift_id} -> {gift_status.status}",
+            {"gift_id": gift_id, "user_id": current_user.id, "status": gift_status.status},
         )
 
         return GiftResponse.model_validate(result)
