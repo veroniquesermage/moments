@@ -1,6 +1,5 @@
 /* Message d'invite */
 .command-accueil {
-  margin-top: 3rem;
   margin-bottom: 1.5rem;
   font-weight: bold;
   font-size: 2rem;
@@ -16,21 +15,16 @@
 
 /* Bouton Email/Mdp */
 .options-wlc {
-  display: block;
-  width: 100%;
-  max-width: 500px;
-  margin: 0.5em auto;
-  padding: 1em 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 700px;
   font-family: inherit;
   font-size: 1.05em;
-  background-color: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
   text-align: center;
-  transition: background 0.15s, color 0.15s, border 0.15s;
   cursor: pointer;
-  letter-spacing: 0.02em;
 }
 
 .options-wlc:hover,
@@ -53,11 +47,13 @@
   font-size: 14px;
   color: #1F1F1F;
 
-  height: 40px;
+  height: 50px;
   padding: 0 16px;
   cursor: pointer;
 
   transition: box-shadow 0.2s ease;
+
+  margin-top: 2rem;
 }
 
 .google-signin-btn:hover {
@@ -178,3 +174,15 @@ input.error {
   text-align: center;
 }
 
+.checkbox-row{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+
+input[type="checkbox"] {
+  accent-color: var(--color-highlight);
+}
