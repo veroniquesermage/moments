@@ -45,4 +45,15 @@ export class SharingService {
       return {success: false, message: "❌ Erreur lors de la mise à jour d\'un partage."};
     }
   }
+
+  async deleteShare(sharedId: number): Promise<ApiResponse<any>>{
+    const url = `${this.apiUrl}/${sharedId}`;
+    try {
+      await firstValueFrom(this.http.delete<void>(url));
+      return {success: true, data: 'ok' };
+    } catch (error) {
+      console.error('[SharingService] Erreur lors de la suppression du partage', error);
+      return {success: false, message: "❌ Impossible de supprimer le partage."};
+    }
+  }
 }

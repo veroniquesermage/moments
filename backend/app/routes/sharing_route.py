@@ -18,10 +18,19 @@ async def set_gift_refund(
     return await SharingService.set_gift_refund(db, current_user, shared, group_id)
 
 @router.put("/{gift_id}", response_model=GiftDetailResponse)
-async def update_partage(
+async def save_all_shares(
     gift_id: int,
     updates: list[GiftSharedSchema],
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_cookie),
     group_id: int = Depends(get_current_group_id)) -> GiftDetailResponse:
     return await SharingService.save_all_shares(db, current_user, gift_id, updates, group_id)
+
+@router.delete("/{shared_id}", status_code=204)
+async def delete_share(
+        shared_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie),
+        group_id: int = Depends(get_current_group_id)):
+
+    await SharingService.delete_share(db, current_user, shared_id, group_id)
