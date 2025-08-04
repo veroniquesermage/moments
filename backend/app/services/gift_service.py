@@ -222,24 +222,12 @@ class GiftService:
         return [GiftResponse.model_validate(gm) for gm in sorted_gifts]
 
     @staticmethod
-    async def update_gift_delivery(db,
-                                   current_user,
-                                   giftId,
-                                   giftDeliveryUpdate) -> GiftDeliveryUpdate:
+    async def update_gift_delivery(db: AsyncSession,
+                                   current_user: User,
+                                   gift_id: int,
+                                   gift_delivery_update: GiftDeliveryUpdate) -> GiftDeliveryUpdate:
         # 1. On récupère le cadeau
-        gift: Gift | None = (
-            await db.execute(
-                select(Gift)
-                .options(
-                    selectinload(Gift.reserve_par),
-                    selectinload(Gift.gift_delivery)
-                )
-                .where(Gift.id == giftId)
-            )
-        ).scalars().first()
-
-        if not gift:
-            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+        gift: Gift = await GiftService.get_gift_or_raise(db, gift_id)
 
         # 2. Check autorisation
         if not gift.reserve_par or gift.reserve_par.id != current_user.id:
@@ -248,11 +236,11 @@ class GiftService:
         # 3. Récupérer ou créer la livraison
         delivery = gift.gift_delivery
         if not delivery:
-            delivery = GiftDelivery(gift_id=giftId)
+            delivery = GiftDelivery(gift_id=gift_id)
 
         # 4. Appliquer les updates
-        for field in giftDeliveryUpdate.model_fields_set:
-            setattr(delivery, field, getattr(giftDeliveryUpdate, field))
+        for field in gift_delivery_update.model_fields_set:
+            setattr(delivery, field, getattr(gift_delivery_update, field))
 
         # 5. Commit
         db.add(delivery)
@@ -263,8 +251,8 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_DELIVERY_UPDATED",
-            f"Livraison du cadeau {giftId} mise a jour",
-            {"gift_id": giftId, "user_id": current_user.id},
+            f"Livraison du cadeau {gift_id} mise a jour",
+            {"gift_id": gift_id, "user_id": current_user.id},
         )
 
         return GiftDeliveryUpdate.model_validate(delivery)
@@ -577,18 +565,10 @@ class GiftService:
     @staticmethod
     async def update_gift_purchase( db: AsyncSession,
                                     current_user: User,
-                                    giftId: int,
-                                    giftPurchaseUpdate: GiftPurchaseUpdate):
-        gift: Gift | None = (
-            await db.execute(
-                select(Gift)
-                .options(
-                    selectinload(Gift.reserve_par),
-                    selectinload(Gift.gift_purchase_info)
-                )
-                .where(Gift.id == giftId)
-            )
-        ).scalars().first()
+                                    gift_id: int,
+                                    gift_purchase_update: GiftPurchaseUpdate):
+
+        gift: Gift = await GiftService.get_gift_or_raise(db, gift_id)
 
         if not gift:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
@@ -599,13 +579,13 @@ class GiftService:
 
         purchase : GiftPurchaseInfo = gift.gift_purchase_info
         if not purchase:
-            purchase = GiftPurchaseInfo(gift_id=giftId)
+            purchase = GiftPurchaseInfo(gift_id=gift_id)
 
-        purchase.prix_reel = (giftPurchaseUpdate.prix_reel if giftPurchaseUpdate.prix_reel is not None else None)
-        purchase.commentaire = (giftPurchaseUpdate.commentaire if giftPurchaseUpdate.commentaire else None)
+        purchase.prix_reel = (gift_purchase_update.prix_reel if gift_purchase_update.prix_reel is not None else None)
+        purchase.commentaire = (gift_purchase_update.commentaire if gift_purchase_update.commentaire else None)
         purchase.compte_tiers_id = (
-            giftPurchaseUpdate.compte_tiers.id
-            if giftPurchaseUpdate.compte_tiers
+            gift_purchase_update.compte_tiers.id
+            if gift_purchase_update.compte_tiers
             else None
         )
 
@@ -618,6 +598,6 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_PURCHASE_UPDATED",
-            f"Information complémentaires d'achat du cadeau {giftId} mise a jour",
-            {"gift_id": giftId, "user_id": current_user.id},
+            f"Information complémentaires d'achat du cadeau {gift_id} mise a jour",
+            {"gift_id": gift_id, "user_id": current_user.id},
         )
