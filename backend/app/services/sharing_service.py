@@ -184,6 +184,38 @@ class SharingService:
         shared_entries = query.scalars().all()
         return [await build_gift_shared_schema(entry, group_id, db) for entry in shared_entries]
 
+    @staticmethod
+    async def delete_share(db: AsyncSession,
+                           current_user: User,
+                           partage_id: int,
+                           group_id: int) :
+
+        query = await db.execute(
+            select(GiftShared).where(
+                and_(
+                    GiftShared.id == partage_id,
+                    GiftShared.preneur_id == current_user.id
+                )
+            )
+        )
+
+        shared: GiftShared = query.scalars().first()
+
+        gift_id = shared.cadeau_id
+
+        if not shared:
+            raise HTTPException(status_code=404, detail="Partage introuvable ou vous n'avez pas les droits pour le supprimer.")
+
+        await db.delete(shared)
+        await db.commit()
+
+        from app.services.gift_service import GiftService
+        gift: GiftDetailResponse = await GiftService.get_gift(db, gift_id, group_id, current_user)
+
+        if not gift.partage:
+            gift.gift.statut = GiftStatusEnum.PRIS
+            await GiftService.change_status(db, current_user, gift_id, GiftStatus(status=GiftStatusEnum.PRIS))
+
 
 
 

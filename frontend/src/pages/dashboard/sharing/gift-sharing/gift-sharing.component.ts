@@ -62,8 +62,17 @@ export class GiftSharingComponent implements OnInit {
     }
   }
 
-  supprimerLigne(index: number) {
-    this.partages!.splice(index, 1);
+  async supprimerLigne(index: number) {
+    const sharedId = this.partages![index].id;
+    const result = await this.sharingService.deleteShare(sharedId);
+
+    if (result.success) {
+      this.partages!.splice(index, 1);
+    } else {
+      this.errorService.showError(result.message);
+    }
+
+
   }
 
   ajouterLigne() {
