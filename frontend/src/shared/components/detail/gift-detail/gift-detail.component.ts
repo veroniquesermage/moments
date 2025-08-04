@@ -241,7 +241,7 @@ export class GiftDetailComponent implements OnInit{
           { label: 'Ok', eventName: ModalActionType.BACK_TO_LIST, style: 'primary' }
         ];
       } else {
-        this.message = 'Votre action est confirmée.</br> Souhaitez-vous le partager avec d\'autres membres du groupe ?';
+        this.message = 'Votre action est confirmée.</br> </br> <strong>Un cadeau commun ? </strong> <br> Vous pouvez l’offrir à plusieurs et partager le montant.';
         this.modalActions = [
           { label: 'Non', eventName: ModalActionType.BACK_TO_LIST, style: 'primary' },
           { label: 'Partager le cadeau', eventName: ModalActionType.PARTAGE, style: 'primary' }
