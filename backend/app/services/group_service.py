@@ -207,7 +207,9 @@ class GroupService:
         return GroupResponse.model_validate(group_existing)
 
     @staticmethod
-    async def delete_group(db: AsyncSession, current_user: User, group_id: int):
+    async def delete_group(db: AsyncSession,
+                           current_user: User,
+                           group_id: int):
         group = await GroupService.get_group_if_admin(current_user, db, group_id)
 
         try:
@@ -228,7 +230,9 @@ class GroupService:
 
 
     @staticmethod
-    async def update_code_invitation(db: AsyncSession, current_user: User, group_id: int):
+    async def update_code_invitation(db: AsyncSession,
+                                     current_user: User,
+                                     group_id: int):
         group = await GroupService.get_group_if_admin(current_user, db, group_id)
         code = generate_random_code()
 
@@ -244,7 +248,9 @@ class GroupService:
         )
 
     @staticmethod
-    async def get_group_if_admin(current_user: User, db: AsyncSession, group_id: int) -> Group:
+    async def get_group_if_admin(current_user: User,
+                                 db: AsyncSession,
+                                 group_id: int) -> Group:
         result = await db.execute(select(Group).where(Group.id == group_id))
         group = result.scalars().first()
         if not group:
