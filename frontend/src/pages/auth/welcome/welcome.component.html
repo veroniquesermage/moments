@@ -8,7 +8,28 @@
   <app-loading *ngIf="groupeService.isLoading()"></app-loading>
 
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
-    <p class="command-accueil"> Veuillez vous connecter :</p>
+
+    <p class="command-accueil"> Choisissez comment vous connecter :</p>
+    <div class="sebou-alert">
+        <span class="intro">
+          <em>Dans chaque groupe sommeille un Sébou, créature sensible en guerre contre les surprises.</em>
+        </span>
+      <span class="middle">
+          Il fera tout pour deviner ce qu’on va lui offrir.
+        </span>
+      <span class="final">
+          Si vous hébergez un Sébou, ne cliquez pas, ne nourrissez pas le Sébou.
+        </span>
+      <div class="checkbox-row">
+      <label>
+        <input type="checkbox" [(ngModel)]="stayLoggedIn" name="stayLoggedIn" />
+        Rester connecté
+      </label>
+    </div>
+    </div>
+
+
+
     <div class="google-btn">
       <button class="google-signin-btn" (click)="googleLogin()">
         <img ngSrc="assets/web_neutral_sq_na.svg" alt="Google logo" width="39" height="39"/>
@@ -89,27 +110,13 @@
         {{ passwordError }}
       </div>
 
-      <div class="checkbox-row">
-        <label>
-          <input type="checkbox" [(ngModel)]="stayLoggedIn" name="stayLoggedIn" />
-          Rester connecté (valable aussi pour Google)
-        </label>
+
+
+      <div class="options-wlc">
+        <button type="button" class="options-wlc" (click)="loginWithCredentials()">🔑 Connexion</button>
+        <button type="button" class="options-wlc" (click)="registerWithCredentials()">✍️ Création de compte</button>
       </div>
 
-      <div class="sebou-alert">
-        <span class="intro">
-          <em>Dans chaque groupe sommeille un Sébou, créature sensible en guerre contre les surprises.</em>
-        </span>
-        <span class="middle">
-          Il fera tout pour deviner ce qu’on va lui offrir.
-        </span>
-        <span class="final">
-          Si vous hébergez un Sébou, ne cliquez pas, ne nourrissez pas le Sébou.
-        </span>
-      </div>
-
-      <button type="button" class="options-wlc" (click)="loginWithCredentials()">🔑 Connexion</button>
-      <button type="button" class="options-wlc" (click)="registerWithCredentials()">✍️ Création de compte</button>
 
     </div>
   </div>

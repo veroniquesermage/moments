@@ -12,6 +12,7 @@ import {IncompleteUser} from 'src/security/model/incomplete_user.model';
 import {RegisterRequest} from 'src/security/model/register-request.model';
 import {ResetPasswordPayload} from 'src/security/model/reset-password-payload.model';
 import {ChangePassword} from 'src/security/model/change-password.model';
+import {GroupService} from 'src/core/services/group.service';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -25,7 +26,8 @@ export class AuthService {
 
   private baseUrl = `${environment.backendBaseUrl}${environment.api.auth}`;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              public groupService: GroupService) {
     this.handleGoogleCodeRedirect();
   }
 
@@ -38,7 +40,7 @@ export class AuthService {
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
 
     sessionStorage.setItem('pkce_code_verifier', codeVerifier);
-
+    this.groupService.isLoading.set(true);
     window.location.href = `${environment.accountGoogle}` +
       `client_id=${authConfig.clientId}` +
       `&redirect_uri=${encodeURIComponent(authConfig.redirectUri!)}` +
@@ -74,7 +76,7 @@ export class AuthService {
       console.error('[Auth] Code verifier manquant dans le sessionStorage');
       return;
     }
-
+    this.groupService.isLoading.set(true);
     fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
