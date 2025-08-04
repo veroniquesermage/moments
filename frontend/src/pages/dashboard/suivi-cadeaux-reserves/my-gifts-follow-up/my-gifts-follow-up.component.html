@@ -32,7 +32,7 @@
       <!-- Ligne de séparation avec le label et le total -->
       <tr class="separator-row">
         <td [attr.colspan]="displayedColumns.length">
-          {{ group.accountLabel }} {{ group.total | number:'1.2-2' }} €
+          {{ group.accountLabel }} {{ group.total | formatMontant }} €
         </td>
       </tr>
 

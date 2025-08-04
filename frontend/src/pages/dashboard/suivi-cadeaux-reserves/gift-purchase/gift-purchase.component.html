@@ -15,7 +15,7 @@
 
   <form [formGroup]="purchaseForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label>Prix payé (en euros)</label>
+      <label>Prix payé (€)</label>
       <p class="advice">Conseil : n'oubliez pas d'ajouter les frais de port et si le cadeau est partagé, indiquez le montant de votre part dans ce champ</p>
       <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')">
     </div>
