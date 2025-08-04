@@ -64,13 +64,6 @@ export class GiftPurchaseComponent implements OnInit{
     if (result.success) {
       this.giftDetail = result.data;
       this.purchase = result.data.purchaseInfo;
-      if (this.purchase) {
-        this.purchaseForm.patchValue({
-          commentaire: this.purchase.commentaire ?? '',
-          compteTiers: this.purchase.compteTiers ?? null,
-          prixReel: this.purchase.prixReel ?? undefined,
-        });
-      }
     } else {
       this.errorService.showError("❌ Impossible de modifier le cadeau.");
     }
@@ -79,6 +72,18 @@ export class GiftPurchaseComponent implements OnInit{
     if (!success) {
       this.errorService.showError("Impossible de charger les comptes tiers.");
     }
+
+    const compteTiersId = this.purchase?.compteTiers?.id;
+
+    const matchedCompteTiers = this.managedAccounts()
+      .find(u => u.id === compteTiersId) ?? null;
+
+    this.purchaseForm.patchValue({
+      commentaire: this.purchase?.commentaire ?? '',
+      compteTiers: matchedCompteTiers,
+      prixReel: this.purchase?.prixReel ?? undefined,
+    });
+
   }
 
   async onSubmit() {

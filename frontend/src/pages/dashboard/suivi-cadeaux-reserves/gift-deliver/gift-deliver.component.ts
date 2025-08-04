@@ -28,7 +28,6 @@ export class GiftDeliverComponent implements OnInit {
   giftForm: FormGroup<{
     lieuLivraison: FormControl<string>;
     dateLivraison: FormControl<string>;
-    prixReel: FormControl<string>; // on reste en string tant que tu veux gérer les virgules
   }>;
 
   private route = inject(ActivatedRoute);
@@ -44,8 +43,7 @@ export class GiftDeliverComponent implements OnInit {
     this.id = idParam ? +idParam : undefined;
     this.giftForm = new FormGroup({
       lieuLivraison: new FormControl('', {nonNullable: true}),
-      dateLivraison: new FormControl('', {nonNullable: true}),
-      prixReel: new FormControl('', {nonNullable: true})
+      dateLivraison: new FormControl('', {nonNullable: true})
     });
   }
 
@@ -61,8 +59,7 @@ export class GiftDeliverComponent implements OnInit {
       if (this.delivery) {
         this.giftForm.patchValue({
           lieuLivraison: this.delivery.lieuLivraison ?? '',
-          dateLivraison: this.delivery.dateLivraison ?? '',
-          prixReel: ''
+          dateLivraison: this.delivery.dateLivraison ?? ''
         });
       }
     } else {
@@ -76,7 +73,6 @@ export class GiftDeliverComponent implements OnInit {
     const updatedDelivery: GiftDeliveryUpdate = {
       lieuLivraison: this.giftForm.value.lieuLivraison || null,
       dateLivraison: this.giftForm.value.dateLivraison || null,
-      prixReel: Number(this.giftForm.value.prixReel),
       recu: this.delivery?.recu ?? false
 
     }
@@ -95,10 +91,4 @@ export class GiftDeliverComponent implements OnInit {
     void this.router.navigate(['/dashboard/cadeaux-suivis']);
   }
 
-  sanitizeDecimal(event: Event, key: string): void {
-    const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(',', '.');
-    // met à jour le FormControl manuellement
-    this.giftForm?.get(key)?.setValue(input.value);
-  }
 }
