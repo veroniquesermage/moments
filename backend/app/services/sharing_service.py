@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.enum import RoleUtilisateur, GiftStatusEnum
 from app.core.logger import logger
-from app.models import User, GiftShared, Gift
+from app.models import User, GiftShared, Gift, GiftPurchaseInfo
 from app.schemas.gift import GiftSharedSchema, GiftDetailResponse, GiftStatus
 from app.services.builders import build_gift_shared_schema
 
@@ -160,7 +160,8 @@ class SharingService:
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea)
+                selectinload(Gift.gift_idea),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
             )
         )).scalars().first()
 
@@ -168,7 +169,7 @@ class SharingService:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
-        return await GiftService.set_gift_detail(gift, current_user, group_id,   db, partage_schema)
+        return await GiftService.set_gift_detail(gift, current_user, group_id, db, partage_schema)
 
     @staticmethod
     async def get_all_shares_for_gift(db: AsyncSession, gift_id: int, group_id: int) -> list[GiftSharedSchema]:
