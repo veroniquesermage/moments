@@ -11,8 +11,8 @@
   </p>
 
   <p><span class="key-label">Quantité : </span> <span class="value-text">{{ gift.quantite }}</span></p>
-  <p><span class="key-label">Prix : </span> <span class="value-text">{{ gift.prix }}</span></p>
-  <p><span class="key-label">Frais de port : </span> <span class="value-text">{{ gift.fraisPort }}</span></p>
+  <p><span class="key-label">Prix unitaire : </span> <span class="value-text">{{ gift.prix | formatMontant}} €</span></p>
+  <p><span class="key-label">Frais de port : </span> <span class="value-text">{{ gift.fraisPort | formatMontant}} €</span></p>
   <p><span class="key-label">Commentaire : </span> <span class="value-text">{{ gift.commentaire }}</span></p>
   <p><span class="key-label">Priorité : </span> <span class="value-text">{{ gift.priorite }}</span></p>
 </div>

@@ -3,7 +3,7 @@
   <tr>
     <th scope="col" class="visually-hidden">Priorité</th>
     <th scope="col">Nom</th>
-    <th scope="col">Prix</th>
+    <th scope="col">Prix unitaire (€)</th>
     <th scope="col" aria-label="Quantité">Qté</th>
   </tr>
   </thead>
@@ -41,7 +41,7 @@
       </ng-template>
     </td>
     <td tabindex="0">{{ gift.nom }}</td>
-    <td>{{ gift.prix }} €</td>
+    <td>{{ gift.prix | formatMontant}}</td>
     <td>{{ gift.quantite }}</td>
   </tr>
   </tbody>

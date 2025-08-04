@@ -1,5 +1,5 @@
 import {Component, computed, OnDestroy, OnInit} from '@angular/core';
-import {DecimalPipe, formatDate, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
+import {formatDate, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
@@ -15,6 +15,8 @@ import {getDisplayName} from 'src/core/utils/display-name';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {GiftFollowedByAccount} from 'src/core/models/gift/gift-followed-by-account.model';
 import {AuthService} from 'src/security/service/auth.service';
+import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
+import {formatEuro} from 'src/core/utils/format-montant';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
@@ -25,7 +27,7 @@ import {AuthService} from 'src/security/service/auth.service';
     NgForOf,
     TitleCasePipe,
     FeedbackTestComponent,
-    DecimalPipe,
+    FormatMontantPipe,
   ],
   templateUrl: './my-gifts-follow-up.component.html',
   styleUrl: './my-gifts-follow-up.component.scss'
@@ -41,7 +43,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
     {key: 'destinataire', label: 'Destinataire', formatFn: (u: UserDisplay | null | undefined) => getDisplayName(u)},
     { key: 'nom', label: 'Nom' },
-    {key: 'prixReel', label: 'Prix payé (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
+    {key: 'prixReel', label: 'Prix payé (€)', formatFn: formatEuro},
     { key: 'statut', label: 'Statut' }
   ];
 
@@ -50,7 +52,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
     {key: 'nom', label: 'Nom'},
     {key: 'magasin', label: 'Magasin'},
     {key: 'quantite', label: 'Qté'},
-    {key: 'prixReel', label: 'Prix payé (€)', formatFn: (v: number | null) => v != null ? `${v}€` : '—'},
+    {key: 'prixReel', label: 'Prix payé (€)', formatFn: formatEuro},
     {key: 'lieuLivraison', label: 'Lieu de livraison'},
     {key: 'dateLivraison', label: 'Date de livraison', formatFn: (v: string) => v ? formatDate(v, 'dd-MM', 'fr-FR') : '—'},
     {key: 'statut', label: 'Statut'}

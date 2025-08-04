@@ -10,6 +10,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {formatEuro} from 'src/core/utils/format-montant';
 
 @Component({
   selector: 'app-group-member-gifts',
@@ -33,8 +34,8 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   displayedColumns = [
     {key: 'nom', label: 'Nom'},
-    {key: 'prix', label: 'Prix (€)', formatFn: (v: number | null | undefined) => v != null ? `${v} €` : '-'},
-    {key: 'fraisPort', label: 'Frais de port (€)', formatFn: (v: number | null | undefined) => v != null ? `${v} €` : '-'},
+    {key: 'prix', label: 'Prix unitaire (€)', formatFn: formatEuro},
+    {key: 'fraisPort', label: 'Frais de port (€)', formatFn: formatEuro},
     {key: 'quantite', label: 'Quantité'},
     {key: 'statut', label: 'Statut'}
   ];

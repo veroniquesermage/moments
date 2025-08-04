@@ -27,9 +27,9 @@
     <input formControlName="url" type="text" />
     <label>Quantité</label>
     <input formControlName="quantite" type="text" />
-    <label>Prix à l'unité</label>
+    <label>Prix unitaire (€)</label>
     <input type="text" formControlName="prix" (input)="sanitizeDecimal($event, 'prix')" />
-    <label>Frais de port</label>
+    <label>Frais de port (€)</label>
     <input type="text" formControlName="fraisPort" (input)="sanitizeDecimal($event, 'fraisPort')" />
     <label>Commentaire</label>
     <textarea formControlName="commentaire"></textarea>
