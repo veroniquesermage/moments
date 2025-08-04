@@ -10,6 +10,7 @@ from app.core.logger import logger
 from app.models import User, GiftShared, Gift, GiftPurchaseInfo
 from app.schemas.gift import GiftSharedSchema, GiftDetailResponse, GiftStatus
 from app.services.builders import build_gift_shared_schema
+from app.services.trace_service import TraceService
 
 
 class SharingService:
@@ -75,6 +76,13 @@ class SharingService:
             new_status = GiftStatus(status=GiftStatusEnum.PRIS)
             await GiftService.change_status(db, current_user, gift_id, new_status)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "SHARING_SAVED",
+            f"Enregistrement des partages pour le cadeau {gift_id}",
+            {"gift_id": gift_id, "user_id": current_user.id},
+        )
         # 5. Retour d’un GiftDetailResponse mis à jour
         return await GiftService.set_gift_detail(gift, current_user, group_id, db, shared_schema)
 

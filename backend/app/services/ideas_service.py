@@ -89,17 +89,17 @@ class GiftIdeasService:
     @staticmethod
     async def change_visibility( db: AsyncSession,
                                  current_user: User,
-                                 ideaId: int,
+                                 idea_id: int,
                                  visibility: bool) :
-        logger.info(f"Changement de visibilité de l'idée {ideaId} pour l'utilisateur {current_user.id}")
+        logger.info(f"Changement de visibilité de l'idée {idea_id} pour l'utilisateur {current_user.id}")
 
         existing = (await db.execute(select(GiftIdeas)
-                         .where(GiftIdeas.id == ideaId))).scalars().first()
+                         .where(GiftIdeas.id == idea_id))).scalars().first()
 
         if not existing :
             raise HTTPException(
                 status_code=400,
-                detail=f"❌ L'idée de cadeau avec l\'ID {ideaId} n\'existe pas."
+                detail=f"❌ L'idée de cadeau avec l\'ID {idea_id} n\'existe pas."
             )
 
         if existing.proposee_par_id != current_user.id:
@@ -117,27 +117,27 @@ class GiftIdeasService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "IDEA_VISIBILITY_CHANGED",
-            f"Visibilite idee {ideaId} -> {visibility}",
-            {"idea_id": ideaId, "user_id": current_user.id, "visible": visibility},
+            f"Visibilite idee {idea_id} -> {visibility}",
+            {"idea_id": idea_id, "user_id": current_user.id, "visible": visibility},
         )
 
 
     @staticmethod
     async def duplicate_gift_idea(db: AsyncSession,
                                     current_user: User,
-                                    ideaId: int,
+                                  idea_id: int,
                                     new_dest_id: int):
 
-            logger.info(f"Dupliquer l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
+            logger.info(f"Dupliquer l'idée de cadeau {idea_id} pour l'utilisateur {current_user.id}")
 
             existing: Gift = (await db.execute(select(Gift)
-                             .where(Gift.gift_idea_id == ideaId)
+                             .where(Gift.gift_idea_id == idea_id)
                              .options(selectinload(Gift.gift_idea)))).scalars().first()
 
             if not existing:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"❌ L'idée de cadeau avec l'ID {ideaId} n'existe pas."
+                    detail=f"❌ L'idée de cadeau avec l'ID {idea_id} n'existe pas."
                 )
 
             idea = existing.gift_idea
@@ -159,26 +159,26 @@ class GiftIdeasService:
                 db,
                 f"{current_user.prenom} {current_user.nom}",
                 "IDEA_DUPLICATED",
-                f"Duplication de l'idee {ideaId}",
-                {"idea_id": ideaId, "new_dest_id": new_dest_id, "user_id": current_user.id},
+                f"Duplication de l'idee {idea_id}",
+                {"idea_id": idea_id, "new_dest_id": new_dest_id, "user_id": current_user.id},
             )
             await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
 
     @staticmethod
     async def delete_gift_idea(db: AsyncSession,
                                current_user: User,
-                               ideaId: int) :
+                               idea_id: int) :
 
-        logger.info(f"Suppression de l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
+        logger.info(f"Suppression de l'idée de cadeau {idea_id} pour l'utilisateur {current_user.id}")
 
         existing: Gift = (await db.execute(select(Gift)
-                                           .where(Gift.gift_idea_id == ideaId)
+                                           .where(Gift.gift_idea_id == idea_id)
                                            .options(selectinload(Gift.gift_idea)))).scalars().first()
 
         if not existing:
             raise HTTPException(
                 status_code=400,
-                detail=f"❌ L'idée de cadeau avec l'ID {ideaId} n'existe pas."
+                detail=f"❌ L'idée de cadeau avec l'ID {idea_id} n'existe pas."
             )
 
         if existing.gift_idea.proposee_par_id != current_user.id:
@@ -195,7 +195,7 @@ class GiftIdeasService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_IDEA_DELETED",
-            f"Suppression idee {ideaId}",
-            {"idea_id": ideaId, "user_id": current_user.id},
+            f"Suppression idee {idea_id}",
+            {"idea_id": idea_id, "user_id": current_user.id},
         )
 
