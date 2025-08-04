@@ -20,7 +20,7 @@
       <p *ngFor="let share of partage">
         <span class="key-label">
           {{ share.participant | displayName }} :</span>
-        <span class="value-text"> {{ share.montant }} €</span>
+        <span class="value-text"> {{ share.montant | formatMontant}} €</span>
         <span
           class="emoji-action"
           role="button"
@@ -35,10 +35,10 @@
       <p *ngFor="let share of partage">
         <ng-container *ngIf="share.participant.id === currentUserId">
           <span *ngIf="share.rembourse">
-          ✅ Vous avez remboursé {{ share.montant }} €</span>
+          ✅ Vous avez remboursé {{ share.montant | formatMontant}} €</span>
 
           <span *ngIf="!share.rembourse">
-          🕒 Vous devez {{ share.montant }} € </span>
+          🕒 Vous devez {{ share.montant | formatMontant }} € </span>
         </ng-container>
       </p>
     </ng-container>

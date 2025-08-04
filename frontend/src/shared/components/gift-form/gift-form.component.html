@@ -13,13 +13,13 @@
     <input data-allow-tiers formControlName="url" type="text"/>
     <label>Quantité</label>
     <input data-allow-tiers formControlName="quantite" type="text"/>
-    <label>Prix à l'unité</label>
+    <label>Prix unitaire (€)</label>
     <input
       data-allow-tiers
       type="text"
       formControlName="prix"
       (input)="sanitizeDecimal($event, 'prix')"/>
-    <label>Frais de port</label>
+    <label>Frais de port (€)</label>
     <input
       data-allow-tiers
       type="text"

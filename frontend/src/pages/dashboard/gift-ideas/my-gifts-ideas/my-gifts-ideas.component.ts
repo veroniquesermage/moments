@@ -17,6 +17,7 @@ import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {UserService} from 'src/core/services/user.service';
+import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -27,7 +28,8 @@ import {UserService} from 'src/core/services/user.service';
     TerminalModalComponent,
     FormsModule,
     DisplayNamePipe,
-    FeedbackTestComponent
+    FeedbackTestComponent,
+    FormatMontantPipe
   ],
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'

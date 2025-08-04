@@ -5,13 +5,15 @@ import {RoleUser} from 'src/core/enum/role-user.enum';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
 import {CommonModule} from '@angular/common';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 
 @Component({
   selector: 'app-gift-shared',
   standalone: true,
   imports: [
     CommonModule,
-    DisplayNamePipe
+    DisplayNamePipe,
+    FormatMontantPipe
   ],
   templateUrl: './gift-shared.component.html',
   styleUrl: './gift-shared.component.scss'
