@@ -136,7 +136,11 @@ export class WelcomeComponent {
       rememberMe: this.stayLoggedIn
     };
     const result = await this.auth.checkMail(credentials);
-    if (!result.success) {
+    if (result.success) {
+      this.modalActions = [{ label: 'OK', eventName: 'CANCEL', style: 'primary' }];
+      this.message = '<strong>Un email vient de partir !</strong> <br> Vous avez 30min pour cliquer sur le lien et terminer votre inscription.';
+      this.showConfirmModal = true;
+    } else {
       this.errorService.showError(result.message);
     }
   }
