@@ -74,7 +74,6 @@ export class GiftDeliverComponent implements OnInit {
       lieuLivraison: this.giftForm.value.lieuLivraison || null,
       dateLivraison: this.giftForm.value.dateLivraison || null,
       recu: this.delivery?.recu ?? false
-
     }
 
     const result = await this.giftService.updateGiftDelivery(this.gift.id!, updatedDelivery);
