@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from jose import jwt
 from jose.exceptions import JWTError
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -36,14 +36,19 @@ class TokenService:
     ) -> RefreshToken:
 
         logger.info(f"Enregistrement refresh token pour l'utilisateur {user_id}")
-        expires_at: datetime = (datetime.now(TokenService.TZ) +
-                                (timedelta(days=30)))
+
+        # Supprime les anciens refresh tokens de l'utilisateur pour éviter l'accumulation
+        await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))
+
+        expires_at: datetime = (
+            datetime.now(TokenService.TZ) + timedelta(days=30)
+        )
 
         logger.info(f"Date d'expiration pour le refresh_token {expires_at}")
         refresh_token = RefreshToken(
-            user_id = user_id,
-            jti = jti,
-            expires_at = expires_at,
+            user_id=user_id,
+            jti=jti,
+            expires_at=expires_at,
         )
 
         db.add(refresh_token)
@@ -85,21 +90,18 @@ class TokenService:
         logger.info(f"Revocation du refresh_token pour l'utilisateur {user_id}, jti={jti}")
 
         result = await db.execute(
-            select(RefreshToken)
-            .where(RefreshToken.user_id == user_id,
-                       RefreshToken.jti == jti
+            delete(RefreshToken).where(
+                RefreshToken.user_id == user_id,
+                RefreshToken.jti == jti,
             )
         )
 
-        existing: RefreshToken = result.scalars().first()
-
-        if not existing :
+        if result.rowcount == 0:
             raise HTTPException(
                 status_code=404,
                 detail="❌ Ce jti n'existe pas pour cet utilisateur"
             )
 
-        existing.is_active = False
         await db.commit()
 
     @staticmethod
