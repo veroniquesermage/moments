@@ -7,8 +7,8 @@ from app.core.enum import RoleEnum
 from app.core.logger import logger
 from app.models import User, Group, UserGroup
 from app.schemas.group import GroupCreate, GroupResponse, GroupDetails, GroupUpdate
-from app.services.user_group_service import UserGroupService
 from app.services.trace_service import TraceService
+from app.services.user_group_service import UserGroupService
 from app.utils.code_generator import generate_random_code
 
 
@@ -82,10 +82,9 @@ class GroupService:
     @staticmethod
     async def get_group(
         db: AsyncSession,
-        current_user: User,
         group_id: int
     ) -> GroupResponse:
-        """Retourne la liste des Group dont current_user est membre."""
+
         result = (await db.execute(
             select(Group)
             .where(Group.id == group_id)
@@ -186,15 +185,7 @@ class GroupService:
             group_id: int
     ) -> GroupResponse :
 
-        group_user: UserGroup = await UserGroupService.get_user_group(db, current_user.id, group_id)
-
-        if group_user is None or  group_user.role != RoleEnum.ADMIN :
-            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas le droit de modifier ce groupe.")
-
-        group_existing: Group = (await db.execute(select(Group).where(Group.id == group_id))).scalars().first()
-
-        if not group_existing:
-            raise HTTPException(status_code=404, detail="Groupe non trouvé.")
+        group_existing = await GroupService.get_group_if_admin(current_user, db, group_id)
 
         group_existing.nom_groupe = group.nom_groupe
         group_existing.description = group.description
@@ -216,15 +207,10 @@ class GroupService:
         return GroupResponse.model_validate(group_existing)
 
     @staticmethod
-    async def delete_group(db: AsyncSession, current_user, group_id: int):
-        result = await db.execute(select(Group).where(Group.id == group_id))
-        group = result.scalars().first()
-        if not group:
-            raise HTTPException(status_code=400, detail="❌ Ce groupe n'existe pas.")
-
-        me = await UserGroupService.get_user_group(db, current_user.id, group_id)
-        if me.role != RoleEnum.ADMIN:
-            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas les droits pour supprimer ce groupe.")
+    async def delete_group(db: AsyncSession,
+                           current_user: User,
+                           group_id: int):
+        group = await GroupService.get_group_if_admin(current_user, db, group_id)
 
         try:
             await UserGroupService.delete_all_users_from_group(db, group_id)
@@ -241,3 +227,37 @@ class GroupService:
             f"Suppression du groupe {group_id}",
             {"group_id": group_id, "user_id": current_user.id},
         )
+
+
+    @staticmethod
+    async def update_code_invitation(db: AsyncSession,
+                                     current_user: User,
+                                     group_id: int):
+        group = await GroupService.get_group_if_admin(current_user, db, group_id)
+        code = generate_random_code()
+
+        group.code = code
+        await db.commit()
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.nom} {current_user.prenom}",
+            "CODE_INVIT",
+            "Refresh du code d'invitation",
+            {"user_id": current_user.id, "groupe": group_id},
+        )
+
+    @staticmethod
+    async def get_group_if_admin(current_user: User,
+                                 db: AsyncSession,
+                                 group_id: int) -> Group:
+        result = await db.execute(select(Group).where(Group.id == group_id))
+        group = result.scalars().first()
+        if not group:
+            raise HTTPException(status_code=400, detail="❌ Ce groupe n'existe pas.")
+        me = await UserGroupService.get_user_group(db, current_user.id, group_id)
+        if me is None or me.role != RoleEnum.ADMIN:
+            raise HTTPException(status_code=403, detail="❌ Vous n'avez pas les droits pour supprimer ce groupe.")
+        return group
+
+

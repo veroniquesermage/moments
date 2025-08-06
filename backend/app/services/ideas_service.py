@@ -3,14 +3,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.enum import GiftStatusEnum
 from app.core.logger import logger
 from app.models import GiftIdeas, Gift, User, UserGroup
-from app.schemas import UserSchema
-from app.schemas.gift import GiftIdeasResponse, GiftCreate
-from app.schemas.gift import GiftPublicResponse
-from app.schemas.gift import GiftIdeasSchema
 from app.schemas.gift import GiftIdeaCreate
+from app.schemas.gift import GiftIdeasResponse, GiftCreate
 from app.services.builders import build_gift_public_response, build_gift_idea_schema
 from app.services.trace_service import TraceService
 
@@ -55,7 +51,7 @@ class GiftIdeasService:
     @staticmethod
     async def create_gift_idea(db: AsyncSession,
                                current_user: User,
-                               gift_idea: GiftIdeaCreate) -> GiftIdeasResponse:
+                               gift_idea: GiftIdeaCreate):
         logger.info(f"Création d'une idée de cadeau pour l'utilisateur {current_user}")
 
         if current_user.id == gift_idea.gift.destinataire_id:
@@ -89,25 +85,21 @@ class GiftIdeasService:
             {"idea_id": idea.id, "gift_id": gift.id, "user_id": current_user.id},
         )
 
-        return GiftIdeasResponse(
-            gift=await build_gift_public_response(gift, gift.destinataire_id, db),
-            gift_idea=await build_gift_idea_schema(idea, db)
-        )
 
     @staticmethod
     async def change_visibility( db: AsyncSession,
                                  current_user: User,
-                                 ideaId: int,
+                                 idea_id: int,
                                  visibility: bool) :
-        logger.info(f"Changement de visibilité de l'idée {ideaId} pour l'utilisateur {current_user.id}")
+        logger.info(f"Changement de visibilité de l'idée {idea_id} pour l'utilisateur {current_user.id}")
 
         existing = (await db.execute(select(GiftIdeas)
-                         .where(GiftIdeas.id == ideaId))).scalars().first()
+                         .where(GiftIdeas.id == idea_id))).scalars().first()
 
         if not existing :
             raise HTTPException(
                 status_code=400,
-                detail=f"❌ L'idée de cadeau avec l\'ID {ideaId} n\'existe pas."
+                detail=f"❌ L'idée de cadeau avec l\'ID {idea_id} n\'existe pas."
             )
 
         if existing.proposee_par_id != current_user.id:
@@ -125,27 +117,27 @@ class GiftIdeasService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "IDEA_VISIBILITY_CHANGED",
-            f"Visibilite idee {ideaId} -> {visibility}",
-            {"idea_id": ideaId, "user_id": current_user.id, "visible": visibility},
+            f"Visibilite idee {idea_id} -> {visibility}",
+            {"idea_id": idea_id, "user_id": current_user.id, "visible": visibility},
         )
 
 
     @staticmethod
     async def duplicate_gift_idea(db: AsyncSession,
                                     current_user: User,
-                                    ideaId: int,
-                                    new_dest_id: int) -> GiftIdeasResponse:
+                                  idea_id: int,
+                                    new_dest_id: int):
 
-            logger.info(f"Dupliquer l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
+            logger.info(f"Dupliquer l'idée de cadeau {idea_id} pour l'utilisateur {current_user.id}")
 
             existing: Gift = (await db.execute(select(Gift)
-                             .where(Gift.gift_idea_id == ideaId)
+                             .where(Gift.gift_idea_id == idea_id)
                              .options(selectinload(Gift.gift_idea)))).scalars().first()
 
             if not existing:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"❌ L'idée de cadeau avec l'ID {ideaId} n'existe pas."
+                    detail=f"❌ L'idée de cadeau avec l'ID {idea_id} n'existe pas."
                 )
 
             idea = existing.gift_idea
@@ -167,27 +159,26 @@ class GiftIdeasService:
                 db,
                 f"{current_user.prenom} {current_user.nom}",
                 "IDEA_DUPLICATED",
-                f"Duplication de l'idee {ideaId}",
-                {"idea_id": ideaId, "new_dest_id": new_dest_id, "user_id": current_user.id},
+                f"Duplication de l'idee {idea_id}",
+                {"idea_id": idea_id, "new_dest_id": new_dest_id, "user_id": current_user.id},
             )
-
-            return await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
+            await GiftIdeasService.create_gift_idea(db, current_user, gift_idea_create)
 
     @staticmethod
     async def delete_gift_idea(db: AsyncSession,
                                current_user: User,
-                               ideaId: int) :
+                               idea_id: int) :
 
-        logger.info(f"Suppression de l'idée de cadeau {ideaId} pour l'utilisateur {current_user.id}")
+        logger.info(f"Suppression de l'idée de cadeau {idea_id} pour l'utilisateur {current_user.id}")
 
         existing: Gift = (await db.execute(select(Gift)
-                                           .where(Gift.gift_idea_id == ideaId)
+                                           .where(Gift.gift_idea_id == idea_id)
                                            .options(selectinload(Gift.gift_idea)))).scalars().first()
 
         if not existing:
             raise HTTPException(
                 status_code=400,
-                detail=f"❌ L'idée de cadeau avec l'ID {ideaId} n'existe pas."
+                detail=f"❌ L'idée de cadeau avec l'ID {idea_id} n'existe pas."
             )
 
         if existing.gift_idea.proposee_par_id != current_user.id:
@@ -204,7 +195,7 @@ class GiftIdeasService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_IDEA_DELETED",
-            f"Suppression idee {ideaId}",
-            {"idea_id": ideaId, "user_id": current_user.id},
+            f"Suppression idee {idea_id}",
+            {"idea_id": idea_id, "user_id": current_user.id},
         )
 

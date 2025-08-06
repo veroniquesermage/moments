@@ -18,7 +18,7 @@ scp moments.tar.gz admin@193.181.210.186:/home/admin/
 ssh admin@193.181.210.186
 ```
 
-### faire un backup:
+### faire un backups:
 ```bash
 mv moments moments_backup_$(date +%s)
 ```
@@ -33,7 +33,7 @@ mkdir moments
 tar xzf moments.tar.gz -C moments
 ```
 
-### penser à remettre d'querre l'environnement du front:
+### penser à remettre d'équerre l'environnement du front:
 ```bash
 cd frontend/src/environments
 rm environment.ts
@@ -57,4 +57,15 @@ alembic upgrade head
 ```bash
 docker exec -it moments-postgres psql -U Mom3ntsAdm1n moments
 \dt
+```
+
+### pour entrer dans le container du back et vérifier qu'il y a bien un cron qui tourne par exemple :
+```bash
+docker exec -it moments-backend bash
+crontab -l
+```
+
+### s'assurer que le fichier cron est bien en LF :
+```bash
+dos2unix cleanup.cron
 ```

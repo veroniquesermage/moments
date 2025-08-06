@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
-import {WelcomeComponent} from 'src/pages/welcome/welcome.component';
+import {WelcomeComponent} from 'src/pages/auth/welcome/welcome.component';
+import {ThemeComponent} from 'src/pages/theme/theme.component';
 
 export const routes: Routes = [
   {
@@ -17,6 +18,18 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadChildren: () => import('../pages/profile/profile.routes').then(m => m.profileRoutes)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('../pages/auth/auth.routes').then(m => m.authRoutes)
+  },
+  {
+    path: 'compte-tiers',
+    loadChildren: () => import('../pages/compte-tiers/compte-tiers.routes').then(m => m.compteTiersRoutes)
+  },
+  {
+    path: 'theme',
+    component: ThemeComponent
   },
   {
     path: '**',

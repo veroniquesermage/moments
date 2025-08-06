@@ -7,9 +7,10 @@ from sqlalchemy.orm import selectinload
 
 from app.core.enum import RoleUtilisateur, GiftStatusEnum
 from app.core.logger import logger
-from app.models import User, GiftShared, Gift
+from app.models import User, GiftShared, Gift, GiftPurchaseInfo
 from app.schemas.gift import GiftSharedSchema, GiftDetailResponse, GiftStatus
 from app.services.builders import build_gift_shared_schema
+from app.services.trace_service import TraceService
 
 
 class SharingService:
@@ -75,6 +76,13 @@ class SharingService:
             new_status = GiftStatus(status=GiftStatusEnum.PRIS)
             await GiftService.change_status(db, current_user, gift_id, new_status)
 
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "SHARING_SAVED",
+            f"Enregistrement des partages pour le cadeau {gift_id}",
+            {"gift_id": gift_id, "user_id": current_user.id},
+        )
         # 5. Retour d’un GiftDetailResponse mis à jour
         return await GiftService.set_gift_detail(gift, current_user, group_id, db, shared_schema)
 
@@ -159,7 +167,9 @@ class SharingService:
             .options(
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery)
+                selectinload(Gift.gift_delivery),
+                selectinload(Gift.gift_idea),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
             )
         )).scalars().first()
 
@@ -167,7 +177,7 @@ class SharingService:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
-        return await GiftService.set_gift_detail(gift, current_user, group_id,   db, partage_schema)
+        return await GiftService.set_gift_detail(gift, current_user, group_id, db, partage_schema)
 
     @staticmethod
     async def get_all_shares_for_gift(db: AsyncSession, gift_id: int, group_id: int) -> list[GiftSharedSchema]:
@@ -181,6 +191,38 @@ class SharingService:
         )
         shared_entries = query.scalars().all()
         return [await build_gift_shared_schema(entry, group_id, db) for entry in shared_entries]
+
+    @staticmethod
+    async def delete_share(db: AsyncSession,
+                           current_user: User,
+                           partage_id: int,
+                           group_id: int) :
+
+        query = await db.execute(
+            select(GiftShared).where(
+                and_(
+                    GiftShared.id == partage_id,
+                    GiftShared.preneur_id == current_user.id
+                )
+            )
+        )
+
+        shared: GiftShared = query.scalars().first()
+
+        gift_id = shared.cadeau_id
+
+        if not shared:
+            raise HTTPException(status_code=404, detail="Partage introuvable ou vous n'avez pas les droits pour le supprimer.")
+
+        await db.delete(shared)
+        await db.commit()
+
+        from app.services.gift_service import GiftService
+        gift: GiftDetailResponse = await GiftService.get_gift(db, gift_id, group_id, current_user)
+
+        if not gift.partage:
+            gift.gift.statut = GiftStatusEnum.PRIS
+            await GiftService.change_status(db, current_user, gift_id, GiftStatus(status=GiftStatusEnum.PRIS))
 
 
 

@@ -1,0 +1,39 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+input, textarea {
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  max-width: 200px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.advice {
+  font-size: 0.85rem;
+  color: var(--color-muted-text);
+  margin-bottom: 0.25rem;
+  margin-top: auto;
+}
+
+.hint {
+  font-size: 0.85em;
+}

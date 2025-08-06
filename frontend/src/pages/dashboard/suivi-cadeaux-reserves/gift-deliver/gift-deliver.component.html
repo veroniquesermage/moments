@@ -1,9 +1,13 @@
 <div class="form-container">
-
-  <h1>> Gestion du suivi de livraison</h1>
-  <section class="intro-bloc" aria-label="Introduction pour la page de gestion de suivi de livraison">
-  <p class="command">> Pour ajouter le suivi de livraison et le prix réel du cadeau, merci d'utiliser ce formulaire.</p>
+  <section class="intro-section" aria-labelledby="Introduction pour la page de gestion de suivi de livraison">
+    <h1 class="dashboard-title">
+      Gestion du suivi de livraison
+    </h1>
+    <p class="emphase-douce">
+      Pour ajouter le suivi de livraison et le prix réel du cadeau, merci d'utiliser ce formulaire.
+    </p>
   </section>
+
 
     <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
       <label>Lieu de livraison</label>
@@ -11,10 +15,6 @@
 
       <label>Date de livraison</label>
       <input name="dateLivraison" formControlName="dateLivraison" type="date" />
-
-      <label>Prix réel (frais de port compris)</label>
-      <p class="advice"> Conseil : si le cadeau est partagé, indiquez le montant de votre part dans ce champ</p>
-      <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')" />
 
       <button type="submit">Valider le suivi</button>
     </form>

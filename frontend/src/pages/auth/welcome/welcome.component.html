@@ -1,0 +1,132 @@
+<div class="terminal">
+  <section class="intro-section" aria-labelledby="titre-groupe">
+    <h1 class="dashboard-title">
+      <span class="bounce">🎁</span> Bienvenue sur (Moments) <span class="bounce">🎁</span>
+    </h1>
+  </section>
+
+  <app-loading *ngIf="groupeService.isLoading()"></app-loading>
+
+  <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
+
+    <p class="command-accueil"> Choisissez comment vous connecter :</p>
+    <div class="sebou-alert">
+        <span class="intro">
+          <em>Dans chaque groupe sommeille un Sébou, créature sensible en guerre contre les surprises.</em>
+        </span>
+      <span class="middle">
+          Il fera tout pour deviner ce qu’on va lui offrir.
+        </span>
+      <span class="final">
+          Si vous hébergez un Sébou, ne cliquez pas, ne nourrissez pas le Sébou.
+        </span>
+      <div class="checkbox-row">
+      <label>
+        <input type="checkbox" [(ngModel)]="stayLoggedIn" name="stayLoggedIn" />
+        Rester connecté
+      </label>
+    </div>
+    </div>
+
+
+
+    <div class="google-btn">
+      <button class="google-signin-btn" (click)="googleLogin()">
+        <img ngSrc="assets/web_neutral_sq_na.svg" alt="Google logo" width="39" height="39"/>
+        <span>Connexion avec Google</span>
+      </button>
+    </div>
+
+    <div class="or-separator">OU</div>
+
+    <div class="login-form" (keydown.enter)="preventIfInvalid(asKeyboardEvent($event))">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        spellcheck="false"
+        [(ngModel)]="email"
+        (blur)="onEmailBlur()"
+        (input)="onEmailInput($event)"
+        [class.error]="emailError"
+        aria-describedby="email-hint email-error"
+        autocomplete="username"
+        required
+      />
+      <div id="email-hint" class="form-hint">
+        Votre adresse email, par exemple : jean.dupont&#64;example.com
+      </div>
+
+      <div
+        *ngIf="emailError"
+        id="email-error"
+        class="form-error"
+        role="alert"
+        aria-live="assertive"
+      >
+        {{ emailError }}
+      </div>
+
+      <label for="password">Mot de passe</label>
+
+      <div class="password-wrapper">
+        <input
+          id="password"
+          name="password"
+          spellcheck="false"
+          [type]="showPassword() ? 'text' : 'password'"
+          [(ngModel)]="password"
+          (input)="onPasswordInput($event)"
+          (blur)="onPasswordBlur()"
+          [class.error]="passwordError"
+          autocomplete="current-password"
+          required
+          aria-describedby="password-help password-error"
+        />
+
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="showPassword.set(!showPassword())"
+          aria-label="Afficher ou masquer le mot de passe"
+        >
+          {{ showPassword() ? '🙈 Masquer' : '🙊 Afficher' }}
+        </button>
+      </div>
+
+      <div id="password-help" class="help-msg">
+        <span>🧠</span> <strong>8 caractères, une lettre, un chiffre.</strong><br />
+        <span class="subtle">Évitons “12345678”, le Sébou te regarde.</span>
+      </div>
+
+      <div
+        *ngIf="passwordError"
+        id="password-error"
+        class="form-error"
+        role="alert"
+        aria-live="assertive"
+      >
+        {{ passwordError }}
+      </div>
+
+      <div class="options-wlc">
+        <button type="button" class="options-wlca" (click)="loginWithCredentials()">🔑 Connexion</button>
+        <button type="button" class="options-wlca" (click)="registerWithCredentials()">✍️ Création de compte</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>
+<app-terminal-modal
+  *ngIf="showConfirmModal"
+  [message]="message"
+  [actions]="modalActions"
+  (actionClicked)="handleClicked($event)">
+</app-terminal-modal>

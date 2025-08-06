@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from collections import defaultdict
+from datetime import timedelta
 from typing import Optional
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 from sqlalchemy import select, or_, and_
@@ -10,23 +10,28 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import GiftActionEnum, GiftStatusEnum, RoleUtilisateur
 from app.core.logger import logger
 from app.core.message import *
-from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup
+from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup, GiftPurchaseInfo
 from app.models.gift import Gift
+from app.schemas.gift import GiftPurchaseInfoSchema, GiftPurchaseUpdate
 from app.schemas.gift.eligibility_response import EligibilityResponse
 from app.schemas.gift.gift_create import GiftCreate
 from app.schemas.gift.gift_delivery_schema import GiftDeliverySchema
 from app.schemas.gift.gift_delivery_update import GiftDeliveryUpdate
 from app.schemas.gift.gift_detail_response import GiftDetailResponse
 from app.schemas.gift.gift_followed import GiftFollowed
+from app.schemas.gift.gift_followed_by_account import GiftFollowedByAccount
 from app.schemas.gift.gift_priority import GiftPriority
 from app.schemas.gift.gift_public_response import GiftPublicResponse
 from app.schemas.gift.gift_response import GiftResponse
 from app.schemas.gift.gift_shared import GiftSharedSchema
 from app.schemas.gift.gift_status import GiftStatus
 from app.schemas.gift.gift_update import GiftUpdate
-from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema
+from app.services.builders import build_gift_public_response, build_gift_shared_schema, build_gift_idea_schema, \
+    build_gift_purchase_info_schema
+from app.services.mailing.mail_service import MailService
 from app.services.sharing_service import SharingService
 from app.services.trace_service import TraceService
+from app.utils.date_helper import now_paris
 
 
 class GiftService:
@@ -164,6 +169,9 @@ class GiftService:
 
         logger.info(f"Modification du cadeau {gift_id} : champs modifiés → {updates.model_fields_set}")
 
+        if existing.statut != GiftStatusEnum.DISPONIBLE:
+            await MailService.send_alert_update(existing, current_user, db)
+
         # 3. Appliquer les mises à jour dynamiquement
         for field in updates.model_fields_set:
             setattr(existing, field, getattr(updates, field))
@@ -211,27 +219,23 @@ class GiftService:
             await db.refresh(gift)
 
         sorted_gifts = sorted(gift_map.values(), key=lambda g: g.priorite)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_UPDATED",
+            f"Mise à jour de tous les cadeaux de l'utilisateur",
+            {"user_id": current_user.id},
+        )
         return [GiftResponse.model_validate(gm) for gm in sorted_gifts]
 
     @staticmethod
-    async def update_gift_delivery(db,
-                                   current_user,
-                                   giftId,
-                                   giftDeliveryUpdate) -> GiftDeliveryUpdate:
+    async def update_gift_delivery(db: AsyncSession,
+                                   current_user: User,
+                                   gift_id: int,
+                                   gift_delivery_update: GiftDeliveryUpdate) -> GiftDeliveryUpdate:
         # 1. On récupère le cadeau
-        gift: Gift | None = (
-            await db.execute(
-                select(Gift)
-                .options(
-                    selectinload(Gift.reserve_par),
-                    selectinload(Gift.gift_delivery)
-                )
-                .where(Gift.id == giftId)
-            )
-        ).scalars().first()
-
-        if not gift:
-            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+        gift: Gift = await GiftService.get_gift_or_raise(db, gift_id)
 
         # 2. Check autorisation
         if not gift.reserve_par or gift.reserve_par.id != current_user.id:
@@ -240,11 +244,11 @@ class GiftService:
         # 3. Récupérer ou créer la livraison
         delivery = gift.gift_delivery
         if not delivery:
-            delivery = GiftDelivery(gift_id=giftId)
+            delivery = GiftDelivery(gift_id=gift_id)
 
         # 4. Appliquer les updates
-        for field in giftDeliveryUpdate.model_fields_set:
-            setattr(delivery, field, getattr(giftDeliveryUpdate, field))
+        for field in gift_delivery_update.model_fields_set:
+            setattr(delivery, field, getattr(gift_delivery_update, field))
 
         # 5. Commit
         db.add(delivery)
@@ -255,8 +259,8 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_DELIVERY_UPDATED",
-            f"Livraison du cadeau {giftId} mise a jour",
-            {"gift_id": giftId, "user_id": current_user.id},
+            f"Livraison du cadeau {gift_id} mise a jour",
+            {"gift_id": gift_id, "user_id": current_user.id},
         )
 
         return GiftDeliveryUpdate.model_validate(delivery)
@@ -295,17 +299,17 @@ class GiftService:
 
     @staticmethod
     async def delete_gift(db: AsyncSession,
-                          giftId: int,
+                          gift_id: int,
                           current_user: User):
 
-        logger.info(f"Suppression du cadeau à l'id {giftId}")
+        logger.info(f"Suppression du cadeau à l'id {gift_id}")
 
         result: Gift | None = (await db.execute(
-            select(Gift).where(Gift.id == giftId)
+            select(Gift).where(Gift.id == gift_id)
         )).scalars().first()
 
         if result is None:
-            logger.info(f"Cadeau avec l'id {giftId} introuvable.")
+            logger.info(f"Cadeau avec l'id {gift_id} introuvable.")
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
         elif result.destinataire_id != current_user.id:
             logger.info(
@@ -319,21 +323,21 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_DELETED",
-            f"Suppression du cadeau {giftId}",
-            {"gift_id": giftId, "user_id": current_user.id},
+            f"Suppression du cadeau {gift_id}",
+            {"gift_id": gift_id, "user_id": current_user.id},
         )
 
     @staticmethod
     async def change_status(db: AsyncSession,
                             current_user: User,
-                            giftId: int,
+                            gift_id: int,
                             gift_status: GiftStatus) -> GiftResponse:
 
-        result: Gift = await GiftService.get_gift_or_raise(db, giftId)
+        result: Gift = await GiftService.get_gift_or_raise(db, gift_id)
 
         result.statut = gift_status.status
 
-        today = datetime.now(ZoneInfo("Europe/Paris")) + timedelta(days=4)
+        today = now_paris() + timedelta(days=4)
         date_expiration = today.replace(hour=1, minute=00, second=00, microsecond=00)
 
         if gift_status.status == GiftStatusEnum.DISPONIBLE:
@@ -353,7 +357,7 @@ class GiftService:
         else:
             # cas PRIS ou RÉSERVÉ
             result.reserve_par = current_user
-            result.date_reservation = datetime.now(ZoneInfo("Europe/Paris"))
+            result.date_reservation = now_paris()
             result.expiration_reservation = date_expiration
 
         logger.debug("Attributs de gift : %s", vars(result))
@@ -365,8 +369,8 @@ class GiftService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GIFT_STATUS_CHANGED",
-            f"Statut du cadeau {giftId} -> {gift_status.status}",
-            {"gift_id": giftId, "user_id": current_user.id, "status": gift_status.status},
+            f"Statut du cadeau {gift_id} -> {gift_status.status}",
+            {"gift_id": gift_id, "user_id": current_user.id, "status": gift_status.status},
         )
 
         return GiftResponse.model_validate(result)
@@ -398,15 +402,26 @@ class GiftService:
         return GiftResponse.model_validate(gift)
 
     @staticmethod
-    async def get_followed_gifts(
+    async def get_gifts_by_account(
+            db: AsyncSession,
+            current_user: User,
+            group_id: int
+    ) -> list[GiftFollowedByAccount]:
+        gifts_followed = await GiftService._get_gifts_followed(db, current_user, group_id)
+        gifts_shared = await GiftService._get_gifts_shared(db, current_user, group_id)
+
+        all_gifts = gifts_followed + gifts_shared
+        grouped = GiftService._group_gifts_by_account(all_gifts)
+
+        return grouped
+
+    @staticmethod
+    async def _get_gifts_followed(
             db: AsyncSession,
             current_user: User,
             group_id: int
     ) -> list[GiftFollowed]:
-
-        # A. Cadeaux réservés ou pris PAR moi, créés PAR des membres du groupe courant
-        gifts_followed = []
-        result_gift = await db.execute(
+        result = await db.execute(
             select(Gift)
             .join(User, Gift.destinataire_id == User.id)
             .join(UserGroup, User.id == UserGroup.utilisateur_id)
@@ -418,24 +433,33 @@ class GiftService:
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea))
+                selectinload(Gift.gift_idea),
+                selectinload(Gift.partages),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
+            )
         )
-        gifts = result_gift.scalars().all()
 
-        if gifts:
-            gifts_followed = [
-                GiftFollowed(
-                    gift=await build_gift_public_response(gift, group_id, db),
-                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                               from_attributes=True) if gift.gift_delivery else None,
-                    partage=None  # à remplir si tu en as besoin
-                )
-                for gift in gifts
-            ]
+        gifts = result.scalars().all()
 
-        # B. Cadeaux partagés AVEC moi, créés PAR des membres du groupe courant
-        gifts_shared = []
-        result_gift_shared = await db.execute(
+        return [
+            GiftFollowed(
+                gift=await build_gift_public_response(gift, group_id, db),
+                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery, from_attributes=True) if gift.gift_delivery else None,
+                partage=None,
+                est_partage= True if gift.partages else False,
+                purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
+            )
+            for gift in gifts
+        ]
+
+    @staticmethod
+    async def _get_gifts_shared(
+            db: AsyncSession,
+            current_user: User,
+            group_id: int
+    ) -> list[GiftFollowed]:
+
+        result = await db.execute(
             select(Gift, GiftShared)
             .join(GiftShared, Gift.id == GiftShared.cadeau_id)
             .join(User, Gift.destinataire_id == User.id)
@@ -445,23 +469,57 @@ class GiftService:
                 UserGroup.groupe_id == group_id
             )
             .options(
+                selectinload(Gift.gift_delivery),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery))
+            )
         )
-        rows = result_gift_shared.all()
-        if rows:
-            gifts_shared = [
-                GiftFollowed(
-                    gift=await build_gift_public_response(gift, group_id, db),
-                    delivery=GiftDeliverySchema.model_validate(gift.gift_delivery,
-                                                               from_attributes=True) if gift.gift_delivery else None,
-                    partage=await build_gift_shared_schema(gift_shared, group_id, db)
-                )
-                for gift, gift_shared in rows
-            ]
 
-        return gifts_followed + gifts_shared
+        rows = result.all()
+        return [
+            GiftFollowed(
+                gift=await build_gift_public_response(gift, group_id, db),
+                delivery=GiftDeliverySchema.model_validate(gift.gift_delivery, from_attributes=True) if gift.gift_delivery else None,
+                partage=await build_gift_shared_schema(gift_shared, group_id, db),
+                est_partage= True,
+                purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
+            )
+            for gift, gift_shared in rows
+        ]
+
+    @staticmethod
+    def _group_gifts_by_account(gifts: list[GiftFollowed]) -> list[GiftFollowedByAccount]:
+        groupes_temp: dict[str, list[GiftFollowed]] = defaultdict(list)
+
+        for gift in gifts:
+            label = GiftService._get_account_label(gift)
+            groupes_temp[label].append(gift)
+
+        result = []
+        for label, cadeaux in groupes_temp.items():
+            total = sum(GiftService._get_amount_paid(c) for c in cadeaux)
+            result.append(GiftFollowedByAccount(
+                account_label=label,
+                total=round(float(total), 2),
+                gifts=cadeaux
+            ))
+
+        return result
+
+    @staticmethod
+    def _get_account_label(gift: GiftFollowed) -> str:
+        compte = gift.purchase_info.compte_tiers if gift.purchase_info else None
+        return f"Montant total au nom de {compte.prenom} : " if compte else "Montant total en mon nom : "
+
+    @staticmethod
+    def _get_amount_paid(gift: GiftFollowed) -> float:
+        if gift.partage and gift.partage.montant is not None:
+            return gift.partage.montant
+        if gift.purchase_info and gift.purchase_info.prix_reel is not None:
+            return gift.purchase_info.prix_reel
+        return 0.0
+
 
     @staticmethod
     async def set_gift_detail(gift: Gift,
@@ -474,6 +532,7 @@ class GiftService:
             delivery=GiftDeliverySchema.model_validate(gift.gift_delivery) if gift.gift_delivery else None,
             partage=partage,
             ideas = await build_gift_idea_schema(gift.gift_idea, group_id, db) if gift.gift_idea else None,
+            purchase_info= await build_gift_purchase_info_schema(gift.gift_purchase_info, group_id, db) if gift.gift_purchase_info else None,
             est_partage=gift.statut == GiftStatusEnum.PARTAGE,
             droits_utilisateur=GiftService.define_user_role(current_user, gift, partage)
         )
@@ -487,7 +546,8 @@ class GiftService:
                 selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par)
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par),
+                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
             )
         )).scalars().first()
         if result is None:
@@ -509,3 +569,43 @@ class GiftService:
             return RoleUtilisateur.PARTICIPANT
         else:
             return RoleUtilisateur.SPECTATEUR
+
+    @staticmethod
+    async def update_gift_purchase( db: AsyncSession,
+                                    current_user: User,
+                                    gift_id: int,
+                                    gift_purchase_update: GiftPurchaseUpdate):
+
+        gift: Gift = await GiftService.get_gift_or_raise(db, gift_id)
+
+        if not gift:
+            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
+
+        # 2. Check autorisation
+        if not gift.reserve_par or gift.reserve_par.id != current_user.id:
+            raise HTTPException(status_code=403, detail="Accès interdit à la livraison de ce cadeau.")
+
+        purchase : GiftPurchaseInfo = gift.gift_purchase_info
+        if not purchase:
+            purchase = GiftPurchaseInfo(gift_id=gift_id)
+
+        purchase.prix_reel = (gift_purchase_update.prix_reel if gift_purchase_update.prix_reel is not None else None)
+        purchase.commentaire = (gift_purchase_update.commentaire if gift_purchase_update.commentaire else None)
+        purchase.compte_tiers_id = (
+            gift_purchase_update.compte_tiers.id
+            if gift_purchase_update.compte_tiers
+            else None
+        )
+
+
+        db.add(purchase)
+        await db.commit()
+        await db.refresh(purchase)
+
+        await TraceService.record_trace(
+            db,
+            f"{current_user.prenom} {current_user.nom}",
+            "GIFT_PURCHASE_UPDATED",
+            f"Information complémentaires d'achat du cadeau {gift_id} mise a jour",
+            {"gift_id": gift_id, "user_id": current_user.id},
+        )

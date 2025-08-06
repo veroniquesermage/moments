@@ -1,4 +1,15 @@
-<router-outlet/>
+<app-global-header-context (heightChange)="updateHeaderHeight($event)"></app-global-header-context>
+<app-global-toastr (heightChange)="updateToastrHeight($event)"></app-global-toastr>
+
+<div *ngIf="auth.profile()?.isCompteTiers" class="sr-only" aria-live="polite" role="status">
+  Vous êtes connecté en tant que compte tiers. Certaines fonctionnalités sont désactivées.
+</div>
+
+<div class="app-content" [style.marginTop.px]="offset()">
+  <router-outlet></router-outlet>
+</div>
+
+<app-global-footer></app-global-footer>
 
 <app-terminal-modal
   *ngIf="errorService.errorMessage()"

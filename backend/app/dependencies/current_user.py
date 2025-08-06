@@ -1,48 +1,58 @@
-from fastapi import Depends, HTTPException, Header
+from fastapi import Depends, HTTPException, Header, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from app.core.config import settings
 from app.database import get_db
-from app.models.user import User
-from sqlalchemy.future import select
+from app.models import User
 
 SECRET_KEY = settings.jwt_secret
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # toujours requis par FastAPI
 
-async def get_current_user(
-    db: AsyncSession = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
+async def get_current_user_from_cookie(
+        request: Request,
+        allow_tiers: bool = False,
+        db: AsyncSession = Depends(get_db)
 ) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="❌ Identité utilisateur invalide ou expirée.",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+
+    token = request.cookies.get("access_token")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="❌ Token manquant (cookie)")
 
     try:
-        # 1. Décoder le JWT signé maison
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = int(payload.get("sub"))
-
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
+        if payload.get("purpose") != "access_token":
+            raise HTTPException(status_code=401, detail="❌ Token invalide (type incorrect)")
+        user_id = payload.get("sub")
         if user_id is None:
-            raise credentials_exception
+            raise HTTPException(status_code=401, detail="❌ Token invalide (ID manquant)")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="❌ Token corrompu ou expiré")
 
-    except (JWTError, ValueError):
-        raise credentials_exception
+    # Récupérer l'utilisateur depuis la DB
+    from app.services.auth.user_service import UserService
+    user = await UserService.get_user_by_id(db, int(user_id))
 
-    # 2. Charger l'utilisateur depuis la base
-    result = await db.execute(select(User).where(User.id == user_id))
-    user = result.scalars().first()
-
-    if user is None:
-        raise credentials_exception
+    if not allow_tiers and user.is_compte_tiers:
+        raise HTTPException(
+            status_code=403,
+            detail="Les comptes tiers ne sont pas autorisés à accéder à cette ressource."
+        )
 
     return user
+
+def get_current_user_from_cookie_with_tiers():
+    async def wrapper(
+            request: Request,
+            db: AsyncSession = Depends(get_db)
+    ):
+        return await get_current_user_from_cookie(request, allow_tiers=True, db=db)
+
+    return Depends(wrapper)
 
 async def get_current_group_id(x_group_id: int = Header(...)) -> int:
     if not x_group_id:

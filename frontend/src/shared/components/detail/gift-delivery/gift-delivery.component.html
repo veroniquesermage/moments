@@ -1,12 +1,12 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator"/>
   <div class="block-title"> 🚚 Livraison</div>
   <hr class="block-separator"/>
 
-  <p>> Lieu : {{ giftDelivery.lieuLivraison }}</p>
-  <p>> Date prévue : {{ giftDelivery.dateLivraison | date:'dd-MM-yyyy' }}</p>
+  <p><span class="key-label">Lieu : </span> <span class="value-text">{{ giftDelivery.lieuLivraison }}</span></p>
+  <p><span class="key-label">Date prévue : </span> <span class="value-text">{{ giftDelivery.dateLivraison | date:'dd-MM-yyyy' }}</span></p>
   <p class="recu-line">
-    > Reçu :
+    <span class="key-label"> Reçu : </span>
     <span
       class="emoji-action"
       (click)="toggleRecu()"
@@ -17,11 +17,5 @@
     </span>
     <span class="legend-icon">&larr; Cliquez pour changer le statut.</span>
   </p>
-
-
-  <hr class="block-separator"/>
-  <div class="block-title"> 💸 Prix réel</div>
-  <hr class="block-separator"/>
-  <p>> Prix payé : {{ giftDelivery.prixReel }} €</p>
 
 </div>

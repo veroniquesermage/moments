@@ -1,8 +1,9 @@
 export interface User {
   id: number;
-  email: string;
+  email?: string;
   prenom: string;
-  nom: string;
-  googleId?: string;
-  dateCreation: string
+  nom?: string;
+  dateCreation: string;
+  isCompteTiers: boolean
+  hasPassword: boolean
 }

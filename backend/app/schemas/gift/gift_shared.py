@@ -1,6 +1,5 @@
 from app.schemas import CamelModel, UserDisplaySchema
 
-
 class GiftSharedSchema(CamelModel):
     id: int
     preneur: UserDisplaySchema

@@ -4,6 +4,7 @@ import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} fr
 import {Router} from '@angular/router';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
+import {ErrorService} from 'src/core/services/error.service';
 
 @Component({
   selector: 'app-gift-form',
@@ -21,7 +22,8 @@ export class GiftFormComponent implements OnChanges{
 
 
   constructor(private fb: FormBuilder,
-              public router: Router,) {
+              public router: Router,
+              public errorService : ErrorService) {
     this.giftForm = this.createGiftForm(this.gift);
   }
 
@@ -52,11 +54,39 @@ export class GiftFormComponent implements OnChanges{
     });
   }
 
-  sanitizeDecimal(event: Event, key: string ): void {
+  sanitizeDecimal(event: Event, key: string): void {
+    const MAX_AMOUNT = 99999999;
     const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(',', '.');
-    // met à jour le FormControl manuellement
-    this.giftForm.get(key)?.setValue(input.value);
+
+    // Nettoyage : supprime tous les espaces (normaux et insécables)
+    let cleaned = input.value.replace(/\s/g, '').replace(/\u00A0/g, '');
+
+    // Remplace virgule par point
+    cleaned = cleaned.replace(',', '.');
+
+    // Parse en nombre
+    const valueAsNumber = parseFloat(cleaned);
+
+    // Si valeur numérique valide
+    if (!isNaN(valueAsNumber)) {
+      if (valueAsNumber > MAX_AMOUNT) {
+        this.errorService.showError(
+          '💸 Pauline, tu as encore tenté un coup de folie ? Sérieusement ? <br> C’est une liste de cadeaux, <em>pas un prêt immobilier pour un hôtel particulier dans le XVIe ! </em> <br> <br> La limite chez (Moments) est <strong>99 999 999 €</strong> ... et c\'est déjà pas mal !'
+        );
+        // Remet l’ancienne valeur
+        const currentControl = this.giftForm.get(key);
+        input.value = currentControl?.value?.toString() || '';
+        return;
+      }
+
+      // ✅ Tout est bon, met à jour le champ proprement
+      this.giftForm.get(key)?.setValue(valueAsNumber);
+      input.value = valueAsNumber.toString(); // on synchronise l'affichage
+    } else {
+      // pas un nombre valide ? on laisse l’utilisateur corriger, mais on ne fait rien
+      this.giftForm.get(key)?.setValue(undefined);
+    }
   }
+
 
 }

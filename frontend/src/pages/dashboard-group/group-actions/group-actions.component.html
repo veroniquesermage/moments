@@ -1,4 +1,4 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator" />
   <div class="block-title"> 💣 Actions définitives </div>
   <hr class="block-separator" />
@@ -15,16 +15,15 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title">
-      <h2 id="modal-title">Sélectionner la personne que vous souhaitez expulser</h2>
+      <h2 id="modal-title">Fenêtre de confirmation</h2>
       <select id="selectDest" [(ngModel)]="selectedMemberID">
         <option [ngValue]="undefined" disabled selected hidden>Choisissez un membre</option>
-        <option *ngFor="let member of members" [value]="member.id">{{member.prenom}} {{member.nom | uppercase }}
+        <option *ngFor="let member of membersSignal()" [value]="member.id">{{member.prenom}} {{member.nom | uppercase }}
           <span *ngIf="member.surnom" class="alias"> alias {{ member.surnom }}</span></option>
       </select>
       <div class="modal-actions">
         <button (click)="cancel()">Fermer</button>
         <button (click)="excludeMember()">Confirmer l'expulsion</button>
-
       </div>
     </div>
   </div>

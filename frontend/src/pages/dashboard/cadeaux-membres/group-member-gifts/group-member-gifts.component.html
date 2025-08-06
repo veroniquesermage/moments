@@ -1,22 +1,32 @@
 <div class="terminal">
-  <h2>> Listes des autres membres</h2>
-
-  <section class="intro-bloc" aria-label="Introduction pour la page Listes des autres membres">
-  <p>> Cliquez sur un membre pour obtenir sa liste de cadeaux</p>
+  <section class="intro-section"  aria-label="Introduction pour la page Listes des autres membres">
+    <h1 class="dashboard-title">
+      📃 Listes des autres membres
+    </h1>
+    <p class="emphase-douce">
+      Cliquez sur un membre pour obtenir sa liste de cadeaux.
+    </p>
+    <p>
+      🧩 Ces comptes sont sous la garde d’un autre membre.
+      Peut-être qu’ils sont trop jeunes, trop âgés, ou juste trop désintéressés par la technologie.<br>
+      <em>(Ce sont ce qu’on appelle des comptes tiers.)</em>
+    </p>
   </section>
-  <app-refresh-group-members (refreshed)="reloadMembers()" />
+
   <div class="user-buttons">
     <button
-      *ngFor="let user of users"
+      *ngFor="let user of membersSignal()"
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
     >
-      {{ user  | displayName }}
+      <span *ngIf="user.isCompteTiers"
+            aria-label="Compte tiers"
+            title="Compte tiers">🧩 </span>{{ user  | displayName }}
     </button>
   </div>
 
   <section class="intro-bloc" aria-label="Explication du fonctionnement de la liste">
-  <p>> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
+  <p class="emphase-douce"> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
   </section>
   <table   aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
@@ -29,7 +39,7 @@
         <!-- Insère le sous-titre si c’est le premier 'proposé' -->
         <tr *ngIf="gift.priorite === 0 && (i === 0 || giftPublic[i-1].priorite !== 0)">
           <td colspan="5" class="separator-row">
-            > Idées proposées par les autres membres
+            Idées proposées par les autres membres
           </td>
         </tr>
 

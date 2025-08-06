@@ -11,7 +11,7 @@
     <p [innerHTML]="message"></p>
 
     <div class="modal-actions">
-      <button
+      <button data-allow-tiers
         *ngFor="let action of actions"
         (click)="actionClicked.emit(action.eventName)"
         [ngClass]="action.style || 'primary'"
