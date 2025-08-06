@@ -38,7 +38,7 @@ def upgrade() -> None:
 
     # Copier les données de prix_reel dans la nouvelle table
     op.execute("""
-               INSERT INTO details_achat_cadeau (gift_id, prix_reel)
+               INSERT INTO detail_achat_cadeau (gift_id, prix_reel)
                SELECT gift_id, prix_reel FROM livraison_cadeau WHERE prix_reel IS NOT NULL
                """)
 
