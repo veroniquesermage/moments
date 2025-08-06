@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /app || exit 1
-python /app/script/cleanup_reservations.py >> /app/logs/cleanup.log 2>&1
-python /app/script/cleanup_refresh_tokens.py >> /app/logs/cleanup.log 2>&1
+cd /app
+/usr/local/bin/python /app/script/cleanup_bdd.py >> /app/logs/cleanup.log 2>&1
+/app/script/backup_db.sh >> /app/logs/backup.log 2>&1
