@@ -1,4 +1,4 @@
-"""acorrection foreignkey gift_purchase_info
+"""ajout du détail achat pour un cadeau
 
 Revision ID: bdc9498dbf29
 Revises: e06196d589be

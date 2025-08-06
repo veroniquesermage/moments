@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "liste2wish-front": {
+    "moments-front": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/liste2wish-front",
+            "outputPath": "dist/moments-front",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -68,10 +68,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "liste2wish-front:build:production"
+              "buildTarget": "moments-front:build:production"
             },
             "development": {
-              "buildTarget": "liste2wish-front:build:development"
+              "buildTarget": "moments-front:build:development"
             }
           },
           "defaultConfiguration": "development"
