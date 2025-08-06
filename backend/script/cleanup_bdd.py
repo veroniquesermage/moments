@@ -1,19 +1,20 @@
+import os
+from _operator import or_
+from datetime import datetime, timedelta
 from operator import and_
 from pathlib import Path
-
-from dotenv import load_dotenv
-import os
-from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from dotenv import load_dotenv
 from sqlalchemy import (
     create_engine, MetaData, Table, Column, Integer, String, DateTime,
-    JSON, update, null, delete
+    JSON, update, null, delete, Boolean
 )
 from sqlalchemy.orm import sessionmaker
 
 # --- Chargement des variables d'environnement ---
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env.prod", override=True)
+env = os.getenv("APP_ENV", "dev")
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / f".env.{env}", override=True)
 db_url = os.getenv("SYNC_DB_URL")
 if not db_url:
     raise ValueError("SYNC_DB_URL est introuvable. Vérifie ton .env.")
@@ -46,6 +47,18 @@ def get_traces_table(metadata):
         Column("date", DateTime)
     )
 
+def get_refresh_token_table(metadata):
+    return Table(
+        "refresh_tokens",
+        metadata,
+        Column("id", Integer, primary_key=True),
+        Column("user_id", Integer),
+        Column("jti", String),
+        Column("expires_at", DateTime(timezone=True)),
+        Column("is_active", Boolean),
+        Column("created_at", DateTime(timezone=True)),
+    )
+
 def write_trace(session, traces, utilisateur, trace_type, message, payload=None):
     insert_stmt = traces.insert().values(
         date=datetime.now(ZoneInfo("Europe/Paris")),
@@ -65,6 +78,7 @@ def main():
     metadata = MetaData()
     cadeaux = get_cadeaux_table(metadata)
     traces = get_traces_table(metadata)
+    refresh_tokens = get_refresh_token_table(metadata)
 
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -139,6 +153,28 @@ def main():
             utilisateur="SCRIPT_CLEANUP",
             trace_type="NETTOYAGE_TRACE",
             message=f"{deleted.rowcount} trace(s) ancienne(s) supprimée(s)"
+        )
+
+        print("Nettoyage des refresh tokens expirés ou inactifs...")
+        session = Session()
+
+        delete_stmt = delete(refresh_tokens).where(
+            or_(
+                refresh_tokens.c.expires_at < now,
+                refresh_tokens.c.is_active == False,
+                )
+        )
+        result_token = session.execute(delete_stmt)
+        session.commit()
+        print(f"{result_token.rowcount} refresh token(s) supprimé(s).")
+
+        # Trace pour suppression des anciens refresh_token
+        write_trace(
+            session=session,
+            traces=traces,
+            utilisateur="SCRIPT_CLEANUP",
+            trace_type="NETTOYAGE_REFRESH_TOKEN",
+            message=f"{result_token.rowcount} refresh_token(s) ancien(s) supprimé(s)"
         )
 
     except Exception as e:

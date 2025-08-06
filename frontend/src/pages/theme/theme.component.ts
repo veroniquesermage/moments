@@ -31,6 +31,7 @@ export class ThemeComponent implements OnInit {
   onThemeChange(themeValue: string): void {
     this.themeService.setTheme(themeValue as any);
     this.selectedTheme = themeValue;
+    void this.router.navigate(['/dashboard']);
   }
 
   return() {

@@ -136,3 +136,22 @@ Demain tu veux permettre de :
 → `POST /gifts/:id/actions/notify`
 
 ---
+
+## 🔧 Sauvegarde et restauration de la base de données (dev uniquement)
+
+Deux scripts sont fournis pour manipuler la base PostgreSQL locale :
+
+### 💾 Sauvegarder la base
+
+```bash
+./dump.sh
+```
+Cela crée un fichier .sql horodaté dans backend/backups/.
+
+### ♻️ Restaurer la base à partir d’un dump
+```bash
+./restore.sh backups/nom_du_fichier.sql
+```
+Ce script :
+- Supprime le schéma public (⚠️ tous les objets sont supprimés)
+- Restaure la base depuis le dump fourni

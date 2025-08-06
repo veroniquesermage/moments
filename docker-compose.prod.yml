@@ -21,8 +21,11 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/backups:/app/backups
     env_file:
-      - ./backend/.env.prod
+      - .env  # Ce fichier contient APP_ENV=dev (ou prod)
     ports:
       - "8000:8000"
 
