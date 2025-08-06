@@ -22,3 +22,7 @@ docker-compose.yml
 # Python envs globaux éventuels
 venv/
 .env/
+
+# Ne pas versionner les dumps SQL
+*.sql
+*.sql.gz

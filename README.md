@@ -18,7 +18,7 @@ scp moments.tar.gz admin@193.181.210.186:/home/admin/
 ssh admin@193.181.210.186
 ```
 
-### faire un backup:
+### faire un backups:
 ```bash
 mv moments moments_backup_$(date +%s)
 ```
