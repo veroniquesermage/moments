@@ -1,7 +1,7 @@
 <div class="options">
 
-  <button *ngIf="canEdit" (click)="editRequested.emit()">✏️ Modifier</button>
-  <button *ngIf="canDelete" (click)="deleteRequested.emit()">🗑️ Supprimer</button>
+  <button data-allow-tiers *ngIf="canEdit" (click)="editRequested.emit()">✏️ Modifier</button>
+  <button data-allow-tiers *ngIf="canDelete" (click)="deleteRequested.emit()">🗑️ Supprimer</button>
 
   <button *ngIf="canEditIdea" (click)="editIdeaRequested.emit()">✏️ Modifier</button>
   <button *ngIf="canDeleteIdea" (click)="deleteIdeaRequested.emit()">🗑️ Supprimer</button>
@@ -12,9 +12,10 @@
   <button *ngIf="canWithdraw" (click)="withdrawRequested.emit()">🔁 Retirer le cadeau</button>
 
   <button *ngIf="canManageDelivery" (click)="manageDeliveryRequested.emit()">🚚 Gérer la livraison</button>
+  <button *ngIf="canManageInfo" (click)="managePurchaseInfoRequested.emit()">📝 Ajouter des informations</button>
   <button *ngIf="canManageSharing" (click)="manageSharingRequested.emit()"> 🧑‍🤝‍🧑  Gérer le partage</button>
 
-  <button *ngIf="canGoBack" (click)="backRequested.emit()">↩ Retour à la liste</button>
+  <button data-allow-tiers *ngIf="canGoBack" (click)="backRequested.emit()">↩ Retour à la liste</button>
 
 </div>
 

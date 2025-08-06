@@ -4,7 +4,7 @@
 *.iml
 
 # Fichier env local (à ne jamais envoyer en prod)
-.env.dev
+.env
 
 # Scripts temporaires ou de test
 test.py

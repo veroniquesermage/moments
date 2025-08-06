@@ -1,7 +1,8 @@
 export interface UserDisplay {
   id: number,
-  nom: string,
+  nom?: string,
   prenom: string,
   surnom?: string,
-  role?: string
+  role?: string,
+  isCompteTiers: boolean
 }

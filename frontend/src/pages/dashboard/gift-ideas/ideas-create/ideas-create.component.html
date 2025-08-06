@@ -1,13 +1,16 @@
 <div class="form-container">
-
-  <h1>> Ajout d'une idée de cadeau </h1>
-  <section class="intro-bloc" aria-label="Introduction pour la page d'ajout d'une idée de cadeau">
-  <p class="command">> Pour ajouter une idée de cadeau pour un membre du groupe, merci de remplir ce formulaire.</p>
+  <section class="intro-section" aria-labelledby="Introduction pour la page d'ajout d'une idée de cadeau">
+    <h1 class="dashboard-title">
+      ➕ Ajout d'une idée de cadeau
+    </h1>
+    <p class="emphase-douce">
+      Pour ajouter une idée de cadeau pour un membre du groupe, merci de remplir ce formulaire.
+    </p>
   </section>
 
   <app-gift-idea-form
     [giftIdeasResponse] = "undefined"
-    [membersGroup] = "membersGroup"
+    [membersGroup] = "membersSignal()"
     (formSubmitted) = "onSubmit($event)"
     (cancel) = "router.navigate(['/dashboard/idees'])"
   ></app-gift-idea-form>

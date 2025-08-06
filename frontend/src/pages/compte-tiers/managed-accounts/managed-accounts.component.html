@@ -1,0 +1,134 @@
+<div class="terminal">
+
+    <section class="intro-section">
+      <h1>🧩 Comptes tiers</h1>
+      <p>
+        Les comptes tiers vous permettent de gérer les souhaits d’un enfant, d’un proche ou de toute personne que vous accompagnez — sans qu’elle ait besoin d’utiliser l’application elle-même.
+      </p>
+      <p>
+        ✨ C’est l’idéal, par exemple, pour préparer les surprises des plus jeunes membres de la famille, ou simplifier l’organisation pour une personne moins à l’aise avec les outils numériques.
+      </p>
+      <p class="emphase-douce">
+        ⚠️ <strong>À savoir :</strong> ces comptes disposent de droits limités. Une fois connecté en tant qu'un des compte-tiers, vous pouvez ajouter ou modifier des cadeaux, mais pas en prendre dans la liste des autres membres.
+        En revanche, vous pouvez le faire sur votre compte principal et indiquer qu’un cadeau a été pris pour eux depuis la page de suivi, dans les informations complémentaires.
+      </p>
+    </section>
+
+
+  <section class="actions">
+    <hr class="block-separator" />
+    <div class="block-title">👭 Créer un compte tiers </div>
+    <hr class="block-separator" />
+    <div class="sebou-alert">
+      <span class="intro">
+        <em>Le prénom et le nom du compte tiers seront partagés entre tous les groupes où il sera ajouté.</em>
+      </span>
+      <span class="middle">
+        En revanche, vous pouvez personnaliser un surnom spécifique à chaque groupe — y compris celui-ci.
+      </span>
+      <span class="final">
+        C’est le moment idéal pour définir ce surnom dans le groupe actif.
+      </span>
+    </div>
+
+    <div class="login-form">
+      <label for="givenName">Prénom</label>
+      <input
+        id="givenName"
+        [(ngModel)]="givenName"
+        type="text"
+        required
+        autocomplete="off"
+      />
+
+      <label for="familyName">Nom</label>
+      <input
+        id="familyName"
+        [(ngModel)]="familyName"
+        type="text"
+        autocomplete="off"
+      />
+
+      <label for="nickname">Surnom</label>
+      <input
+        id="nickname"
+        [(ngModel)]="nickname"
+        type="text"
+        autocomplete="off"
+      />
+    </div>
+
+    <button class="button-bloc" type="button" (click)="goToCreateCompteTiers()">➕ Créer un nouveau compte tiers</button>
+  </section>
+
+  <section class="liste-comptes" aria-live="polite">
+    <hr class="block-separator" />
+    <div class="block-title">📋 Comptes actuellement gérés</div>
+    <hr class="block-separator" />
+    <ul *ngIf="managedAccounts().length > 0; else noAccounts">
+      <li *ngFor="let account of managedAccounts(); let i = index" class="compte-tiers-bloc">
+        <div class="nom-tiers">
+            <span class="emoji">
+              {{ i % 2 === 0 ? '💿' : '📀' }}
+            </span>
+          <strong>{{ account.prenom }} {{ account.nom || '' }}</strong>
+        </div>
+        <div class="act">
+          <p><button type="button" (click)="switchToAccount(account.id)">🎭 Se connecter en tant que</button></p>
+          <p><button type="button" (click)="addToAnotherGroup(account.id)">📤 Ajouter à un autre groupe</button></p>
+          <p><button type="button"  (click)="deleteFromGroup(account.id)">🗑️ Supprimer du groupe</button></p>
+          <p><button type="button"  (click)="deleteGlobally(account.id)">❌ Supprimer définitivement</button></p>
+        </div>
+      </li>
+
+    </ul>
+
+    <ng-template #noAccounts>
+      <p>Vous ne gérez actuellement aucun compte tiers.</p>
+    </ng-template>
+  </section>
+
+  <div class="options">
+    <button data-allow-tiers (click)="return()">↩ Retour au Menu</button>
+  </div>
+</div>
+
+<app-terminal-modal
+  *ngIf="showModal"
+  [message]="message"
+  [actions]="modalActions"
+  (actionClicked)="handleClicked($event)"
+/>
+
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()"
+></app-terminal-modal>
+
+<ng-container *ngIf="showExportUser">
+  <div class="modal-overlay">
+    <div
+      class="modal-box terminal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title">
+
+      <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
+      <p>A quel groupe souhaitez ajouter ce compte tiers ?</p>
+
+      <select id="selectDest" [(ngModel)]="selectedGroupId">
+        <option [ngValue]="undefined" disabled selected hidden>Choisissez un groupe</option>
+        <option *ngFor="let group of groupFiltered()" [value]="group.id">{{group.nomGroupe}}</option>
+      </select>
+
+
+      <div class="modal-actions">
+        <button (click)="confirmExport()">Valider</button>
+        <button (click)="cancelExport()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+

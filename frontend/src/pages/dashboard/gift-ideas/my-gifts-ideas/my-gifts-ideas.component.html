@@ -1,20 +1,24 @@
 <div class="terminal">
-  <h2>> Vos idées de cadeaux</h2>
-
-  <section class="intro-bloc" aria-label="Introduction pour la page Idées de cadeaux pour les autres">
-  <p>> Enregistrez ici vos idées de cadeaux pour d'autres membres du groupe. </p>
-  <p class="sub-intro">Cliquez sur votre idée pour obtenir son détail et la gérer. </p>
+  <section class="intro-section" aria-labelledby="Introduction pour la page de vos idées de cadeaux pour les autres">
+    <h1 class="dashboard-title">
+      💡 Vos idées de cadeaux
+    </h1>
+    <p>
+      Enregistrez ici vos idées de cadeaux pour d'autres membres du groupe.
+    </p>
+    <p class="emphase-douce">
+      Cliquez sur votre idée pour obtenir son détail et la gérer.
+    </p>
   </section>
 
-
-  <p class="actions-legend"> <em>> Actions rapides: 🔒 Changer la visibilité | 📄 Dupliquer l'idée | 🛒 Prendre le cadeau (si privé et disponible) </em> </p>
+  <p class="actions-legend emphase-douce"> <em> Actions rapides: 🔒 Changer la visibilité | 📄 Dupliquer l'idée | 🛒 Prendre le cadeau (si privé et disponible) </em> </p>
 
   <table   aria-describedby="table-priorite-explication" class="gift-table">
     <thead>
     <tr>
       <th scope="col">Destinataire</th>
       <th scope="col">Nom</th>
-      <th scope="col" class="col-actions">Prix</th>
+      <th scope="col" class="col-actions">Prix unitaire (€)</th>
       <th scope="col" class="col-actions">Privé</th>
       <th scope="col" class="col-actions">Actions</th>
     </tr>
@@ -26,7 +30,7 @@
         (keydown.space)="onRowClick(gift)">
       <td tabindex="0">{{ gift.gift.destinataire | displayName }}</td>
       <td>{{ gift.gift.nom }}</td>
-      <td class="col-actions">{{ gift.gift.prix }} €</td>
+      <td class="col-actions">{{ gift.gift.prix | formatMontant}}</td>
       <td
         class="col-actions">
         {{ gift.giftIdea.visibilite ? 'NON' : 'OUI' }}
@@ -75,7 +79,7 @@
 
         <select id="selectDest" [(ngModel)]="selectedDestId">
           <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
-          <option *ngFor="let user of allUsers" [value]="user.id">{{ user | displayName}}</option>
+          <option *ngFor="let user of membersSharedGroup" [value]="user.id">{{ user | displayName }}</option>
         </select>
 
 

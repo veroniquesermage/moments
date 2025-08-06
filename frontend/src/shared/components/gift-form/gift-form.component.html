@@ -1,38 +1,40 @@
 <div class="form-container">
 
-  <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
+  <form data-allow-tiers [formGroup]="giftForm" (ngSubmit)="onSubmit()">
     <label>Nom</label>
-    <input formControlName="nom" type="text"/>
+    <input data-allow-tiers formControlName="nom" type="text"/>
     <label>Marque</label>
-    <input formControlName="marque" type="text"/>
+    <input data-allow-tiers formControlName="marque" type="text"/>
     <label>Magasin</label>
-    <input formControlName="magasin" type="text"/>
+    <input data-allow-tiers formControlName="magasin" type="text"/>
     <label>Description</label>
-    <textarea formControlName="description"></textarea>
+    <textarea data-allow-tiers formControlName="description"></textarea>
     <label>Url du cadeau</label>
-    <input formControlName="url" type="text"/>
+    <input data-allow-tiers formControlName="url" type="text"/>
     <label>Quantité</label>
-    <input formControlName="quantite" type="text"/>
-    <label>Prix à l'unité</label>
+    <input data-allow-tiers formControlName="quantite" type="text"/>
+    <label>Prix unitaire (€)</label>
     <input
+      data-allow-tiers
       type="text"
       formControlName="prix"
       (input)="sanitizeDecimal($event, 'prix')"/>
-    <label>Frais de port</label>
+    <label>Frais de port (€)</label>
     <input
+      data-allow-tiers
       type="text"
       formControlName="fraisPort"
       (input)="sanitizeDecimal($event, 'fraisPort')"/>
 
     <label>Commentaire</label>
-    <textarea formControlName="commentaire"></textarea>
+    <textarea data-allow-tiers formControlName="commentaire"></textarea>
 
-    <button type="submit">
-      {{ gift?.id ? 'Modifier le cadeau' : 'Créer le cadeau' }}
+    <button data-allow-tiers type="submit">
+      {{ gift?.id ? '✅ Modifier le cadeau' : '✅ Créer le cadeau' }}
     </button>
   </form>
 
   <div class="options">
-    <button (click)="cancel.emit()">↩ Retour</button>
+    <button data-allow-tiers (click)="cancel.emit()">↩ Retour</button>
   </div>
 </div>

@@ -52,4 +52,8 @@ export class GroupCreateComponent {
       this.errorService.showError('❌ Formulaire invalide');
     }
   }
+
+  return() {
+    void this.router.navigate(['/groupe/onboarding']);
+  }
 }

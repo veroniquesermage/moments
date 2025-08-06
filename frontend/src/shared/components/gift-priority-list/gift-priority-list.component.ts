@@ -7,6 +7,7 @@ import {GiftPriority} from 'src/core/models/gift/gift-priority.model';
 import {UserInteractionService} from 'src/core/services/user-interaction.service';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 
 @Component({
   selector: 'app-gift-priority-list',
@@ -14,7 +15,8 @@ import {TerminalModalComponent} from 'src/shared/components/terminal-modal/termi
   imports: [
     CommonModule,
     DragDropModule,
-    TerminalModalComponent
+    TerminalModalComponent,
+    FormatMontantPipe
   ],
   templateUrl: './gift-priority-list.component.html',
   styleUrl: './gift-priority-list.component.scss'

@@ -1,23 +1,28 @@
 <div class="terminal">
-  <h2>> Mes cadeaux</h2>
-  <section class="intro-bloc" aria-label="Introduction pour la page Mes cadeaux">
-  <p>
-    > Les cadeaux sont triés par ordre de priorité. Utilisez la poignée ↕️ pour organiser votre liste.
-    <br>
-    > Cliquez sur un cadeau pour consulter son détail, le modifier ou le supprimer.
-  </p>
+  <section class="intro-section"  aria-label="Introduction pour la page Mes cadeaux">
+    <h1 class="dashboard-title">
+      🎁 Mes cadeaux
+    </h1>
+    <p>
+      Les cadeaux sont triés par ordre de priorité. Utilisez la poignée ↕️ pour organiser votre liste.
+    </p>
+    <p class="emphase-douce">
+      Cliquez sur un cadeau pour consulter son détail, le modifier ou le supprimer.
+    </p>
+    <p class="visually-hidden" id="table-priorite-explication">
+      Chaque ligne commence par des boutons pour modifier la priorité : utilisez Tab pour les afficher, puis les activer avec Entrée ou Espace.
+    </p>
   </section>
-  <p class="visually-hidden" id="table-priorite-explication">
-    Chaque ligne commence par des boutons pour modifier la priorité : utilisez Tab pour les afficher, puis les activer avec Entrée ou Espace.
-  </p>
+
+
 
   <app-gift-priority-list
   [gifts]="this.giftService.giftsResponse()"
   (rowClicked)="onGiftClicked($event)"
   />
   <div class="options">
-    <button (click)="goToAjout()">[+] Ajouter un cadeau</button>
-    <button (click)="return()">↩ Retour au Menu</button>
+    <button data-allow-tiers (click)="goToAjout()">[+] Ajouter un cadeau</button>
+    <button data-allow-tiers (click)="return()">↩ Retour au Menu</button>
   </div>
 
 </div>

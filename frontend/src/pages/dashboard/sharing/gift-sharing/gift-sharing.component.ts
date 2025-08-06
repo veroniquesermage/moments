@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, Signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
@@ -9,9 +9,6 @@ import {GiftSharedDraft} from 'src/core/models/gift/gift-shared-draft.model';
 import {CommonModule} from '@angular/common';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {
-  RefreshGroupMembersComponent
-} from 'src/shared/components/refresh-group-members/refresh-group-members.component';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
@@ -22,7 +19,6 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
   imports: [
     FormsModule,
     CommonModule,
-    RefreshGroupMembersComponent,
     DisplayNamePipe,
     FeedbackTestComponent
   ],
@@ -36,7 +32,7 @@ export class GiftSharingComponent implements OnInit {
   partages: GiftShared[] | undefined = [];
   partagesDraft: GiftSharedDraft[] = [];
   gift: GiftPublicResponse | undefined = undefined;
-  membresDisponibles: UserDisplay[] = [];
+  membersSignal: Signal<UserDisplay[]>;
   contextBrut: string | null = null;
   composant: string = "GiftSharingComponent";
 
@@ -45,6 +41,7 @@ export class GiftSharingComponent implements OnInit {
               private groupContextService: GroupContextService,
               public router: Router,
               public errorService: ErrorService) {
+    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
@@ -63,20 +60,19 @@ export class GiftSharingComponent implements OnInit {
     } else {
       this.errorService.showError("❌ Impossible de modifier le partage.");
     }
-
-    await this.reloadMembers()
   }
 
-  async reloadMembers() {
-    try {
-      this.membresDisponibles = await this.groupContextService.getGroupMembers();
-    } catch (err) {
-      this.errorService.showError("❌ Impossible de récupérer les membres du groupe. Veuillez réessayer plus tard.");
+  async supprimerLigne(index: number) {
+    const sharedId = this.partages![index].id;
+    const result = await this.sharingService.deleteShare(sharedId);
+
+    if (result.success) {
+      this.partages!.splice(index, 1);
+    } else {
+      this.errorService.showError(result.message);
     }
-  }
 
-  supprimerLigne(index: number) {
-    this.partages!.splice(index, 1);
+
   }
 
   ajouterLigne() {
@@ -93,7 +89,7 @@ export class GiftSharingComponent implements OnInit {
   }
 
   retourEnArriere(){
-    this.router.navigate(['/dashboard/cadeau', this.idGift], {
+    void this.router.navigate(['/dashboard/cadeau', this.idGift], {
       queryParams: { context: this.contextBrut }
     });
   }

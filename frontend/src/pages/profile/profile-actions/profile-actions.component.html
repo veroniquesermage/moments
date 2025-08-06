@@ -1,4 +1,4 @@
-<div class="gift-block">
+<div class="block">
   <hr class="block-separator" />
   <div class="block-title">🤹🏻 Autres actions </div>
   <hr class="block-separator" />
@@ -6,12 +6,6 @@
   <div  class="options">
     <button (click)="back()">↩ Retour</button>
     <button (click)="changeGroup()">🔄 Changer, créer ou rejoindre un autre groupe</button>
-    <label class="theme-select label-theme">
-      🎨 Thème&nbsp;
-      <select [value]="theme.current" (change)="theme.setTheme($any($event.target).value)">
-        <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
-      </select>
-    </label>
   </div>
   <app-feedback-test
   [composant]="composant">

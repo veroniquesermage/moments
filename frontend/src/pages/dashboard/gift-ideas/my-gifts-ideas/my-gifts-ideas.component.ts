@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Signal} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
@@ -11,11 +11,13 @@ import {GiftStatutDTO} from 'src/core/models/gift/gift-statut.model';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {ModalActionType} from 'src/core/enum/modal-action.enum';
 import {FormsModule} from '@angular/forms';
-import {ToastrService} from 'ngx-toastr';
+import {ToastrService} from 'src/core/services/toastr.service';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
+import {UserService} from 'src/core/services/user.service';
+import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 
 @Component({
   selector: 'app-my-gifts-ideas',
@@ -26,7 +28,8 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
     TerminalModalComponent,
     FormsModule,
     DisplayNamePipe,
-    FeedbackTestComponent
+    FeedbackTestComponent,
+    FormatMontantPipe
   ],
   templateUrl: './my-gifts-ideas.component.html',
   styleUrl: './my-gifts-ideas.component.scss'
@@ -41,8 +44,9 @@ export class MyGiftsIdeasComponent implements OnInit {
   ideaId: number | undefined;
   selectedDestId?: number;
   showDuplicationModal = false;
-  allUsers: UserDisplay[] = [];
+  membersSignal: Signal<UserDisplay[]>;
   composant: string = "MyGiftsIdeasComponent";
+  membersSharedGroup: UserDisplay[] = [];
 
 
   constructor(private ideaService: IdeaService,
@@ -50,11 +54,19 @@ export class MyGiftsIdeasComponent implements OnInit {
               private groupContextService : GroupContextService,
               private router: Router,
               public errorService: ErrorService,
-              private toastr: ToastrService) {
+              private toastrService: ToastrService,
+              private userService: UserService) {
+    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
     await this.loadIdeas();
+    const result = await this.userService.getUsersWithSharedGroups();
+    if (result.success) {
+      this.membersSharedGroup = result.data;
+    } else {
+      console.warn('[UserService] Échec du fetch des membres partageant un groupe');
+    }
   }
 
   changeVisibility(actualVisibility: boolean, ideaId: number) {
@@ -69,7 +81,6 @@ export class MyGiftsIdeasComponent implements OnInit {
 
   async duplicateIdea(ideaId: number) {
     this.ideaId = ideaId;
-    this.allUsers = await this.groupContextService.getGroupMembers();
     this.showDuplicationModal = true;
   }
 
@@ -91,17 +102,17 @@ export class MyGiftsIdeasComponent implements OnInit {
   }
 
   onRowClick(gift: GiftIdeasResponse) {
-    this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
+    void this.router.navigate(['/dashboard/cadeau', gift.gift.id], {
       queryParams: {context: 'idee-cadeau'}
     });
   }
 
   return() {
-    this.router.navigate(['/dashboard']);
+    void this.router.navigate(['/dashboard']);
   }
 
   goToAjout() {
-    this.router.navigate(['/dashboard/idees/creer']);
+    void this.router.navigate(['/dashboard/idees/creer']);
   }
 
   async takeIt(id: number) {
@@ -136,7 +147,7 @@ export class MyGiftsIdeasComponent implements OnInit {
 
     if(result.success){
       await this.loadIdeas()
-      this.toastr.success('Duplication confirmée 👍');
+      this.toastrService.show({ message: 'Duplication confirmée 👍', type: 'success' });
       this.showDuplicationModal = false;
       await this.router.navigate(['/dashboard/idees'])
     } else {

@@ -1,1 +1,1 @@
-0 1 * * * /usr/local/bin/python /app/script/cleanup_reservations.py >> /var/log/cleanup.log 2>&1
+0 1 * * * root /app/script/run_cleanup.sh >> /app/logs/run_cleanup.log 2>&1

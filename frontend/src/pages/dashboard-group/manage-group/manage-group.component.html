@@ -1,15 +1,21 @@
 <div class="terminal">
-  <h2>> Gestion du groupe</h2>
+  <section class="intro-section" aria-labelledby="Introduction pour la page de gestion du groupe en tant qu'admin">
+    <h1 class="dashboard-title">
+      🛠️ Gestion du groupe
+    </h1>
+  </section>
   <app-group-info
   [groupId] = "groupId"></app-group-info>
-  <app-group-invite/>
+  <app-group-invite
+    [groupId]="groupId">
+  </app-group-invite>
   <app-group-roles
-    [membersOriginal]="members"
+    [membersSignal]="membersSignal"
     [groupId]="groupId">
   </app-group-roles>
   <app-group-actions
     [groupId]="groupId"
-    [members]="members"
+    [membersSignal]="membersSignal"
     (membersUpdated)="reloadMembers()">
   </app-group-actions>
 </div>

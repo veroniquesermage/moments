@@ -1,5 +1,5 @@
 <div class="terminal" style="position: relative;">
-  <h2>> Détail du cadeau</h2>
+  <h2>Détail du cadeau</h2>
 
   <app-gift-idea
     *ngIf="giftDetail.ideas && context != 'mes-cadeaux'"
@@ -15,6 +15,11 @@
     *ngIf="context === 'suivi' && giftDetail.droitsUtilisateur === RoleUser.PRENEUR && giftDetail.delivery"
     [giftDelivery]="giftDetail.delivery"
     (receptionToggled)="onReceptionToggled($event)"
+  />
+
+  <app-gift-purchase-info
+    *ngIf="context === 'suivi' && giftDetail.purchaseInfo"
+    [purchaseInfo]="giftDetail.purchaseInfo"
   />
 
   <app-gift-shared
@@ -35,6 +40,7 @@
     (cancelReservationRequested)="annulerReservation()"
     (withdrawRequested)="retirerCadeau()"
     (manageDeliveryRequested)="gererLivraison()"
+    (managePurchaseInfoRequested)="gererDetailsAchat()"
     (manageSharingRequested)="gererPartage()"
     (backRequested)="retour()"
     (editIdeaRequested)="modifierIdee()"
