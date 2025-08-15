@@ -1,5 +1,29 @@
 # Commandes utiles pour déployer sur VPS
 
+### Modification avant livraison:
+- A la racine :
+  - le .env de dev doit être remplacé par celui de prod
+  - dans pgbouncer:
+    - .ini -> remplacer le user admin et les valeurs de prod d'appel à la bdd
+    - userlist -> mettre le userlist de prod
+  - supprimer les fichiers inutiles :
+    - .env autre que ceux de prod
+    - docker_compose.yml
+- Dans le backend :
+  - supprimer les fichiers inutiles :
+    - les .env autre que ceux de prod
+    - les fichiers .iml
+    - le repertoire .venv
+  - modifier dans cleanup_bdd.py cette ligne avec l'env de prod :
+    ```python
+        load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env.prod", override=True)
+    ```
+  - verifier que cleanup.cron est bien en LF (sinon dos2unix cleanup.cron)
+- Dans le front :
+  - supprimer les fichiers inutiles :
+    - node_modules
+    - les fichiers .iml
+  - renommer frontend/src/environments/environment.prod.ts par environment.ts:
 
 ### création d'un tar.gz y compris avec les fichiers cachés:
 ```bash
@@ -31,13 +55,6 @@ rm -rf moments
 ```bash
 mkdir moments
 tar xzf moments.tar.gz -C moments
-```
-
-### penser à remettre d'équerre l'environnement du front:
-```bash
-cd frontend/src/environments
-rm environment.ts
-mv environment.prod.ts environment.ts
 ```
 
 ### relancer docker :

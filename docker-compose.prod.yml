@@ -14,13 +14,25 @@ services:
     ports:
       - "5432:5432"
 
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: moments-pgbouncer
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "6432:6432"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+
   backend:
     build:
       context: ./backend
     container_name: moments-backend
     restart: unless-stopped
     depends_on:
-      - postgres
+      - pgbouncer
     volumes:
       - ./backend/logs:/app/logs
       - ./backend/backups:/app/backups
@@ -28,6 +40,9 @@ services:
       - .env  # Ce fichier contient APP_ENV=dev (ou prod)
     ports:
       - "8000:8000"
+    environment:
+      PGBOUNCER_AUTH_TYPE: plain
+      ADMIN_USERS: Mom3ntsAdm1n
 
   frontend:
     build:
