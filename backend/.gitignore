@@ -12,13 +12,6 @@ __pycache__/
 
 # Garder uniquement les paramètres de projet utiles
 .idea/*
-!.idea/codeStyles
-!.idea/runConfigurations
-!.idea/inspectionProfiles
-# Mais ignorer les fichiers locaux
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
 
 # Secrets
 .env*
@@ -40,3 +33,4 @@ env/
 
 # Logs éventuels
 *.log
+
