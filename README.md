@@ -47,6 +47,8 @@ docker compose -f docker-compose.prod.yml down
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+Le fichier `docker-compose.prod.yml` inclut désormais un service **pgbouncer** qui assure le pooling des connexions vers PostgreSQL afin de limiter les ralentissements lors des fortes charges.
+
 ### lancer les migrations alembic :
 ```bash
 docker exec -it moments-backend bash
