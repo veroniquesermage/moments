@@ -1,6 +1,7 @@
 # IDE / éditeurs
 .vscode/
 .idea/
+/.idea
 
 # OS
 .DS_Store
@@ -26,3 +27,6 @@ venv/
 # Ne pas versionner les dumps SQL
 *.sql
 *.sql.gz
+
+#pgBouncer
+pgbouncer/userlist-prod.txt
