@@ -13,8 +13,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker
 
 # --- Chargement des variables d'environnement ---
-env = os.getenv("APP_ENV", "dev")
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / f".env.{env}", override=True)
+# à modifier pour test en local
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env.prod", override=True)
 db_url = os.getenv("SYNC_DB_URL")
 if not db_url:
     raise ValueError("SYNC_DB_URL est introuvable. Vérifie ton .env.")
