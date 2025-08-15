@@ -20,14 +20,11 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      POOL_MODE: transaction
-      MAX_CLIENT_CONN: 100
-      DEFAULT_POOL_SIZE: 20
-      ADMIN_USERS: ${POSTGRES_USER}
     ports:
       - "6432:6432"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
 
   backend:
     build:
@@ -43,6 +40,9 @@ services:
       - .env  # Ce fichier contient APP_ENV=dev (ou prod)
     ports:
       - "8000:8000"
+    environment:
+      PGBOUNCER_AUTH_TYPE: plain
+      ADMIN_USERS: Mom3ntsAdm1n
 
   frontend:
     build:

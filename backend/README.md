@@ -16,8 +16,8 @@ Cette version est une migration depuis Spring Boot vers FastAPI, avec authentifi
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/ton-utilisateur/liste2wish-back.git
-cd liste2wish-back
+git clone https://github.com/ton-utilisateur/moments.git
+cd backend
 python -m venv .venv
 source .venv/bin/activate  # ou .venv\Scripts\activate sous Windows
 pip install -r requirements.txt
@@ -30,25 +30,23 @@ Localhost: http://127.0.0.1:8000/
 ### ⚙️ Configuration Run (mode classique)
 
 
-| Champ                   | Valeur                             |
-|-------------------------|------------------------------------|
-| **Type**                | Python                             |
-| **Script path**         | `./.venv/Scripts/uvicorn.exe`      |
-| **Parameters**          | `app.main:app --reload`            |
-| **Working directory**   | `./list2wish-back`                 |
-| **Environment variables** | `PYTHONUNBUFFERED=1`             |
-| **.env file**           | `./list2wish-back/.env`            |
+| Champ                   | Valeur                           |
+|-------------------------|----------------------------------|
+| **Type**                | Python                           |
+| **Script path**         | `./.venv/Scripts/uvicorn.exe`    |
+| **Parameters**          | `app.main:app --reload`          |
+| **Working directory**   | `./backend`                      |
+| **Environment variables** | `PYTHONUNBUFFERED=1;APP_ENV=dev` |
 
 ### 🐞 Configuration Debug (mode débogage)
 
-| Champ                   | Valeur                             |
-|-------------------------|------------------------------------|
-| **Type**                | Python                             |
-| **Module name**         | `uvicorn`                          |
-| **Parameters**          | `app.main:app`                     |
-| **Working directory**   | `./list2wish-back`                 |
-| **Environment variables** | `PYTHONUNBUFFERED=1`             |
-| **.env file**           | `./list2wish-back/.env`            |
+| Champ                   | Valeur                           |
+|-------------------------|----------------------------------|
+| **Type**                | Python                           |
+| **Module name**         | `uvicorn`                        |
+| **Parameters**          | `app.main:app`                   |
+| **Working directory**   | `./backend`                      |
+| **Environment variables** | `PYTHONUNBUFFERED=1;APP_ENV=dev` | 
 
 > 🧠 **Important :** ne pas utiliser `--reload` ici, sinon les breakpoints ne fonctionneront pas.  
 > ✅ Cette configuration permet à IntelliJ/PyCharm de déboguer FastAPI sans erreurs de subprocess ni UnicodeDecodeError.
@@ -61,7 +59,7 @@ On génère d'abord la version avec un message d'upgrade:
 ```bash
 alembic revision --autogenerate -m "Ajout du code dans Group et création de UserGroup"
 ```
-On vérifie que els tables sont bien créées dans le fichier de version et on crée la base :
+On vérifie que les tables sont bien créées dans le fichier de version et on crée la base :
 ```bash
 alembic upgrade head
 ```
