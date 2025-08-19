@@ -4,7 +4,7 @@
 - A la racine :
   - le .env de dev doit être remplacé par celui de prod
   - dans pgbouncer:
-    - .ini -> remplacer le user admin et les valeurs de prod d'appel à la bdd
+    - .ini -> remplacer le user admin et les valeurs de prod d'appel à la bdd (attention ! à remplacer dans les blocs database et pgbouncer)
     - userlist -> mettre le userlist de prod
   - supprimer les fichiers inutiles :
     - .env autre que ceux de prod

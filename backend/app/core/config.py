@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     invitation_link: str
     check_mail: str
     reset_password: str
+    otel_endpoint: str
 
     @property
     def is_prod(self) -> bool:

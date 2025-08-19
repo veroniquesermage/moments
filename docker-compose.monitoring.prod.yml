@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  pgbouncer-exporter:
+    image: prometheuscommunity/pgbouncer-exporter
+    container_name: moments-pgbouncer-exporter
+    restart: unless-stopped
+    depends_on:
+      - pgbouncer
+    ports:
+      - "9127:9127"
+    env_file:
+      - .env.monitoring
+    command:
+    - '--pgBouncer.connectionString=postgresql://${PGBOUNCER_STATS_USER}:${PGBOUNCER_STATS_PASSWORD}@pgbouncer:6432/pgbouncer?sslmode=disable'
