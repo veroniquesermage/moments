@@ -1,3 +1,4 @@
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -8,6 +9,9 @@ DATABASE_URL = settings.database_url
 
 # Création du moteur
 engine = create_async_engine(DATABASE_URL, echo=True)
+
+# 2) Instrumentation OTel → sur le moteur sync sous-jacent
+SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
 
 # Création de la session
 AsyncSessionLocal = sessionmaker(

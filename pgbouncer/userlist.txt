@@ -1,1 +1,2 @@
 "moments" "moments"
+"stats" "super-secret-password"
