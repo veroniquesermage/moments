@@ -29,12 +29,53 @@
     cursor: pointer;
   }
 
+  // Responsive design pour mobile
   @media (max-width: 768px) {
-    th, td {
-      padding: 0.5rem;
+    // Masquer l'en-tête du tableau sur mobile
+    thead {
+      display: none;
     }
+
+    // Transformer chaque ligne en carte
+    tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-bg);
+      padding: 0.5rem;
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: var(--color-row-hover-bg);
+      }
+    }
+
+    // Chaque cellule devient un bloc avec un label
+    tbody td {
+      display: block;
+      border: none;
+      padding: 0.25rem 0;
+      text-align: left;
+      
+      &::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: var(--color-text);
+        display: inline-block;
+        min-width: 120px;
+      }
+      
+      &.col-actions {
+        text-align: left;
+        
+        &::before {
+          content: "Actions: ";
+        }
+      }
+    }
+    
     .emoji {
-      font-size: 1rem; // ajuste ici la taille de l’emoji
+      font-size: 1rem;
       line-height: 1;
     }
   }

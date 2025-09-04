@@ -43,6 +43,7 @@
             [class.recu]="gift.delivery?.recu"
             [attr.aria-label]="getAriaLabel(gift)">
           <td *ngFor="let column of displayedColumns"
+              [attr.data-label]="column.label || column.key"
               tabindex="0"
               (keydown.enter)="onGiftClicked(gift)"
               (keydown.space)="onGiftClicked(gift)">

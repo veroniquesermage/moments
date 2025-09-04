@@ -28,14 +28,14 @@
         (click)="onRowClick(gift)"
         (keydown.enter)="onRowClick(gift)"
         (keydown.space)="onRowClick(gift)">
-      <td tabindex="0">{{ gift.gift.destinataire | displayName }}</td>
-      <td>{{ gift.gift.nom }}</td>
-      <td class="col-actions">{{ gift.gift.prix | formatMontant}}</td>
+      <td tabindex="0" data-label="Destinataire">{{ gift.gift.destinataire | displayName }}</td>
+      <td data-label="Nom">{{ gift.gift.nom }}</td>
+      <td class="col-actions" data-label="Prix unitaire (€)">{{ gift.gift.prix | formatMontant}}</td>
       <td
-        class="col-actions">
+        class="col-actions" data-label="Privé">
         {{ gift.giftIdea.visibilite ? 'NON' : 'OUI' }}
       </td>
-      <td class="emoji-action col-actions">
+      <td class="emoji-action col-actions" data-label="Actions">
         <button type="button" class="emoji-button"
                 title="Modifier la visibilité"
                 attr.aria-label="Modifier la visibilité de {{ gift.gift.nom }}">
