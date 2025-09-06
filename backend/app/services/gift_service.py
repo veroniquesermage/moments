@@ -107,6 +107,7 @@ class GiftService:
             case GiftActionEnum.RESERVER:
                 logger.debug(f"L'action est de réserver le cadeau {gift_id} par l'utilisateur {user.id}")
                 if gift.statut == GiftStatusEnum.DISPONIBLE:
+
                     return EligibilityResponse(ok=True, message=CADEAU_DISPONIBLE)
 
             case GiftActionEnum.PRENDRE:
