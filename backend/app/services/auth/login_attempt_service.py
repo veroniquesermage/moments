@@ -21,7 +21,11 @@ class LoginAttemptService:
             return False
 
         if record.tentatives >= LoginAttemptService.MAX_ATTEMPTS:
-            return record.derniere_tentative + LoginAttemptService.BLOCK_DURATION > now_paris()
+            last = record.derniere_tentative
+            # Normalize to timezone-aware datetime if backend (e.g., SQLite) returns naive
+            if last.tzinfo is None:
+                last = last.replace(tzinfo=now_paris().tzinfo)
+            return last + LoginAttemptService.BLOCK_DURATION > now_paris()
         return False
 
     @staticmethod
