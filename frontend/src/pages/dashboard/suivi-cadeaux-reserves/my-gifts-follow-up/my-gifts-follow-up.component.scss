@@ -60,9 +60,71 @@
     cursor: pointer;
   }
 
+  // Responsive design pour mobile
   @media (max-width: 768px) {
-    th, td {
+    // Masquer l'en-tête du tableau sur mobile
+    thead {
+      display: none;
+    }
+
+    // Transformer chaque ligne en carte
+    tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-bg);
       padding: 0.5rem;
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: var(--color-row-hover-bg);
+      }
+      
+      &.recu {
+        background-color: var(--color-received);
+      }
+      
+      &.partage {
+        outline: 2px solid var(--color-sharing);
+        outline-offset: -2px;
+      }
+    }
+
+    // Chaque cellule devient un bloc avec un label
+    tbody td {
+      display: block;
+      border: none;
+      padding: 0.25rem 0;
+      text-align: left;
+      
+      &::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: var(--color-text);
+        display: inline-block;
+        min-width: 120px;
+      }
+    }
+
+    // Style spécial pour la ligne séparateur
+    tbody tr.separator-row {
+      display: block;
+      text-align: center;
+      font-weight: bold;
+      font-style: italic;
+      padding: 1rem;
+      margin: 1rem 0;
+      border: 2px solid var(--color-alt-border);
+      border-radius: 4px;
+      
+      td {
+        display: block;
+        text-align: center;
+        
+        &::before {
+          content: none;
+        }
+      }
     }
   }
 }

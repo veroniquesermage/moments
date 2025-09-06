@@ -14,7 +14,7 @@
       (keydown.enter)="onRowClick(gift)"
       (keydown.space)="onRowClick(gift)">
 
-    <td (click)="$event.stopPropagation()" class=" col-actions">
+    <td (click)="$event.stopPropagation()" class=" col-actions" data-label="Priorité">
       <ng-container *ngIf="userIsTabbing$ | async; else dragHandle">
         <button data-allow-tiers class="drag-handle"
                 (click)="changeOrder(i, 'up')"
@@ -40,9 +40,9 @@
         </button>
       </ng-template>
     </td>
-    <td tabindex="0">{{ gift.nom }}</td>
-    <td>{{ gift.prix | formatMontant}}</td>
-    <td>{{ gift.quantite }}</td>
+    <td tabindex="0" data-label="Nom">{{ gift.nom }}</td>
+    <td data-label="Prix unitaire (€)">{{ gift.prix | formatMontant}}</td>
+    <td data-label="Qté">{{ gift.quantite }}</td>
   </tr>
   </tbody>
 </table>

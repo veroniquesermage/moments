@@ -47,6 +47,7 @@
             [class.gris]="gift.statut === 'PRIS'"
             [attr.aria-label]="getAriaLabel(gift)">
           <td *ngFor="let column of displayedColumns"
+              [attr.data-label]="column.label"
               tabindex="0"
               (keydown.enter)="onGiftClicked(gift)"
               (keydown.space)="onGiftClicked(gift)">

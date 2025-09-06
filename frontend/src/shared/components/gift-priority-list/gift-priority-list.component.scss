@@ -42,9 +42,56 @@
     cursor: pointer;
   }
 
+  // Responsive design pour mobile
   @media (max-width: 768px) {
-    th, td {
+    // Masquer l'en-tête du tableau sur mobile
+    thead {
+      display: none;
+    }
+
+    // Transformer chaque ligne en carte
+    tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-bg);
       padding: 0.5rem;
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: var(--color-row-hover-bg);
+      }
+    }
+
+    // Chaque cellule devient un bloc avec un label
+    tbody td {
+      display: block;
+      border: none;
+      padding: 0.25rem 0;
+      text-align: left;
+      
+      &::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: var(--color-text);
+        display: inline-block;
+        min-width: 120px;
+      }
+      
+      &.col-actions {
+        text-align: left;
+        width: auto;
+        height: auto;
+        
+        &::before {
+          content: "Priorité: ";
+        }
+        
+        .drag-handle {
+          display: inline-block;
+          margin-right: 0.5rem;
+        }
+      }
     }
   }
 }
@@ -59,7 +106,7 @@ th.col-actions, td.col-actions {
   text-align: center !important;
   vertical-align: center !important;
 }
-@media (max-width: 768px) {
+@media (min-width: 769px) {
   th.col-actions, td.col-actions {
     width: 3rem;
     height: 3rem;

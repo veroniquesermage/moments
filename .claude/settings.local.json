@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\pages\\dashboard\\cadeaux-membres\\group-member-gifts/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)",
+      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
