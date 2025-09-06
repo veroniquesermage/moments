@@ -10,8 +10,10 @@ from app.services.gift_service import GiftService
 from app.schemas.gift.gift_create import GiftCreate
 from app.schemas.gift.gift_update import GiftUpdate
 from app.schemas.gift.gift_status import GiftStatus
-from app.core.enum import GiftStatusEnum
-from app.models import User, Gift, GiftIdeas
+from app.schemas.gift import GiftDeliveryUpdate, GiftPurchaseUpdate, GiftPriority
+from app.schemas import UserTiersResponse
+from app.core.enum import GiftActionEnum, GiftStatusEnum, RoleEnum
+from app.models import User, Gift, GiftIdeas, Group, UserGroup, GiftShared
 
 
 class TestGiftServiceFixed:
@@ -24,7 +26,7 @@ class TestGiftServiceFixed:
         # Arrange - Créer tout dans la même session
         user = User(
             email=f"test{uuid4().hex[:8]}@example.com",
-            prenom="Test", 
+            prenom="Test",
             nom="User",
             google_id=f"google{uuid4().hex[:8]}"
         )
@@ -60,7 +62,7 @@ class TestGiftServiceFixed:
         user = User(
             email=f"create{uuid4().hex[:8]}@example.com",
             prenom="Create",
-            nom="User", 
+            nom="User",
             google_id=f"create{uuid4().hex[:8]}"
         )
         unit_db_session.add(user)
@@ -81,7 +83,7 @@ class TestGiftServiceFixed:
         # Assert
         assert result is not None
         assert result.nom == "Nouveau Cadeau"
-        
+
         # Vérifier en base
         gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
         assert len(gifts) == 1
@@ -99,10 +101,10 @@ class TestGiftServiceFixed:
             prenom="User1", nom="Test", google_id=f"user1{uuid4().hex[:8]}"
         )
         user2 = User(
-            email=f"user2{uuid4().hex[:8]}@example.com", 
+            email=f"user2{uuid4().hex[:8]}@example.com",
             prenom="User2", nom="Test", google_id=f"user2{uuid4().hex[:8]}"
         )
-        
+
         unit_db_session.add_all([user1, user2])
         await unit_db_session.commit()
         await unit_db_session.refresh(user1)
@@ -306,3 +308,298 @@ class TestGiftServiceFixed:
         # 4. Vérification finale
         final_gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
         assert len(final_gifts) == 1
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_verify_eligibility_all_paths(unit_db_session):
+    creator = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="C", nom="U")
+    taker = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="T", nom="U")
+    other = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="O", nom="U")
+    unit_db_session.add_all([creator, taker, other])
+    await unit_db_session.commit()
+    for u in (creator, taker, other):
+        await unit_db_session.refresh(u)
+
+    # Disponible gift → RESERVER/PRENDRE OK
+    g1 = Gift(destinataire_id=creator.id, nom="G1", priorite=1, statut=GiftStatusEnum.DISPONIBLE)
+    # Reserved by taker
+    g2 = Gift(destinataire_id=creator.id, nom="G2", priorite=1, statut=GiftStatusEnum.RESERVE, reserve_par_id=taker.id)
+    # Taken by taker
+    g3 = Gift(destinataire_id=creator.id, nom="G3", priorite=1, statut=GiftStatusEnum.PRIS, reserve_par_id=taker.id)
+    unit_db_session.add_all([g1, g2, g3])
+    await unit_db_session.commit()
+    for g in (g1, g2, g3):
+        await unit_db_session.refresh(g)
+
+    el1 = await GiftService.verify_eligibility(unit_db_session, g1.id, other, GiftActionEnum.RESERVER)
+    assert el1.ok is True
+    el2 = await GiftService.verify_eligibility(unit_db_session, g1.id, other, GiftActionEnum.PRENDRE)
+    assert el2.ok is True
+
+    # PRENDRE autorisé si RESERVE par le même utilisateur
+    el3 = await GiftService.verify_eligibility(unit_db_session, g2.id, taker, GiftActionEnum.PRENDRE)
+    assert el3.ok is True
+
+    # ANNULER_RESERVATION quand non réservé → False
+    el4 = await GiftService.verify_eligibility(unit_db_session, g1.id, other, GiftActionEnum.ANNULER_RESERVATION)
+    assert el4.ok is False
+
+    # RETIRER autorisé uniquement si PRIS et par le preneur
+    el5 = await GiftService.verify_eligibility(unit_db_session, g3.id, taker, GiftActionEnum.RETIRER)
+    assert el5.ok is True
+    el6 = await GiftService.verify_eligibility(unit_db_session, g3.id, other, GiftActionEnum.RETIRER)
+    assert el6.ok is False
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_set_gift_delivery_create_and_unauthorized(unit_db_session, mock_trace_service):
+    dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D", nom="D")
+    taker = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="T", nom="T")
+    group_code = uuid4().hex[:10]
+    unit_db_session.add_all([dest, taker])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(dest)
+    await unit_db_session.refresh(taker)
+
+    # group exists only to pass ID around; GiftService.set_gift_detail relies on builders using group membership
+    group = Group(nom_groupe="Gifts", description=None, code=group_code)
+    unit_db_session.add(group)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(group)
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=dest.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=taker.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    gift = Gift(destinataire_id=dest.id, nom="Livraison", priorite=1, statut=GiftStatusEnum.PRIS, reserve_par_id=taker.id)
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    detail = await GiftService.set_gift_delivery(unit_db_session, taker, gift.id, True, group.id)
+    assert detail.delivery and detail.delivery.recu is True
+
+    # Unauthorized user
+    with pytest.raises(HTTPException):
+        await GiftService.set_gift_delivery(unit_db_session, dest, gift.id, False, group.id)
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_update_gift_purchase_paths(unit_db_session, mock_trace_service):
+    dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D", nom="D")
+    taker = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="T", nom="T")
+    tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="X", nom="Y", is_compte_tiers=True)
+    group = Group(nom_groupe="GP", description=None, code=uuid4().hex[:10])
+    unit_db_session.add_all([dest, taker, tiers, group])
+    await unit_db_session.commit()
+    for u in (dest, taker, tiers, group):
+        await unit_db_session.refresh(u)
+
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=dest.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=taker.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=tiers.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    gift = Gift(destinataire_id=dest.id, nom="Achat", priorite=1, statut=GiftStatusEnum.PRIS, reserve_par_id=taker.id)
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    # Success: set prix/commentaire/compte_tiers
+    upd = GiftPurchaseUpdate(gift_id=gift.id, prix_reel=42.5, commentaire="note", compte_tiers=UserTiersResponse(
+        id=tiers.id, prenom=tiers.prenom, nom=tiers.nom, surnom=None, is_compte_tiers=True
+    ))
+    await GiftService.update_gift_purchase(unit_db_session, taker, gift.id, upd)
+
+    # Unauthorized user
+    upd2 = GiftPurchaseUpdate(gift_id=gift.id, prix_reel=None, commentaire=None, compte_tiers=None)
+    with pytest.raises(HTTPException):
+        await GiftService.update_gift_purchase(unit_db_session, dest, gift.id, upd2)
+
+
+    # ---------------------------------------------------------------------
+    # Additional coverage: update_all_gifts, get_visible_gifts_for_member,
+    # update_gift_delivery, get_gifts_by_account, define_user_role
+    # ---------------------------------------------------------------------
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_update_all_gifts_order_and_forbidden(unit_db_session):
+    owner = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Own", nom="Er")
+    other = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Oth", nom="Er")
+    unit_db_session.add_all([owner, other])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(owner)
+    await unit_db_session.refresh(other)
+
+    g1 = Gift(destinataire_id=owner.id, nom="A", priorite=1, statut=GiftStatusEnum.DISPONIBLE)
+    g2 = Gift(destinataire_id=owner.id, nom="B", priorite=2, statut=GiftStatusEnum.DISPONIBLE)
+    unit_db_session.add_all([g1, g2])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(g1)
+    await unit_db_session.refresh(g2)
+
+    # Reorder priorities
+    payload = [GiftPriority(id=g1.id, priority=2), GiftPriority(id=g2.id, priority=1)]
+    updated = await GiftService.update_all_gifts(unit_db_session, owner, payload)
+    assert [g.nom for g in updated] == ["B", "A"]
+
+    # Add a gift from another user → forbidden
+    g3 = Gift(destinataire_id=other.id, nom="C", priorite=3, statut=GiftStatusEnum.DISPONIBLE)
+    unit_db_session.add(g3)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(g3)
+
+    with pytest.raises(HTTPException):
+        await GiftService.update_all_gifts(unit_db_session, owner, [GiftPriority(id=g3.id, priority=1)])
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_get_visible_gifts_for_member_visibility(unit_db_session):
+    proposer = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Pro", nom="P")
+    dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Des", nom="T")
+    unit_db_session.add_all([proposer, dest])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(proposer)
+    await unit_db_session.refresh(dest)
+
+    # Gift with no idea (visible)
+    g_no = Gift(destinataire_id=dest.id, nom="NoIdea", priorite=1, statut=GiftStatusEnum.DISPONIBLE)
+    # Gift with hidden idea
+    idea_hidden = GiftIdeas(proposee_par_id=proposer.id, visibilite=False)
+    # Gift with visible idea
+    idea_visible = GiftIdeas(proposee_par_id=proposer.id, visibilite=True)
+    unit_db_session.add_all([g_no, idea_hidden, idea_visible])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(idea_hidden)
+    await unit_db_session.refresh(idea_visible)
+
+    g_hidden = Gift(destinataire_id=dest.id, nom="Hidden", priorite=2, statut=GiftStatusEnum.DISPONIBLE, gift_idea_id=idea_hidden.id)
+    g_visible = Gift(destinataire_id=dest.id, nom="Visible", priorite=3, statut=GiftStatusEnum.DISPONIBLE, gift_idea_id=idea_visible.id)
+    unit_db_session.add_all([g_hidden, g_visible])
+    await unit_db_session.commit()
+
+    visible = await GiftService.get_visible_gifts_for_member(unit_db_session, dest.id)
+    names = [g.nom for g in visible]
+    assert "NoIdea" in names
+    assert "Visible" in names
+    assert "Hidden" not in names
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_update_gift_delivery_update_existing_and_unauthorized(unit_db_session, mock_trace_service):
+    u = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="U", nom="U")
+    other = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="O", nom="O")
+    group = Group(nom_groupe="GLiv", description=None, code=uuid4().hex[:10])
+    unit_db_session.add_all([u, other, group])
+    await unit_db_session.commit()
+    for o in (u, other, group):
+        await unit_db_session.refresh(o)
+
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=u.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=other.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    gift = Gift(destinataire_id=u.id, nom="Liv", priorite=1, statut=GiftStatusEnum.PRIS, reserve_par_id=u.id)
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    upd = GiftDeliveryUpdate(lieu_livraison="Maison", recu=False)
+    res = await GiftService.update_gift_delivery(unit_db_session, u, gift.id, upd)
+    assert res.lieu_livraison == "Maison"
+
+    with pytest.raises(HTTPException):
+        await GiftService.update_gift_delivery(unit_db_session, other, gift.id, GiftDeliveryUpdate(lieu_livraison="X"))
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_get_gifts_by_account_grouping_and_totals(unit_db_session, mock_trace_service):
+    current = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Cur", nom="R")
+    dest1 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D1", nom="N")
+    dest2 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D2", nom="N")
+    tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Tiers", nom="N")
+    group = Group(nom_groupe="GAcc", description=None, code=uuid4().hex[:10])
+    unit_db_session.add_all([current, dest1, dest2, tiers, group])
+    await unit_db_session.commit()
+    for o in (current, dest1, dest2, tiers, group):
+        await unit_db_session.refresh(o)
+
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=current.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=dest1.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=dest2.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=tiers.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    # Gift followed (reserved by current) with purchase info in my name
+    g_follow_mine = Gift(destinataire_id=dest1.id, nom="Mine", priorite=1, statut=GiftStatusEnum.PRIS, reserve_par_id=current.id)
+    # Gift followed (reserved by current) with purchase info under tiers
+    g_follow_tiers = Gift(destinataire_id=dest2.id, nom="TiersGift", priorite=2, statut=GiftStatusEnum.PRIS, reserve_par_id=current.id)
+    # Gift shared where current is participant (montant used)
+    g_shared = Gift(destinataire_id=dest1.id, nom="Shared", priorite=3, statut=GiftStatusEnum.PARTAGE, reserve_par_id=dest2.id)
+    unit_db_session.add_all([g_follow_mine, g_follow_tiers, g_shared])
+    await unit_db_session.commit()
+    for g in (g_follow_mine, g_follow_tiers, g_shared):
+        await unit_db_session.refresh(g)
+
+    # Add partage for g_shared where current participates
+    ps = GiftShared(preneur_id=dest2.id, participant_id=current.id, cadeau_id=g_shared.id, montant=20.0, rembourse=False)
+    unit_db_session.add(ps)
+    await unit_db_session.commit()
+
+    # Add purchase info via service for both followed gifts
+    upd_mine = GiftPurchaseUpdate(gift_id=g_follow_mine.id, prix_reel=30.0, commentaire=None, compte_tiers=None)
+    await GiftService.update_gift_purchase(unit_db_session, current, g_follow_mine.id, upd_mine)
+
+    upd_tiers = GiftPurchaseUpdate(
+        gift_id=g_follow_tiers.id, prix_reel=70.0, commentaire=None,
+        compte_tiers=UserTiersResponse(id=tiers.id, prenom=tiers.prenom, nom=tiers.nom, surnom=None, is_compte_tiers=True)
+    )
+    await GiftService.update_gift_purchase(unit_db_session, current, g_follow_tiers.id, upd_tiers)
+
+    grouped = await GiftService.get_gifts_by_account(unit_db_session, current, group.id)
+    labels = {g.account_label: g.total for g in grouped}
+    totals = sorted(round(float(t), 2) for t in labels.values())
+    # At minimum, the shared gift contribution (20.0) must be present
+    assert 20.0 in totals
+
+
+@pytest.mark.unit
+def test_define_user_role_cases():
+    # Minimal in-memory Gift-like object using actual models for consistency
+    creator = User(id=1, email="a@b", prenom="A")
+    taker = User(id=2, email="c@d", prenom="B")
+    gift = Gift(destinataire_id=creator.id, nom="X", priorite=1, statut=GiftStatusEnum.DISPONIBLE, reserve_par_id=taker.id)
+    # Attach related objects minimalistically
+    gift.destinataire = creator
+    gift.reserve_par = taker
+
+    from app.core.enum import RoleUtilisateur
+    # CREATEUR
+    assert GiftService.define_user_role(creator, gift, []) == RoleUtilisateur.CREATEUR
+    # PRENEUR
+    assert GiftService.define_user_role(taker, gift, []) == RoleUtilisateur.PRENEUR
+    # PARTICIPANT
+    from app.schemas import UserDisplaySchema
+    from app.schemas.gift import GiftSharedSchema
+    participant = User(id=3, email="p@q", prenom="P")
+    partages = [GiftSharedSchema(id=1, preneur=UserDisplaySchema(id=taker.id, prenom=taker.prenom), cadeau_id=42,
+                                 participant=UserDisplaySchema(id=participant.id, prenom=participant.prenom), montant=10.0, rembourse=False)]
+    assert GiftService.define_user_role(participant, gift, partages) == RoleUtilisateur.PARTICIPANT
+    # SPECTATEUR
+    stranger = User(id=4, email="s@t", prenom="S")
+    assert GiftService.define_user_role(stranger, gift, partages) == RoleUtilisateur.SPECTATEUR

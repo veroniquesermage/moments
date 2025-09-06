@@ -2,6 +2,8 @@ import pytest
 from uuid import uuid4
 from sqlalchemy import text
 
+from fastapi import HTTPException
+
 from app.core.enum import RoleEnum
 from app.models import User, Group, UserGroup
 from app.schemas import UserDisplaySchema, ExportManagedAccountRequest
@@ -202,3 +204,43 @@ async def test_get_users_with_shared_groups(unit_db_session):
 
     users = await UserGroupService.get_users_with_shared_groups(unit_db_session, [g1.id, g2.id], a.id)
     assert {u.id for u in users} == {b.id, c.id}
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_remove_tiers_from_group_success_and_errors(unit_db_session, mock_trace_service):
+    parent = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Par", nom="Ent")
+    tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Kid", nom="K", is_compte_tiers=True)
+    stranger = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Str", nom="A")
+    group = Group(nom_groupe="GRT", description=None, code=uuid4().hex[:10])
+    unit_db_session.add_all([parent, tiers, stranger, group])
+    await unit_db_session.commit()
+    for o in (parent, tiers, stranger, group):
+        await unit_db_session.refresh(o)
+
+    # Assign management
+    tiers.gere_par = parent.id
+    await unit_db_session.commit()
+
+    # Add tiers to group
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=parent.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=tiers.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    # Success removal by parent
+    await UserGroupService.remove_tiers_from_group(unit_db_session, parent, group.id, tiers.id)
+    left = (await unit_db_session.execute(
+        text("SELECT 1 FROM utilisateur_groupe WHERE utilisateur_id = :u AND groupe_id = :g"),
+        {"u": tiers.id, "g": group.id},
+    )).first()
+    assert left is None
+
+    # Error: not managed by current user
+    with pytest.raises(HTTPException):
+        await UserGroupService.remove_tiers_from_group(unit_db_session, stranger, group.id, tiers.id)
+
+    # Error: not in group
+    with pytest.raises(HTTPException):
+        await UserGroupService.remove_tiers_from_group(unit_db_session, parent, group.id, tiers.id)
