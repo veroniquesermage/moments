@@ -64,6 +64,23 @@ export class GiftFormComponent implements OnChanges{
     // Remplace virgule par point
     cleaned = cleaned.replace(',', '.');
 
+    // Validation du format décimal (permet les nombres avec point décimal)
+    const decimalPattern = /^[0-9]*\.?[0-9]*$/;
+    
+    if (!decimalPattern.test(cleaned) && cleaned !== '') {
+      // Format invalide, on restaure la valeur précédente
+      const currentControl = this.giftForm.get(key);
+      input.value = currentControl?.value?.toString() || '';
+      return;
+    }
+
+    // Si c'est vide ou juste un point, on met à jour le form control mais on garde l'affichage
+    if (cleaned === '' || cleaned === '.') {
+      this.giftForm.get(key)?.setValue(cleaned === '' ? null : 0);
+      input.value = cleaned;
+      return;
+    }
+
     // Parse en nombre
     const valueAsNumber = parseFloat(cleaned);
 
@@ -81,10 +98,11 @@ export class GiftFormComponent implements OnChanges{
 
       // ✅ Tout est bon, met à jour le champ proprement
       this.giftForm.get(key)?.setValue(valueAsNumber);
-      input.value = valueAsNumber.toString(); // on synchronise l'affichage
+      // Garde l'affichage tel que saisi par l'utilisateur (avec le point décimal si présent)
+      input.value = cleaned;
     } else {
-      // pas un nombre valide ? on laisse l’utilisateur corriger, mais on ne fait rien
-      this.giftForm.get(key)?.setValue(undefined);
+      // pas un nombre valide ? on laisse l'utilisateur corriger
+      this.giftForm.get(key)?.setValue(null);
     }
   }
 
