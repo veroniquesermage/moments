@@ -107,6 +107,7 @@ class GiftService:
             case GiftActionEnum.RESERVER:
                 logger.debug(f"L'action est de réserver le cadeau {gift_id} par l'utilisateur {user.id}")
                 if gift.statut == GiftStatusEnum.DISPONIBLE:
+
                     return EligibilityResponse(ok=True, message=CADEAU_DISPONIBLE)
 
             case GiftActionEnum.PRENDRE:
@@ -161,7 +162,10 @@ class GiftService:
         if not existing:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
-        if updates.destinataire_id != current_user.id and (existing.gift_idea.proposee_par.id != current_user.id):
+        if updates.destinataire_id != current_user.id and (
+            not existing.gift_idea or 
+            existing.gift_idea.proposee_par_id != current_user.id
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="❌ Vous ne pouvez modifier que vos propres cadeaux ou idées."
