@@ -166,6 +166,8 @@ docker exec -it moments-postgres psql -U Mom3ntsAdm1n moments
 
 ## Testing Strategy
 
+**Test code not Framework !**
+
 ### Backend Testing Framework & Structure
 
 **Testing Stack:**
