@@ -35,3 +35,4 @@ pgbouncer/userlist-prod.txt
 # claude code
 .claude/
 .claude-*/
+.claude-*/**
