@@ -81,6 +81,12 @@ async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
 # 7) Routes
 app.include_router(router)
 
+# 8) Event handlers
+@app.on_event("shutdown")
+async def shutdown_event():
+    from app.core.http_clients import close_http_clients
+    await close_http_clients()
+
 @app.get("/")
 async def read_root():
     return {"message": "🎁 Bienvenue sur (Moments) avec FastAPI"}
