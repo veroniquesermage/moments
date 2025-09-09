@@ -166,7 +166,66 @@ docker exec -it moments-postgres psql -U Mom3ntsAdm1n moments
 
 ## Testing Strategy
 
-**Test code not Framework !**
+### Testing Directives for Claude
+
+**MANDATORY TESTING WORKFLOW:**
+
+1. **Before any code modification**: Always run existing tests to ensure current codebase is stable
+   ```bash
+   # Backend
+   pytest
+
+   # Frontend
+   ng test --watch=false --browsers=ChromeHeadless
+   ```
+
+2. **After any code implementation**:
+   - Write comprehensive tests covering the new/modified functionality
+   - Ensure all tests pass before considering the task complete
+   - Test coverage should include happy path, edge cases, and error scenarios
+
+3. **Test-First Approach for new features**:
+   - Write failing tests first (when possible)
+   - Implement code to make tests pass
+   - Refactor while keeping tests green
+
+**Code Quality Gates:**
+- **No code without tests**: Every new function, method, or feature must have corresponding tests
+- **No broken tests**: All existing tests must continue to pass
+- **Business logic coverage**: Focus on service layer testing for backend, component logic for frontend
+- **Error handling**: Test error scenarios and edge cases explicitly
+
+**Testing Standards:**
+- **Backend**: Minimum 80% test coverage on service layer
+- **Frontend**: Component logic and service methods must be tested
+- **Integration**: Critical user workflows must have integration tests
+- **Performance**: Include performance regression tests for optimizations
+
+**Test Categories to Always Include:**
+```python
+# Backend example structure for any new service method
+async def test_[method_name]_success():
+    """Test successful execution"""
+    pass
+
+async def test_[method_name]_validation_error():
+    """Test input validation failures"""
+    pass
+
+async def test_[method_name]_permission_denied():
+    """Test unauthorized access"""
+    pass
+
+async def test_[method_name]_not_found():
+    """Test resource not found scenarios"""
+    pass
+```
+
+**Before submitting any code change:**
+1. Run full test suite: `pytest` and `ng test`
+2. Check test coverage: `pytest --cov=app --cov-report=term-missing`
+3. Verify no regressions in existing functionality
+4. Confirm new functionality is properly tested
 
 ### Backend Testing Framework & Structure
 

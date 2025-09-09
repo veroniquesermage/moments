@@ -1,49 +1,51 @@
 import pytest
+from unittest.mock import AsyncMock, MagicMock
 
 from app.services.auth.google_auth_service import exchange_code_for_tokens
-
-
-class DummyResponse:
-    def __init__(self, status_code: int, payload: dict):
-        self.status_code = status_code
-        self._payload = payload
-
-    def json(self):
-        return self._payload
-
-
-class DummyClient:
-    def __init__(self, status_code: int, payload: dict):
-        self._resp = DummyResponse(status_code, payload)
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc, tb):
-        return False
-
-    async def post(self, url, data=None):
-        return self._resp
 
 
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_exchange_code_for_tokens_success(monkeypatch):
-    def fake_client(*args, **kwargs):
-        return DummyClient(200, {"id_token": "xyz", "access_token": "abc"})
-
-    monkeypatch.setattr("httpx.AsyncClient", fake_client)
+    """Test l'échange réussi de code OAuth contre tokens"""
+    # Mock de la réponse Google
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"id_token": "xyz", "access_token": "abc"}
+    mock_response.content = b'{"id_token": "xyz", "access_token": "abc"}'
+    
+    # Mock du client HTTP persistant
+    mock_google_client = AsyncMock()
+    mock_google_client.post.return_value = mock_response
+    
+    # Remplace google_client par le mock
+    monkeypatch.setattr("app.services.auth.google_auth_service.google_client", mock_google_client)
+    
     tokens = await exchange_code_for_tokens("code", "verifier")
+    
     assert tokens["id_token"] == "xyz"
+    assert tokens["access_token"] == "abc"
+    mock_google_client.post.assert_called_once()
 
 
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_exchange_code_for_tokens_failure(monkeypatch):
-    def fake_client(*args, **kwargs):
-        return DummyClient(400, {})
-
-    monkeypatch.setattr("httpx.AsyncClient", fake_client)
+    """Test l'échec de l'échange OAuth (erreur Google)"""
+    # Mock de la réponse d'erreur Google
+    mock_response = MagicMock()
+    mock_response.status_code = 400
+    mock_response.content = b'{"error": "invalid_grant"}'
+    
+    # Mock du client HTTP persistant
+    mock_google_client = AsyncMock()
+    mock_google_client.post.return_value = mock_response
+    
+    # Remplace google_client par le mock
+    monkeypatch.setattr("app.services.auth.google_auth_service.google_client", mock_google_client)
+    
     with pytest.raises(Exception):
         await exchange_code_for_tokens("code", "verifier")
+    
+    mock_google_client.post.assert_called_once()
 
