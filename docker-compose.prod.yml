@@ -43,6 +43,9 @@ services:
     environment:
       PGBOUNCER_AUTH_TYPE: plain
       ADMIN_USERS: ${POSTGRES_USER}
+    labels:
+      - "logging=promtail"
+      - "logging.jobname=moments-backend"
 
   frontend:
     build:
@@ -54,5 +57,77 @@ services:
     ports:
       - "8080:80"
 
+  # === METRICS EXPORTERS ===
+  pgbouncer-exporter:
+    image: prometheuscommunity/pgbouncer-exporter
+    container_name: moments-pgbouncer-exporter
+    restart: unless-stopped
+    depends_on:
+      - pgbouncer
+    ports:
+      - "9127:9127"
+    environment:
+      - PGBOUNCER_EXPORTER_WEB_LISTEN_ADDRESS=0.0.0.0:9127
+    command:
+      - '--pgBouncer.connectionString=postgresql://${PGBOUNCER_STATS_USER:-stats}:${PGBOUNCER_STATS_PASSWORD:-super-secret-password}@pgbouncer:6432/pgbouncer?sslmode=disable'
+
+  # === MONITORING STACK ===
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: moments-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: moments-promtail
+    restart: unless-stopped
+    depends_on:
+      - loki
+    volumes:
+      # Configuration
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml
+      
+      # Application logs
+      - ./backend/logs:/app/logs:ro
+      
+      # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      
+      # System logs
+      - /var/log:/var/log:ro
+      
+      # PostgreSQL logs (si disponibles sur l'hôte)
+      - /var/lib/postgresql/data/log:/var/lib/postgresql/data/log:ro
+      
+      # Logs de monitoring (créés par les autres containers)
+      - /var/log/grafana:/var/log/grafana:ro
+      - /var/log/loki:/var/log/loki:ro
+      - /var/log/prometheus:/var/log/prometheus:ro
+    command: -config.file=/etc/promtail/config.yml
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: moments-grafana
+    restart: unless-stopped
+    depends_on:
+      - loki
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=moments2024!
+      - GF_USERS_ALLOW_SIGN_UP=false
+
 volumes:
   pgdata:
+  loki-data:
+  grafana-data:
