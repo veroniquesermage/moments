@@ -57,7 +57,61 @@ services:
     ports:
       - "8080:80"
 
-  # === METRICS EXPORTERS ===
+  # === METRICS & TRACING STACK ===
+
+  # Collecte des métriques
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: moments-prometheus
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+
+  # Collecteur de traces
+  tempo:
+    image: grafana/tempo:2.3.0
+    container_name: moments-tempo
+    restart: unless-stopped
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    ports:
+      - "3200:3200"    # Tempo API
+      - "4317:4317"    # OTLP gRPC (traces OpenTelemetry)  
+      - "4318:4318"    # OTLP HTTP (traces OpenTelemetry)
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - tempo-data:/tmp/tempo
+
+  # Gestionnaire d'alertes
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: moments-alertmanager
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+
+  # Exporteur PgBouncer
   pgbouncer-exporter:
     image: prometheuscommunity/pgbouncer-exporter
     container_name: moments-pgbouncer-exporter
@@ -69,9 +123,9 @@ services:
     environment:
       - PGBOUNCER_EXPORTER_WEB_LISTEN_ADDRESS=0.0.0.0:9127
     command:
-      - '--pgBouncer.connectionString=postgresql://${PGBOUNCER_STATS_USER:-stats}:${PGBOUNCER_STATS_PASSWORD:-super-secret-password}@pgbouncer:6432/pgbouncer?sslmode=disable'
+      - '--pgBouncer.connectionString=postgresql://${PGBOUNCER_STATS_USER}:${PGBOUNCER_STATS_PASSWORD}@pgbouncer:6432/pgbouncer?sslmode=disable'
 
-  # === MONITORING STACK ===
+  # === LOG COLLECTION ===
   loki:
     image: grafana/loki:3.0.0
     container_name: moments-loki
@@ -92,20 +146,20 @@ services:
     volumes:
       # Configuration
       - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml
-      
+
       # Application logs
       - ./backend/logs:/app/logs:ro
-      
+
       # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      
+
       # System logs
       - /var/log:/var/log:ro
-      
+
       # PostgreSQL logs (si disponibles sur l'hôte)
       - /var/lib/postgresql/data/log:/var/lib/postgresql/data/log:ro
-      
+
       # Logs de monitoring (créés par les autres containers)
       - /var/log/grafana:/var/log/grafana:ro
       - /var/log/loki:/var/log/loki:ro
@@ -118,6 +172,7 @@ services:
     restart: unless-stopped
     depends_on:
       - loki
+      - tempo
     ports:
       - "3000:3000"
     volumes:
@@ -129,5 +184,8 @@ services:
 
 volumes:
   pgdata:
+  prometheus-data:
+  tempo-data:
+  alertmanager-data:
   loki-data:
   grafana-data:

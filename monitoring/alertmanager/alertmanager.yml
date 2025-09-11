@@ -1,0 +1,33 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'app.moments.ep@gmail.com'
+  smtp_auth_username: 'app.moments.ep@gmail.com'
+  smtp_auth_password: 'ibas bzat uzgn ioga'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'email-alerts'
+
+receivers:
+- name: 'email-alerts'
+  email_configs:
+  - to: 'app.moments.ep@gmail.com'
+    headers:
+      Subject: '🚨 [ALERT] Moments API - {{ .GroupLabels.alertname }}'
+    html: |
+      <h2>🚨 Alerte Moments</h2>
+      <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+      <p><strong>Status:</strong> {{ .Status }}</p>
+      <p><strong>Instance:</strong> {{ .GroupLabels.instance }}</p>
+      <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+      <p><strong>Time:</strong> {{ .FireTime }}</p>
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']

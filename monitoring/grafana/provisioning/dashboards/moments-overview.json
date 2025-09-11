@@ -1,0 +1,251 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Moments - Overview (Logs + Métriques + Traces)",
+    "tags": ["moments", "overview"],
+    "style": "dark",
+    "timezone": "Europe/Paris",
+    "editable": true,
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "🔴 Backend Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"moments-backend\"}",
+            "legendFormat": "Backend Status",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"text": "DOWN"}}, "type": "value"},
+              {"options": {"1": {"text": "UP"}}, "type": "value"}
+            ]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "📊 Requêtes/sec",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"moments-backend\"}[5m])",
+            "legendFormat": "RPS",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "⚡ Latence P95",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"moments-backend\"}[5m]))",
+            "legendFormat": "P95 Latency",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 0.5},
+                {"color": "red", "value": 2}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "❌ Taux d'erreur",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"moments-backend\",status=~\"4..|5..\"}[5m]) / rate(http_requests_total{job=\"moments-backend\"}[5m]) * 100",
+            "legendFormat": "Error Rate %",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "📈 Latence par Endpoint (dernières 30min)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"moments-backend\"}[5m])) by (method, handler)",
+            "legendFormat": "{{method}} {{handler}} (P95)",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"moments-backend\"}[5m])) by (method, handler)",
+            "legendFormat": "{{method}} {{handler}} (P50)",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "🗄️ PgBouncer - Connexions & Latence",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "pgbouncer_pools_client_active_connections",
+            "legendFormat": "Connexions actives - {{database}}",
+            "refId": "A"
+          },
+          {
+            "expr": "pgbouncer_stats_queries_duration_seconds",
+            "legendFormat": "Latence SQL - {{database}}",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 4
+        }
+      },
+      {
+        "id": 7,
+        "title": "🔍 Traces Récentes (Endpoint lents > 500ms)",
+        "type": "traces",
+        "targets": [
+          {
+            "query": "service.name=\"moments-api\" duration>500ms",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 12
+        },
+        "options": {
+          "limit": 20
+        }
+      },
+      {
+        "id": 8,
+        "title": "📋 Logs d'Erreurs Récents",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"moments-app\",level=\"ERROR\"} or {job=\"moments-app\",level=\"WARNING\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 20
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 9,
+        "title": "🔗 Corrélation: Traces SQL Lentes",
+        "type": "traces",
+        "targets": [
+          {
+            "query": "service.name=\"moments-api\" component=\"database\" duration>200ms",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 20
+        },
+        "options": {
+          "limit": 10
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}
