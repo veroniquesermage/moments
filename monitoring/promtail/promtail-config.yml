@@ -1,0 +1,217 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # === APPLICATION LOGS ===
+  
+  # Logs de l'application FastAPI principale
+  - job_name: moments-app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: moments-app
+          service: backend
+          log_type: application
+          __path__: /app/logs/app.log
+    pipeline_stages:
+      - regex:
+          expression: '^\[(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] (?P<level>\w+) - (?P<logger>\S+) - (?P<message>.*)'
+      - labels:
+          level:
+          logger:
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02 15:04:05"
+
+  # Logs des scripts (cleanup, backup, cron, etc.)
+  - job_name: moments-scripts
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: moments-scripts
+          service: scripts
+          log_type: scripts
+          __path__: /app/logs/*.log
+    pipeline_stages:
+      - match:
+          selector: '{__path__=~"/app/logs/(cleanup|backup|run_cleanup)\\.log"}'
+          stages:
+            - regex:
+                expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (?P<level>\w+): (?P<message>.*)'
+            - labels:
+                level:
+            - timestamp:
+                source: timestamp
+                format: "2006-01-02 15:04:05"
+
+  # === CONTAINER LOGS ===
+  
+  # Logs des containers Docker (stdout/stderr)
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container_name'
+      - source_labels: ['__meta_docker_container_image']
+        target_label: 'container_image'  
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'log_stream'
+      - target_label: 'job'
+        replacement: 'docker-containers'
+      - target_label: 'log_type'
+        replacement: 'container'
+    pipeline_stages:
+      - cri: {}
+
+  # === INFRASTRUCTURE LOGS ===
+
+  # Logs PostgreSQL
+  - job_name: postgresql
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: postgresql
+          service: database
+          log_type: infrastructure
+          __path__: /var/lib/postgresql/data/log/*.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) \w+ \[(?P<pid>\d+)\] (?P<level>\w+): (?P<message>.*)'
+      - labels:
+          level:
+          pid:
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02 15:04:05.000000"
+
+  # Logs PgBouncer
+  - job_name: pgbouncer
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: pgbouncer
+          service: connection-pool
+          log_type: infrastructure
+          __path__: /var/log/pgbouncer/*.log
+
+  # === SYSTEM LOGS ===
+  
+  # Logs système (syslog)
+  - job_name: syslog
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          service: system
+          log_type: system
+          __path__: /var/log/syslog
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\w{3}\s+\d{1,2} \d{2}:\d{2}:\d{2}) (?P<hostname>\S+) (?P<program>[^:\[]+)(?:\[(?P<pid>\d+)\])?: (?P<message>.*)'
+      - labels:
+          hostname:
+          program:
+          pid:
+
+  # Logs auth (authentification système)
+  - job_name: auth-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: auth-logs
+          service: system
+          log_type: security
+          __path__: /var/log/auth.log
+
+  # === MONITORING LOGS ===
+  
+  # Logs Prometheus (si vous l'utilisez)
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: prometheus
+          service: monitoring
+          log_type: monitoring
+          __path__: /var/log/prometheus/*.log
+
+  # Logs Grafana
+  - job_name: grafana-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: grafana
+          service: monitoring
+          log_type: monitoring
+          __path__: /var/log/grafana/*.log
+
+  # Logs Loki lui-même
+  - job_name: loki-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: loki
+          service: monitoring
+          log_type: monitoring
+          __path__: /var/log/loki/*.log
+
+  # === OPENTELEMETRY LOGS ===
+  
+  # Logs OpenTelemetry/OTLP
+  - job_name: opentelemetry
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: opentelemetry
+          service: tracing
+          log_type: telemetry
+          __path__: /var/log/opentelemetry/*.log
+
+  # === NGINX/REVERSE PROXY LOGS ===
+  
+  # Logs Nginx (si vous en avez)
+  - job_name: nginx-access
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: web-server
+          log_type: access
+          __path__: /var/log/nginx/access.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<timestamp>[^\]]+)\] "(?P<method>\S+) (?P<path>\S+) (?P<protocol>\S+)" (?P<status>\d+) (?P<bytes>\d+)'
+      - labels:
+          method:
+          status:
+          remote_addr:
+
+  - job_name: nginx-error
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: web-server
+          log_type: error
+          __path__: /var/log/nginx/error.log

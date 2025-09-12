@@ -1,0 +1,231 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Moments - Application Logs",
+    "tags": ["moments", "logs"],
+    "style": "dark",
+    "timezone": "Europe/Paris",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    },
+    "refresh": "10s",
+    "schemaVersion": 27,
+    "version": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "Log Levels Over Time",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(count_over_time({job=\"moments-backend\",level=\"ERROR\"}[5m]))",
+            "legendFormat": "Errors",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(count_over_time({job=\"moments-backend\",level=\"WARNING\"}[5m]))",
+            "legendFormat": "Warnings", 
+            "refId": "B"
+          },
+          {
+            "expr": "sum(count_over_time({job=\"moments-backend\",level=\"INFO\"}[5m]))",
+            "legendFormat": "Info",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "list",
+              "orientation": "horizontal"
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "All Application & Script Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{log_type=\"application\"} or {log_type=\"scripts\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Container Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{log_type=\"container\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 6,
+        "title": "Infrastructure Logs (PostgreSQL, PgBouncer)",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{log_type=\"infrastructure\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 7,
+        "title": "System & Security Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{log_type=\"system\"} or {log_type=\"security\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 8,
+        "title": "Monitoring & Telemetry Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{log_type=\"monitoring\"} or {log_type=\"telemetry\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Logs Only",
+        "type": "logs", 
+        "targets": [
+          {
+            "expr": "{job=\"moments-backend\",level=\"ERROR\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 20
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Container Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{container_name=~\"moments-.*\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 20
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}

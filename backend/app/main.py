@@ -90,3 +90,7 @@ async def shutdown_event():
 @app.get("/")
 async def read_root():
     return {"message": "🎁 Bienvenue sur (Moments) avec FastAPI"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "moments-api"}
