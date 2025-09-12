@@ -1,4 +1,4 @@
-import {Injectable, signal} from '@angular/core';
+import {Injectable, signal, inject} from '@angular/core';
 import {environment} from 'src/environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
@@ -16,59 +16,82 @@ import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.mode
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {GiftPurchaseUpdate} from 'src/core/models/gift/gift-purchase-update.model';
 import {GiftFollowedByAccount} from 'src/core/models/gift/gift-followed-by-account.model';
+import {PaginatedResponse} from 'src/core/models/common/pagination.model';
+import {ResponsiveService} from 'src/core/services/responsive.service';
 
 @Injectable({providedIn: 'root'})
 export class GiftService {
 
   private apiUrl = environment.backendBaseUrl + environment.api.cadeaux;
-  giftsResponse = signal<GiftResponse[]>([])
-  giftsFollowed = signal<GiftFollowedByAccount[]>([])
+  
+  // Signaux pour les données paginées
+  giftsResponse = signal<PaginatedResponse<GiftResponse> | null>(null);
+  giftsFollowed = signal<PaginatedResponse<GiftFollowedByAccount> | null>(null);
   isLoading = signal<boolean>(false);
+
+  private responsiveService = inject(ResponsiveService);
 
   constructor(private http: HttpClient,
               private groupContextService: GroupContextService) {
   }
 
-  async fetchGifts(userId?: number): Promise<ApiResponse<GiftResponse[]>> {
+  async fetchGifts(
+    userId?: number, 
+    page: number = 1,
+    customLimit?: number
+  ): Promise<ApiResponse<PaginatedResponse<GiftResponse>>> {
 
     this.isLoading.set(true);
 
-    let params = new HttpParams();
+    const limit = customLimit || this.responsiveService.getPageSizeForContext('user-gifts');
+    
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+      
     if (userId != null) {
       params = params.set('userId', userId.toString());
     }
 
     try {
-      const giftsResponse = await firstValueFrom(
-        this.http.get<GiftResponse[]>(this.apiUrl, {
-          params: params
-        })
+      const response = await firstValueFrom(
+        this.http.get<PaginatedResponse<GiftResponse>>(this.apiUrl, { params })
       );
 
-      this.giftsResponse.set(giftsResponse);
-
-      return {success: true, data: giftsResponse};
+      this.giftsResponse.set(response);
+      return {success: true, data: response};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux', error);
-
       return {success: false, message: "Impossible de récupérer les cadeaux."};
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  async getVisibleGiftsForMember(userId: number): Promise<ApiResponse<GiftPublicResponse[]>> {
+  async getVisibleGiftsForMember(
+    userId: number, 
+    page: number = 1,
+    customLimit?: number
+  ): Promise<ApiResponse<PaginatedResponse<GiftPublicResponse>>> {
+    
+    const limit = customLimit || this.responsiveService.getPageSizeForContext('member-gifts');
     const idEnc = encodeURIComponent(userId);
+    
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+      
     const url = `${this.apiUrl}/membre/${idEnc}`;
+    
     try {
-      const giftsResponse = await firstValueFrom(
-        this.http.get<GiftPublicResponse[]>(url)
+      const response = await firstValueFrom(
+        this.http.get<PaginatedResponse<GiftPublicResponse>>(url, { params })
       );
-      return {success: true, data: giftsResponse};
+      return {success: true, data: response};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux d\'un membre', error);
-      return {success: false, message: "❌ Impossible de créer le cadeau."};
+      return {success: false, message: "Impossible de récupérer les cadeaux."};
     }
   }
 
@@ -173,17 +196,28 @@ export class GiftService {
     }
   }
 
-  async getFollowedGifts(): Promise<ApiResponse<GiftFollowedByAccount[]>> {
+  async getFollowedGifts(
+    page: number = 1,
+    customLimit?: number
+  ): Promise<ApiResponse<PaginatedResponse<GiftFollowedByAccount>>> {
+    
+    const limit = customLimit || this.responsiveService.getPageSizeForContext('followed-gifts');
     const groupId = this.groupContextService.getGroupId()!;
     const idEnc = encodeURIComponent(groupId);
+    
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+      
     const url = `${this.apiUrl}/suivis/${idEnc}`;
+    
     try {
-      const giftsFollowed = await firstValueFrom(
-        this.http.get<GiftFollowedByAccount[]>(url)
+      const response = await firstValueFrom(
+        this.http.get<PaginatedResponse<GiftFollowedByAccount>>(url, { params })
       );
 
-      this.giftsFollowed.set(giftsFollowed);
-      return {success: true, data: giftsFollowed};
+      this.giftsFollowed.set(response);
+      return {success: true, data: response};
 
     } catch (error) {
       console.error('[GiftService] Erreur lors de la récupération des cadeaux suivis', error);
@@ -211,7 +245,8 @@ export class GiftService {
     try {
       const giftsList = await firstValueFrom(this.http.put<GiftResponse[]>(this.apiUrl, gifts));
 
-      this.giftsResponse.set(giftsList);
+      // Note: cette méthode ne met plus à jour le signal car il est maintenant PaginatedResponse
+      // TODO: Adapter quand nécessaire pour la pagination
       return {success: true, data: giftsList};
     } catch (error) {
       console.error('[GiftService] Erreur lors de la mise à jour des priorités', error);
@@ -221,7 +256,8 @@ export class GiftService {
   }
 
   clearGifts() {
-    this.giftsResponse.set([]);
+    this.giftsResponse.set(null);
+    this.giftsFollowed.set(null);
   }
 
   async updateGiftPurchase(updatedPurchase: GiftPurchaseUpdate): Promise<ApiResponse<void>> {

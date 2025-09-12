@@ -14,12 +14,31 @@
     </p>
   </section>
 
+  <!-- Loading state -->
+  <div *ngIf="giftService.isLoading()" class="loading-state">
+    Chargement des cadeaux...
+  </div>
 
-
+  <!-- Liste des cadeaux -->
   <app-gift-priority-list
-  [gifts]="this.giftService.giftsResponse()"
-  (rowClicked)="onGiftClicked($event)"
+    *ngIf="!giftService.isLoading() && gifts().length > 0"
+    [gifts]="gifts()"
+    (rowClicked)="onGiftClicked($event)"
   />
+
+  <!-- Pagination -->
+  <app-pagination
+    [paginationInfo]="paginationInfo()!"
+    (pageChange)="onPageChange($event)"
+    *ngIf="paginationInfo()">
+  </app-pagination>
+
+  <!-- Message si aucun cadeau -->
+  <div *ngIf="!giftService.isLoading() && gifts().length === 0" class="no-gifts">
+    <p>Aucun cadeau dans votre liste.</p>
+    <p class="emphase-douce">Commencez par ajouter votre premier cadeau !</p>
+  </div>
+
   <div class="options">
     <button data-allow-tiers (click)="goToAjout()">[+] Ajouter un cadeau</button>
     <button data-allow-tiers (click)="return()">↩ Retour au Menu</button>

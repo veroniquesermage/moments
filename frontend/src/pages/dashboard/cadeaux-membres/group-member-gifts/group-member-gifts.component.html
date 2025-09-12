@@ -25,38 +25,59 @@
     </button>
   </div>
 
-  <section class="intro-bloc" aria-label="Explication du fonctionnement de la liste">
-  <p class="emphase-douce"> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
-  </section>
-  <table   aria-describedby="table-priorite-explication" class="gift-table">
-    <thead>
-    <tr>
-      <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
-    </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let gift of giftPublic; let i = index">
-        <!-- Insère le sous-titre si c’est le premier 'proposé' -->
-        <tr *ngIf="gift.priorite === 0 && (i === 0 || giftPublic[i-1].priorite !== 0)">
-          <td colspan="5" class="separator-row">
-            Idées proposées par les autres membres
-          </td>
-        </tr>
+  <!-- Loading state pour le membre sélectionné -->
+  <div *ngIf="isLoadingMember()" class="loading-state">
+    Chargement des cadeaux du membre...
+  </div>
 
-        <tr (click)="onGiftClicked(gift)"
-            [class.gris]="gift.statut === 'PRIS'"
-            [attr.aria-label]="getAriaLabel(gift)">
-          <td *ngFor="let column of displayedColumns"
-              [attr.data-label]="column.label"
-              tabindex="0"
-              (keydown.enter)="onGiftClicked(gift)"
-              (keydown.space)="onGiftClicked(gift)">
-            {{ getGiftValue(gift, column) }}
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
+  <!-- Contenu des cadeaux -->
+  <div *ngIf="selectedMember && !isLoadingMember()">
+    <section class="intro-bloc" aria-label="Explication du fonctionnement de la liste">
+      <p class="emphase-douce"> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
+    </section>
+    
+    <table *ngIf="giftPublic.length > 0" aria-describedby="table-priorite-explication" class="gift-table">
+      <thead>
+      <tr>
+        <th scope="col" *ngFor="let column of displayedColumns">{{ column.label || column.key | titlecase }}</th>
+      </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let gift of giftPublic; let i = index">
+          <!-- Insère le sous-titre si c'est le premier 'proposé' -->
+          <tr *ngIf="gift.priorite === 0 && (i === 0 || giftPublic[i-1].priorite !== 0)">
+            <td colspan="5" class="separator-row">
+              Idées proposées par les autres membres
+            </td>
+          </tr>
+
+          <tr (click)="onGiftClicked(gift)"
+              [class.gris]="gift.statut === 'PRIS'"
+              [attr.aria-label]="getAriaLabel(gift)">
+            <td *ngFor="let column of displayedColumns"
+                [attr.data-label]="column.label"
+                tabindex="0"
+                (keydown.enter)="onGiftClicked(gift)"
+                (keydown.space)="onGiftClicked(gift)">
+              {{ getGiftValue(gift, column) }}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <app-pagination
+      [paginationInfo]="paginationInfo()!"
+      (pageChange)="onPageChange($event)"
+      *ngIf="paginationInfo()">
+    </app-pagination>
+
+    <!-- Message si aucun cadeau -->
+    <div *ngIf="giftPublic.length === 0" class="no-gifts">
+      <p>Ce membre n'a pas encore de cadeaux dans sa liste.</p>
+    </div>
+  </div>
 
   <div class="options">
     <button (click)="retour()">↩ Retour au Menu</button>

@@ -1,4 +1,4 @@
-import {Component, OnInit, Signal} from '@angular/core';
+import {Component, OnInit, Signal, signal} from '@angular/core';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -11,6 +11,8 @@ import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {formatEuro} from 'src/core/utils/format-montant';
+import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
+import {PaginationInfo} from 'src/core/models/common/pagination.model';
 
 @Component({
   selector: 'app-group-member-gifts',
@@ -19,7 +21,8 @@ import {formatEuro} from 'src/core/utils/format-montant';
     CommonModule,
     TerminalModalComponent,
     DisplayNamePipe,
-    FeedbackTestComponent
+    FeedbackTestComponent,
+    PaginationComponent
   ],
   templateUrl: './group-member-gifts.component.html',
   styleUrl: './group-member-gifts.component.scss'
@@ -30,7 +33,10 @@ export class GroupMemberGiftsComponent implements OnInit {
   composant: string = "GroupMemberGiftsComponent";
   membersSignal: Signal<UserDisplay[]>;
   selectedMember: UserDisplay | undefined = undefined;
-  giftPublic: GiftPublicResponse[] = []
+  giftPublic: GiftPublicResponse[] = [];
+  currentPage = signal(1);
+  paginationInfo = signal<PaginationInfo | null>(null);
+  isLoadingMember = signal<boolean>(false);
 
   displayedColumns = [
     {key: 'nom', label: 'Nom'},
@@ -63,18 +69,38 @@ export class GroupMemberGiftsComponent implements OnInit {
     void this.router.navigate(['/dashboard']);
   }
 
-  async selectMember(user: UserDisplay) {
+  async selectMember(user: UserDisplay): Promise<void> {
     this.selectedMember = user;
 
     if(!user.id){
       this.errorService.showError("❌ Impossible d\'accéder au membre. Veuillez réessayer plus tard.");
+      return;
     }
-    const result = await this.giftService.getVisibleGiftsForMember(user!.id);
-    if (result.success) {
-      this.giftPublic = [ ...result.data.filter(gift => gift.priorite !==0),
-                          ...result.data.filter(gift => gift.priorite === 0)];
-    }else {
+    
+    await this.loadMemberGifts(user.id, 1);
+  }
+
+  async loadMemberGifts(userId: number, page: number): Promise<void> {
+    this.isLoadingMember.set(true);
+    
+    const result = await this.giftService.getVisibleGiftsForMember(userId, page);
+    if (result.success && result.data) {
+      this.currentPage.set(page);
+      this.paginationInfo.set(result.data.pagination);
+      // Tri par priorité : priorités non nulles d\'abord, puis nulles
+      this.giftPublic = [ ...result.data.items.filter(gift => gift.priorite !==0),
+                          ...result.data.items.filter(gift => gift.priorite === 0)];
+    } else {
       this.errorService.showError("❌ Impossible d\'afficher la liste de ce membre. Veuillez réessayer plus tard.");
+    }
+    
+    this.isLoadingMember.set(false);
+  }
+
+  async onPageChange(page: number): Promise<void> {
+    if (this.selectedMember?.id) {
+      await this.loadMemberGifts(this.selectedMember.id, page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
