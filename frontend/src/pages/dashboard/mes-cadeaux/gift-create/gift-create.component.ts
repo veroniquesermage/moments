@@ -28,9 +28,9 @@ export class GiftCreateComponent {
   }
 
   async onSubmit(giftFormData: GiftResponse): Promise<void> {
-    const giftslist = this.giftService.giftsResponse();
+    const giftsResponse = this.giftService.giftsResponse();
     const destinataire = this.authService.profile();
-    const newPriority = Math.max(1, giftslist.length + 1);
+    const newPriority = Math.max(1, giftsResponse?.items?.length ? giftsResponse.items.length + 1 : 1);
 
     if (!destinataire) {
       this.errorService.showError("❌ Impossible de créer un cadeau sans utilisateur connecté.");

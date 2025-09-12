@@ -26,12 +26,12 @@
 
 ## ✅ ÉTAT D'AVANCEMENT - Phase 2 TERMINÉE ✅
 
-**Date de mise à jour** : 12 septembre 2025  
+**Date de mise à jour** : 12 septembre 2025
 **Phase actuelle** : Phase 2 Base de Données - **COMPLÉTÉE** ✅
 
 ### 📋 Récapitulatif Phase 1 (TERMINÉE ✅)
 - ✅ **Infrastructure de base** : Modèles et utilitaires créés
-- ✅ **Services modifiés** : 3 services principaux paginés  
+- ✅ **Services modifiés** : 3 services principaux paginés
 - ✅ **Routes mises à jour** : 3 endpoints avec paramètres de pagination
 - ✅ **Tests validés** : 4 tests unitaires passant tous (PaginationHelper)
 - ✅ **Documentation** : Code entièrement documenté
@@ -96,16 +96,16 @@ class PaginationHelper:
         count_query = select(func.count()).select_from(query.subquery())
         total_result = await db.execute(count_query)
         total_count = total_result.scalar()
-        
+
         # Calcul pagination
         total_pages = ceil(total_count / limit)
         offset = (page - 1) * limit
-        
+
         # Requête paginée
         paginated_query = query.offset(offset).limit(limit)
         result = await db.execute(paginated_query)
         items = result.scalars().all()
-        
+
         # Info pagination
         pagination_info = PaginationInfo(
             total_count=total_count,
@@ -115,7 +115,7 @@ class PaginationHelper:
             has_next=page < total_pages,
             has_previous=page > 1
         )
-        
+
         return items, pagination_info
 ```
 
@@ -131,7 +131,7 @@ class GiftService:
         page: int = 1,
         limit: int = 20
     ) -> PaginatedResponse[GiftResponse]:
-        
+
         base_query = (
             select(Gift)
             .where(and_(Gift.destinataire_id == effective_user_id, Gift.gift_idea_id.is_(None)))
@@ -141,13 +141,13 @@ class GiftService:
                 selectinload(Gift.reserve_par)
             )
         )
-        
+
         items, pagination_info = await PaginationHelper.paginate_query(
             db, base_query, page, limit
         )
-        
+
         gift_responses = [GiftResponse.model_validate(g) for g in items]
-        
+
         return PaginatedResponse(
             items=gift_responses,
             pagination=pagination_info
@@ -160,7 +160,7 @@ class GiftService:
         page: int = 1,
         limit: int = 20
     ) -> PaginatedResponse[GiftPublicResponse]:
-        
+
         base_query = (
             select(Gift)
             .outerjoin(Gift.gift_idea)
@@ -178,13 +178,13 @@ class GiftService:
             )
             .order_by(Gift.priorite)
         )
-        
+
         items, pagination_info = await PaginationHelper.paginate_query(
             db, base_query, page, limit
         )
-        
+
         gift_responses = [GiftPublicResponse.model_validate(g) for g in items]
-        
+
         return PaginatedResponse(
             items=gift_responses,
             pagination=pagination_info
@@ -204,7 +204,7 @@ async def get_gifts(
     db: AsyncSession = Depends(get_db),
     current_user: User = get_current_user_from_cookie_with_tiers()
 ) -> PaginatedResponse[GiftResponse]:
-    
+
     effective_user_id = userId or current_user.id
     logger.info(f"Récupération paginée des cadeaux pour l'utilisateur {effective_user_id} - Page {page}, Limit {limit}")
     return await GiftService.get_my_gifts(db, effective_user_id, page, limit)
@@ -217,7 +217,7 @@ async def get_visible_gifts_for_member(
     db: AsyncSession = Depends(get_db),
     current_user: User = get_current_user_from_cookie_with_tiers()
 ) -> PaginatedResponse[GiftPublicResponse]:
-    
+
     return await GiftService.get_visible_gifts_for_member(db, userId, page, limit)
 
 @router.get("/suivis/{groupId}", response_model=PaginatedResponse[GiftFollowedByAccount])
@@ -228,7 +228,7 @@ async def get_followed_gifts(
     db: AsyncSession = Depends(get_db),
     current_user: User = get_current_user_from_cookie_with_tiers()
 ) -> PaginatedResponse[GiftFollowedByAccount]:
-    
+
     return await GiftService.get_followed_gifts(db, groupId, page, limit)
 ```
 
@@ -265,7 +265,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 
 const PAGE_SIZES = {
   mobile: 8,     // Écrans < 768px
-  tablet: 12,    // Écrans 768px - 1024px  
+  tablet: 12,    // Écrans 768px - 1024px
   desktop: 20    // Écrans > 1024px
 } as const;
 
@@ -279,26 +279,26 @@ const PAGINATION_CONFIGS = {
 @Injectable({ providedIn: 'root' })
 export class ResponsiveService {
   private breakpointObserver = inject(BreakpointObserver);
-  
+
   isMobile = signal(false);
   isTablet = signal(false);
-  
+
   constructor() {
     this.breakpointObserver.observe(['(max-width: 767px)']).subscribe(result => {
       this.isMobile.set(result.matches);
     });
-    
+
     this.breakpointObserver.observe(['(min-width: 768px) and (max-width: 1024px)']).subscribe(result => {
       this.isTablet.set(result.matches);
     });
   }
-  
+
   getCurrentPageSize(): number {
     if (this.isMobile()) return PAGE_SIZES.mobile;
     if (this.isTablet()) return PAGE_SIZES.tablet;
     return PAGE_SIZES.desktop;
   }
-  
+
   getPageSizeForContext(context: keyof typeof PAGINATION_CONFIGS): number {
     const config = PAGINATION_CONFIGS[context] || PAGINATION_CONFIGS.default;
     return this.isMobile() ? config.mobile : config.desktop;
@@ -315,7 +315,7 @@ import { PaginatedResponse, PaginationParams } from '../models/common/pagination
 @Injectable({ providedIn: 'root' })
 export class GiftService {
   private apiUrl = environment.backendBaseUrl + environment.api.cadeaux;
-  
+
   // Signaux pour les données paginées
   giftsResponse = signal<PaginatedResponse<GiftResponse> | null>(null);
   giftsFollowed = signal<PaginatedResponse<GiftFollowedByAccount> | null>(null);
@@ -328,19 +328,19 @@ export class GiftService {
   ) {}
 
   async fetchGifts(
-    userId?: number, 
+    userId?: number,
     page: number = 1,
     customLimit?: number
   ): Promise<ApiResponse<PaginatedResponse<GiftResponse>>> {
-    
+
     this.isLoading.set(true);
 
     const limit = customLimit || this.responsiveService.getPageSizeForContext('user-gifts');
-    
+
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-      
+
     if (userId != null) {
       params = params.set('userId', userId.toString());
     }
@@ -362,20 +362,20 @@ export class GiftService {
   }
 
   async getVisibleGiftsForMember(
-    userId: number, 
+    userId: number,
     page: number = 1,
     customLimit?: number
   ): Promise<ApiResponse<PaginatedResponse<GiftPublicResponse>>> {
-    
+
     const limit = customLimit || this.responsiveService.getPageSizeForContext('member-gifts');
     const idEnc = encodeURIComponent(userId);
-    
+
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-      
+
     const url = `${this.apiUrl}/membre/${idEnc}`;
-    
+
     try {
       const response = await firstValueFrom(
         this.http.get<PaginatedResponse<GiftPublicResponse>>(url, { params })
@@ -391,17 +391,17 @@ export class GiftService {
     page: number = 1,
     customLimit?: number
   ): Promise<ApiResponse<PaginatedResponse<GiftFollowedByAccount>>> {
-    
+
     const limit = customLimit || this.responsiveService.getPageSizeForContext('followed-gifts');
     const groupId = this.groupContextService.getGroupId()!;
     const idEnc = encodeURIComponent(groupId);
-    
+
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-      
+
     const url = `${this.apiUrl}/suivis/${idEnc}`;
-    
+
     try {
       const response = await firstValueFrom(
         this.http.get<PaginatedResponse<GiftFollowedByAccount>>(url, { params })
@@ -432,23 +432,23 @@ import { PaginationInfo } from '../../../core/models/common/pagination.model';
   imports: [CommonModule],
   template: `
     <div class="pagination-container" *ngIf="paginationInfo && paginationInfo.total_pages > 1">
-      
+
       <!-- Version mobile : navigation simple -->
       <div class="mobile-pagination" *ngIf="isMobile()">
-        <button 
-          class="btn-pagination" 
-          [disabled]="!paginationInfo.has_previous" 
+        <button
+          class="btn-pagination"
+          [disabled]="!paginationInfo.has_previous"
           (click)="previousPage()">
           ‹ Précédent
         </button>
-        
+
         <span class="page-info">
           {{ paginationInfo.page }} / {{ paginationInfo.total_pages }}
         </span>
-        
-        <button 
-          class="btn-pagination" 
-          [disabled]="!paginationInfo.has_next" 
+
+        <button
+          class="btn-pagination"
+          [disabled]="!paginationInfo.has_next"
           (click)="nextPage()">
           Suivant ›
         </button>
@@ -456,16 +456,16 @@ import { PaginationInfo } from '../../../core/models/common/pagination.model';
 
       <!-- Version desktop : pagination complète -->
       <div class="desktop-pagination" *ngIf="!isMobile()">
-        <button 
-          class="btn-pagination" 
-          [disabled]="!paginationInfo.has_previous" 
+        <button
+          class="btn-pagination"
+          [disabled]="!paginationInfo.has_previous"
           (click)="previousPage()">
           ‹ Précédent
         </button>
 
         <div class="page-numbers">
-          <button 
-            *ngFor="let page of getVisiblePages()" 
+          <button
+            *ngFor="let page of getVisiblePages()"
             class="btn-page-number"
             [class.active]="page === paginationInfo.page"
             (click)="goToPage(page)">
@@ -473,9 +473,9 @@ import { PaginationInfo } from '../../../core/models/common/pagination.model';
           </button>
         </div>
 
-        <button 
-          class="btn-pagination" 
-          [disabled]="!paginationInfo.has_next" 
+        <button
+          class="btn-pagination"
+          [disabled]="!paginationInfo.has_next"
           (click)="nextPage()">
           Suivant ›
         </button>
@@ -495,7 +495,7 @@ export class PaginationComponent {
   @Output() pageChange = new EventEmitter<number>();
 
   private responsiveService = inject(ResponsiveService);
-  
+
   isMobile = this.responsiveService.isMobile;
 
   previousPage() {
@@ -520,15 +520,15 @@ export class PaginationComponent {
     const current = this.paginationInfo.page;
     const total = this.paginationInfo.total_pages;
     const delta = 2;
-    
+
     const range = [];
     const rangeStart = Math.max(1, current - delta);
     const rangeEnd = Math.min(total, current + delta);
-    
+
     for (let i = rangeStart; i <= rangeEnd; i++) {
       range.push(i);
     }
-    
+
     return range;
   }
 }
@@ -631,26 +631,26 @@ import { GiftResponse } from '../../../../core/models/gift/gift-response.model';
   template: `
     <div class="user-gifts-container">
       <h2>Mes Cadeaux</h2>
-      
+
       <!-- Loading state -->
       <div *ngIf="giftService.isLoading()" class="loading">
         Chargement des cadeaux...
       </div>
-      
+
       <!-- Liste des cadeaux -->
       <div *ngIf="!giftService.isLoading() && gifts().length > 0" class="gifts-list">
         <div *ngFor="let gift of gifts()" class="gift-item">
           {{ gift.nom }}
         </div>
       </div>
-      
+
       <!-- Pagination -->
       <app-pagination
         [paginationInfo]="paginationInfo()"
         (pageChange)="onPageChange($event)"
         *ngIf="paginationInfo()">
       </app-pagination>
-      
+
       <!-- Message si aucun cadeau -->
       <div *ngIf="!giftService.isLoading() && gifts().length === 0" class="no-gifts">
         Aucun cadeau trouvé.
@@ -672,7 +672,7 @@ export class UserGiftsComponent implements OnInit {
 
   async loadGifts(page: number) {
     const result = await this.giftService.fetchGifts(undefined, page);
-    
+
     if (result.success && result.data) {
       this.currentPage.set(page);
       this.paginationInfo.set(result.data.pagination);
@@ -706,23 +706,23 @@ import sqlalchemy as sa
 def upgrade():
     # Index composites pour optimiser la pagination
     op.create_index(
-        'ix_gift_user_priority_paginated', 
-        'cadeaux', 
-        ['destinataire_id', 'priorite'], 
+        'ix_gift_user_priority_paginated',
+        'cadeaux',
+        ['destinataire_id', 'priorite'],
         postgresql_concurrently=True
     )
-    
+
     op.create_index(
-        'ix_gift_user_status_priority', 
-        'cadeaux', 
-        ['destinataire_id', 'statut', 'priorite'], 
+        'ix_gift_user_status_priority',
+        'cadeaux',
+        ['destinataire_id', 'statut', 'priorite'],
         postgresql_concurrently=True
     )
-    
+
     op.create_index(
-        'ix_gift_member_visibility', 
-        'cadeaux', 
-        ['destinataire_id', 'gift_idea_id'], 
+        'ix_gift_member_visibility',
+        'cadeaux',
+        ['destinataire_id', 'gift_idea_id'],
         postgresql_concurrently=True
     )
 
@@ -745,7 +745,7 @@ from app.schemas.common.pagination import PaginatedResponse
 async def test_get_my_gifts_pagination_first_page(unit_db_session, test_user):
     """Test pagination première page"""
     result = await GiftService.get_my_gifts(unit_db_session, test_user.id, page=1, limit=10)
-    
+
     assert isinstance(result, PaginatedResponse)
     assert result.pagination.page == 1
     assert result.pagination.limit == 10
@@ -755,7 +755,7 @@ async def test_get_my_gifts_pagination_first_page(unit_db_session, test_user):
 async def test_get_my_gifts_pagination_invalid_page(unit_db_session, test_user):
     """Test pagination page invalide"""
     result = await GiftService.get_my_gifts(unit_db_session, test_user.id, page=999, limit=10)
-    
+
     assert result.pagination.page == 999
     assert len(result.items) == 0
     assert not result.pagination.has_next
@@ -780,14 +780,14 @@ describe('PaginationComponent', () => {
     TestBed.configureTestingModule({
       imports: [PaginationComponent]
     });
-    
+
     fixture = TestBed.createComponent(PaginationComponent);
     component = fixture.componentInstance;
   });
 
   it('should emit page change when next button clicked', () => {
     spyOn(component.pageChange, 'emit');
-    
+
     component.paginationInfo = {
       page: 1,
       total_pages: 3,
@@ -796,9 +796,9 @@ describe('PaginationComponent', () => {
       total_count: 50,
       limit: 20
     };
-    
+
     component.nextPage();
-    
+
     expect(component.pageChange.emit).toHaveBeenCalledWith(2);
   });
 
@@ -806,10 +806,10 @@ describe('PaginationComponent', () => {
     // Mock responsive service
     component.responsiveService.isMobile.set(true);
     fixture.detectChanges();
-    
+
     const mobileElement = fixture.debugElement.query(By.css('.mobile-pagination'));
     const desktopElement = fixture.debugElement.query(By.css('.desktop-pagination'));
-    
+
     expect(mobileElement).toBeTruthy();
     expect(desktopElement).toBeFalsy();
   });
@@ -820,7 +820,7 @@ describe('PaginationComponent', () => {
 
 ### Breakpoints et tailles de page
 - **Mobile** (< 768px) : 8 éléments par page
-- **Tablet** (768px - 1024px) : 12 éléments par page  
+- **Tablet** (768px - 1024px) : 12 éléments par page
 - **Desktop** (> 1024px) : 20 éléments par page
 
 ### Configuration par contexte
@@ -843,10 +843,10 @@ describe('PaginationComponent', () => {
 **Durée** : 2 jours (vs 3-4 prévus) - **Gain de temps : 1-2 jours** 🚀
 
 #### ✅ Livrables réalisés
-- **Infrastructure complète** 
+- **Infrastructure complète**
   - `app/schemas/common/pagination.py` - Modèles génériques
   - `app/core/pagination.py` - Utilitaire de pagination
-- **Services paginés**  
+- **Services paginés**
   - `get_my_gifts()` - Pagination des cadeaux personnels
   - `get_visible_gifts_for_member()` - Pagination des cadeaux d'un membre
   - `get_gifts_by_account()` - Pagination des cadeaux suivis
@@ -861,7 +861,7 @@ describe('PaginationComponent', () => {
 
 #### 🎯 Fonctionnalités backend opérationnelles
 - ✅ **Rétrocompatibilité** : Paramètres optionnels avec valeurs par défaut
-- ✅ **Validation automatique** : Pages/limites normalisées automatiquement  
+- ✅ **Validation automatique** : Pages/limites normalisées automatiquement
 - ✅ **Performance optimisée** : Requêtes COUNT avec sous-requêtes
 - ✅ **Documentation complète** : Docstrings et types pour tous les endpoints
 - ✅ **Gestion d'erreurs** : Validation robuste des entrées utilisateur
@@ -900,7 +900,7 @@ describe('PaginationComponent', () => {
 - **✅ CRÉÉ** : `tests/unit/core/test_pagination.py` - Tests unitaires PaginationHelper
 - **✅ CRÉÉ** : `PAGINATION_MONITORING.md` - Guide monitoring OpenTelemetry
 
-### ✅ Base de Données (Phase 2 - TERMINÉE)  
+### ✅ Base de Données (Phase 2 - TERMINÉE)
 - **✅ CRÉÉ** : `alembic/versions/688930d9fdb4_add_pagination_indexes_for_gifts.py` - Migration index
 
 ### ⏳ Frontend (Phase 3 - À FAIRE)
@@ -911,7 +911,7 @@ describe('PaginationComponent', () => {
 - **À FAIRE** : `src/shared/components/pagination/pagination.component.scss`
 - **À FAIRE** : 7 pages de dashboard (user-gifts, group-member-gifts, etc.)
 
-### ⏳ Tests Complets (Phase 4 - À FAIRE)  
+### ⏳ Tests Complets (Phase 4 - À FAIRE)
 - **✅ CRÉÉ** : `tests/unit/services/test_gift_pagination.py` - Tests backend
 - **À FAIRE** : `src/shared/components/pagination/pagination.component.spec.ts`
 - **À FAIRE** : Tests d'intégration bout en bout
