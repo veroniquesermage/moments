@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.enum.gift_action_enum import GiftActionEnum
@@ -9,6 +9,7 @@ from app.database import get_db
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id, \
     get_current_user_from_cookie_with_tiers
 from app.models import User
+from app.schemas.common.pagination import PaginatedResponse
 from app.schemas.gift import EligibilityResponse, GiftStatus, GiftCreate, \
     GiftDetailResponse, RecuPayload, GiftResponse, GiftPriority, GiftPublicResponse, GiftDeliveryUpdate, \
     GiftPurchaseUpdate
@@ -18,16 +19,18 @@ from app.services import GiftService
 
 router = APIRouter(prefix="/api/cadeaux", tags=["cadeaux"])
 
-@router.get("", response_model=list[GiftResponse])
-@router.get("/", response_model=list[GiftResponse])
+@router.get("", response_model=PaginatedResponse[GiftResponse])
+@router.get("/", response_model=PaginatedResponse[GiftResponse])
 async def get_gifts(
         userId: Optional[int] = None,
+        page: int = Query(1, ge=1, description="Numéro de page"),
+        limit: int = Query(20, ge=1, le=100, description="Nombre d'éléments par page"),
         db: AsyncSession = Depends(get_db),
-        current_user: User = get_current_user_from_cookie_with_tiers() ) -> list[GiftResponse]:
+        current_user: User = get_current_user_from_cookie_with_tiers() ) -> PaginatedResponse[GiftResponse]:
 
     effective_user_id = userId or current_user.id
-    logger.info(f"L'utilisateur concerné est {effective_user_id}")
-    return await GiftService.get_my_gifts(db, effective_user_id)
+    logger.info(f"Récupération paginée des cadeaux pour l'utilisateur {effective_user_id} - Page {page}, Limit {limit}")
+    return await GiftService.get_my_gifts(db, effective_user_id, page, limit)
 
 @router.post("", response_model=GiftResponse, status_code=201)
 async def create_gift(
@@ -46,21 +49,25 @@ async def update_all_gifts(
     return await GiftService.update_all_gifts(db, current_user, gifts)
 
 
-@router.get("/suivis/{groupId}", response_model=list[GiftFollowedByAccount])
+@router.get("/suivis/{groupId}", response_model=PaginatedResponse[GiftFollowedByAccount])
 async def get_followed_gifts(
         groupId: int,
+        page: int = Query(1, ge=1, description="Numéro de page"),
+        limit: int = Query(20, ge=1, le=100, description="Nombre d'éléments par page"),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie) ) -> list[GiftFollowedByAccount]:
+        current_user: User = Depends(get_current_user_from_cookie) ) -> PaginatedResponse[GiftFollowedByAccount]:
 
-    return await GiftService.get_gifts_by_account(db, current_user, groupId)
+    return await GiftService.get_gifts_by_account(db, current_user, groupId, page, limit)
 
-@router.get("/membre/{user_id}", response_model=list[GiftPublicResponse])
+@router.get("/membre/{user_id}", response_model=PaginatedResponse[GiftPublicResponse])
 async def get_visible_gifts_for_member(
         user_id: int,
+        page: int = Query(1, ge=1, description="Numéro de page"),
+        limit: int = Query(20, ge=1, le=100, description="Nombre d'éléments par page"),
         db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie)) -> list[GiftPublicResponse]:
+        current_user: User = Depends(get_current_user_from_cookie)) -> PaginatedResponse[GiftPublicResponse]:
 
-    return await GiftService.get_visible_gifts_for_member(db, user_id)
+    return await GiftService.get_visible_gifts_for_member(db, user_id, page, limit)
 
 @router.get("/{giftId}", response_model=GiftDetailResponse)
 async def get_gift(

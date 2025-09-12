@@ -48,11 +48,13 @@ class TestGiftServiceFixed:
         await unit_db_session.refresh(gift)
 
         # Act
-        gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
+        result = await GiftService.get_my_gifts(unit_db_session, user.id)
 
         # Assert
-        assert len(gifts) == 1
-        assert gifts[0].nom == "Cadeau Test"
+        assert len(result.items) == 1
+        assert result.items[0].nom == "Cadeau Test"
+        assert result.pagination.total_count == 1
+        assert result.pagination.page == 1
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -85,8 +87,8 @@ class TestGiftServiceFixed:
         assert result.nom == "Nouveau Cadeau"
 
         # Vérifier en base
-        gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
-        assert len(gifts) == 1
+        gifts_result = await GiftService.get_my_gifts(unit_db_session, user.id)
+        assert len(gifts_result.items) == 1
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -214,8 +216,8 @@ class TestGiftServiceFixed:
         await GiftService.delete_gift(unit_db_session, gift.id, user)
 
         # Assert - Vérifier que le cadeau n'existe plus
-        gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
-        assert len(gifts) == 0
+        gifts_result = await GiftService.get_my_gifts(unit_db_session, user.id)
+        assert len(gifts_result.items) == 0
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -306,8 +308,8 @@ class TestGiftServiceFixed:
         assert reserved_gift is not None
 
         # 4. Vérification finale
-        final_gifts = await GiftService.get_my_gifts(unit_db_session, user.id)
-        assert len(final_gifts) == 1
+        final_gifts_result = await GiftService.get_my_gifts(unit_db_session, user.id)
+        assert len(final_gifts_result.items) == 1
 
 
 @pytest.mark.unit
@@ -487,8 +489,8 @@ async def test_get_visible_gifts_for_member_visibility(unit_db_session):
     unit_db_session.add_all([g_hidden, g_visible])
     await unit_db_session.commit()
 
-    visible = await GiftService.get_visible_gifts_for_member(unit_db_session, dest.id)
-    names = [g.nom for g in visible]
+    visible_result = await GiftService.get_visible_gifts_for_member(unit_db_session, dest.id)
+    names = [g.nom for g in visible_result.items]
     assert "NoIdea" in names
     assert "Visible" in names
     assert "Hidden" not in names
@@ -571,8 +573,8 @@ async def test_get_gifts_by_account_grouping_and_totals(unit_db_session, mock_tr
     )
     await GiftService.update_gift_purchase(unit_db_session, current, g_follow_tiers.id, upd_tiers)
 
-    grouped = await GiftService.get_gifts_by_account(unit_db_session, current, group.id)
-    labels = {g.account_label: g.total for g in grouped}
+    grouped_result = await GiftService.get_gifts_by_account(unit_db_session, current, group.id)
+    labels = {g.account_label: g.total for g in grouped_result.items}
     totals = sorted(round(float(t), 2) for t in labels.values())
     # At minimum, the shared gift contribution (20.0) must be present
     assert 20.0 in totals

@@ -10,8 +10,11 @@ from sqlalchemy.orm import selectinload
 from app.core.enum import GiftActionEnum, GiftStatusEnum, RoleUtilisateur
 from app.core.logger import logger
 from app.core.message import *
+from app.core.pagination import PaginationHelper
+from opentelemetry import trace
 from app.models import User, GiftShared, GiftIdeas, GiftDelivery, UserGroup, GiftPurchaseInfo
 from app.models.gift import Gift
+from app.schemas.common.pagination import PaginatedResponse
 from app.schemas.gift import GiftPurchaseInfoSchema, GiftPurchaseUpdate
 from app.schemas.gift.eligibility_response import EligibilityResponse
 from app.schemas.gift.gift_create import GiftCreate
@@ -33,22 +36,80 @@ from app.services.sharing_service import SharingService
 from app.services.trace_service import TraceService
 from app.utils.date_helper import now_paris
 
+# Tracer OpenTelemetry pour ce module
+tracer = trace.get_tracer(__name__)
+
 
 class GiftService:
 
     @staticmethod
-    async def get_my_gifts(db: AsyncSession,
-                           effective_user_id: int) -> list[GiftResponse]:
-        logger.info(f"Récupération des cadeaux de l'utilisateur {effective_user_id}")
-        result = (await db.execute(
-            select(Gift).where(and_(Gift.destinataire_id == effective_user_id, Gift.gift_idea_id.is_(None)))
-            .order_by(Gift.priorite)
-            .options(
-                selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
-                selectinload(Gift.reserve_par)  # charge eager l’utilisateur qui réserve
+    async def get_my_gifts(
+        db: AsyncSession,
+        effective_user_id: int,
+        page: int = 1,
+        limit: int = 20
+    ) -> PaginatedResponse[GiftResponse]:
+        """
+        Récupère les cadeaux d'un utilisateur avec pagination
+        
+        Args:
+            db: Session de base de données
+            effective_user_id: ID de l'utilisateur
+            page: Numéro de page (défaut: 1)
+            limit: Nombre d'éléments par page (défaut: 20)
+            
+        Returns:
+            Réponse paginée contenant les cadeaux
+        """
+        with tracer.start_as_current_span("get_my_gifts_paginated") as span:
+            # Attributs pour le monitoring
+            span.set_attribute("service.method", "get_my_gifts")
+            span.set_attribute("user.id", effective_user_id)
+            span.set_attribute("pagination.page_requested", page)
+            span.set_attribute("pagination.limit_requested", limit)
+            
+            # Validation des paramètres de pagination
+            page, limit = PaginationHelper.validate_pagination_params(page, limit)
+            
+            span.set_attribute("pagination.page_validated", page)
+            span.set_attribute("pagination.limit_validated", limit)
+            
+            logger.info(f"Récupération paginée des cadeaux de l'utilisateur {effective_user_id} - Page {page}, Limit {limit}")
+            
+            # Construire la requête de base
+            with tracer.start_as_current_span("build_base_query") as query_span:
+                base_query = (
+                    select(Gift)
+                    .where(and_(Gift.destinataire_id == effective_user_id, Gift.gift_idea_id.is_(None)))
+                    .order_by(Gift.priorite)
+                    .options(
+                        selectinload(Gift.destinataire),  # charge eager le créateur du cadeau
+                        selectinload(Gift.reserve_par)    # charge eager l'utilisateur qui réserve
+                    )
+                )
+                query_span.set_attribute("query.has_eager_loading", True)
+                query_span.set_attribute("query.filter_by_user", True)
+                query_span.set_attribute("query.exclude_gift_ideas", True)
+            
+            # Paginer la requête
+            items, pagination_info = await PaginationHelper.paginate_query(
+                db, base_query, page, limit
             )
-        )).scalars().all()
-        return [GiftResponse.model_validate(g) for g in result]
+            
+            # Convertir en modèles de réponse
+            with tracer.start_as_current_span("model_validation") as validation_span:
+                gift_responses = [GiftResponse.model_validate(gift) for gift in items]
+                validation_span.set_attribute("models.count", len(gift_responses))
+            
+            # Ajouter les métriques finales au span principal
+            span.set_attribute("result.items_count", len(gift_responses))
+            span.set_attribute("result.total_count", pagination_info.total_count)
+            span.set_attribute("result.total_pages", pagination_info.total_pages)
+            
+            return PaginatedResponse(
+                items=gift_responses,
+                pagination=pagination_info
+            )
 
     @staticmethod
     async def get_gift(db: AsyncSession,
@@ -67,10 +128,31 @@ class GiftService:
         return await GiftService.set_gift_detail(result, current_user, group_id, db, shared_schema)
 
     @staticmethod
-    async def get_visible_gifts_for_member(db: AsyncSession,
-                                           user_id: int) -> list[GiftPublicResponse]:
-
-        result = await db.execute(
+    async def get_visible_gifts_for_member(
+        db: AsyncSession,
+        user_id: int,
+        page: int = 1,
+        limit: int = 20
+    ) -> PaginatedResponse[GiftPublicResponse]:
+        """
+        Récupère les cadeaux visibles d'un membre avec pagination
+        
+        Args:
+            db: Session de base de données
+            user_id: ID de l'utilisateur membre
+            page: Numéro de page (défaut: 1)
+            limit: Nombre d'éléments par page (défaut: 20)
+            
+        Returns:
+            Réponse paginée contenant les cadeaux publics
+        """
+        # Validation des paramètres de pagination
+        page, limit = PaginationHelper.validate_pagination_params(page, limit)
+        
+        logger.info(f"Récupération paginée des cadeaux visibles pour l'utilisateur {user_id} - Page {page}, Limit {limit}")
+        
+        # Construire la requête de base
+        base_query = (
             select(Gift)
             .outerjoin(Gift.gift_idea)
             .options(
@@ -87,11 +169,22 @@ class GiftService:
             )
             .order_by(Gift.priorite)
         )
-        gifts = result.scalars().all()
-
+        
+        # Paginer la requête
+        items, pagination_info = await PaginationHelper.paginate_query(
+            db, base_query, page, limit
+        )
+        
         logger.debug(
-            f"Récupération des cadeaux visibles pour l'utilisateur {user_id}, nombre de cadeaux trouvés : {len(gifts)}")
-        return [GiftPublicResponse.model_validate(g) for g in gifts]
+            f"Récupération paginée des cadeaux visibles pour l'utilisateur {user_id} - {len(items)} cadeaux trouvés sur {pagination_info.total_count} au total")
+        
+        # Convertir en modèles de réponse
+        gift_responses = [GiftPublicResponse.model_validate(gift) for gift in items]
+        
+        return PaginatedResponse(
+            items=gift_responses,
+            pagination=pagination_info
+        )
 
     @staticmethod
     async def verify_eligibility(db: AsyncSession,
@@ -407,17 +500,62 @@ class GiftService:
 
     @staticmethod
     async def get_gifts_by_account(
-            db: AsyncSession,
-            current_user: User,
-            group_id: int
-    ) -> list[GiftFollowedByAccount]:
+        db: AsyncSession,
+        current_user: User,
+        group_id: int,
+        page: int = 1,
+        limit: int = 20
+    ) -> PaginatedResponse[GiftFollowedByAccount]:
+        """
+        Récupère les cadeaux suivis et partagés par compte avec pagination
+        
+        Args:
+            db: Session de base de données
+            current_user: Utilisateur actuel
+            group_id: ID du groupe
+            page: Numéro de page (défaut: 1)
+            limit: Nombre d'éléments par page (défaut: 20)
+            
+        Returns:
+            Réponse paginée contenant les cadeaux par compte
+        """
+        # Validation des paramètres de pagination
+        page, limit = PaginationHelper.validate_pagination_params(page, limit)
+        
+        logger.info(f"Récupération paginée des cadeaux suivis pour l'utilisateur {current_user.id} dans le groupe {group_id} - Page {page}, Limit {limit}")
+        
+        # Récupérer tous les cadeaux (suivis + partagés)
         gifts_followed = await GiftService._get_gifts_followed(db, current_user, group_id)
         gifts_shared = await GiftService._get_gifts_shared(db, current_user, group_id)
 
         all_gifts = gifts_followed + gifts_shared
         grouped = GiftService._group_gifts_by_account(all_gifts)
-
-        return grouped
+        
+        # Pagination manuelle sur les résultats groupés
+        total_count = len(grouped)
+        total_pages = (total_count + limit - 1) // limit if limit > 0 else 0
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        
+        paginated_items = grouped[start_index:end_index]
+        
+        # Créer les informations de pagination
+        from app.schemas.common.pagination import PaginationInfo
+        pagination_info = PaginationInfo(
+            total_count=total_count,
+            page=page,
+            limit=limit,
+            total_pages=total_pages,
+            has_next=page < total_pages,
+            has_previous=page > 1
+        )
+        
+        logger.debug(f"Récupération paginée des cadeaux suivis - {len(paginated_items)} comptes trouvés sur {total_count} au total")
+        
+        return PaginatedResponse(
+            items=paginated_items,
+            pagination=pagination_info
+        )
 
     @staticmethod
     async def _get_gifts_followed(
