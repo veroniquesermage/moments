@@ -28,7 +28,9 @@
 ### création d'un tar.gz y compris avec les fichiers cachés:
 ```bash
 tar --exclude=./moments.tar.gz -czf moments.tar.gz .
+```
 pour vérifier :
+```bash
 tar -tvf moments.tar.gz
 ```
 
@@ -60,8 +62,8 @@ tar xzf moments.tar.gz -C moments
 ### relancer docker :
 ```bash
 cd moments
-docker compose -f docker-compose.prod.yml down
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml down
+docker compose -f docker-compose.yml up -d --build
 ```
 
 ### lancer les migrations alembic :

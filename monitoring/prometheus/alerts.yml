@@ -1,0 +1,38 @@
+groups:
+- name: moments-api
+  rules:
+  - alert: BackendDown
+    expr: up{job="moments-backend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Backend Moments API est DOWN"
+      description: "Le backend Moments n'est pas accessible depuis {{ $labels.instance }}"
+
+  - alert: HighLatency
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="moments-backend"}[5m])) > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Latence élevée détectée"
+      description: "La latence P95 est de {{ $value }}s (seuil: 2s)"
+
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{job="moments-backend",status=~"5.."}[5m]) / rate(http_requests_total{job="moments-backend"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Taux d'erreur élevé"
+      description: "{{ $value | humanizePercentage }} des requêtes sont en erreur (seuil: 5%)"
+
+  - alert: DatabaseConnectionIssues
+    expr: increase(pgbouncer_stats_queries_errors_total[5m]) > 10
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Erreurs de connexion à la base de données"
+      description: "{{ $value }} erreurs SQL détectées en 5 minutes"

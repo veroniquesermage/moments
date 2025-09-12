@@ -1,0 +1,283 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Moments - Alertes & Monitoring",
+    "tags": ["moments", "alerts"],
+    "style": "dark",
+    "timezone": "Europe/Paris",
+    "editable": true,
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "🚨 Alertes Actives",
+        "type": "alertlist",
+        "targets": [],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "options": {
+          "showOptions": "current",
+          "maxItems": 20,
+          "sortOrder": 1,
+          "dashboardAlerts": false,
+          "alertName": "",
+          "dashboardTitle": "",
+          "folderId": null,
+          "tags": []
+        }
+      },
+      {
+        "id": 2,
+        "title": "📊 Statut des Services",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"moments-backend\"}",
+            "legendFormat": "Backend API",
+            "refId": "A"
+          },
+          {
+            "expr": "up{job=\"prometheus\"}",
+            "legendFormat": "Prometheus",
+            "refId": "B"
+          },
+          {
+            "expr": "up{job=\"pgbouncer\"}",
+            "legendFormat": "PgBouncer",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"text": "DOWN"}}, "type": "value"},
+              {"options": {"1": {"text": "UP"}}, "type": "value"}
+            ]
+          }
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto"
+        }
+      },
+      {
+        "id": 3,
+        "title": "⚡ Métriques Performance (24h)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"moments-backend\"}[5m]))",
+            "legendFormat": "Latence P95",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(http_requests_total{job=\"moments-backend\"}[5m])",
+            "legendFormat": "Requêtes/sec",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(http_requests_total{job=\"moments-backend\",status=~\"5..\"}[5m]) / rate(http_requests_total{job=\"moments-backend\"}[5m]) * 100",
+            "legendFormat": "Taux d'erreur %",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "barAlignment": 0,
+              "lineWidth": 1,
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "auto",
+              "pointSize": 5
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Latence P95"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "s"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Taux d'erreur %"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percent"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "title": "🗄️ Base de Données - Connexions",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "pgbouncer_pools_client_active_connections",
+            "legendFormat": "Connexions actives - {{database}}",
+            "refId": "A"
+          },
+          {
+            "expr": "pgbouncer_pools_client_waiting_connections", 
+            "legendFormat": "Connexions en attente - {{database}}",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "id": 5,
+        "title": "📈 Historique des Alertes (24h)",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "ALERTS{job=\"moments-backend\"}",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto",
+              "filterable": false
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "🔥 Top 10 Endpoints Latence",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"moments-backend\"}[1h])) by (method, handler))",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            }
+          }
+        },
+        "options": {
+          "showHeader": true
+        }
+      },
+      {
+        "id": 7,
+        "title": "🚀 Top 10 Endpoints Trafic",
+        "type": "table", 
+        "targets": [
+          {
+            "expr": "topk(10, rate(http_requests_total{job=\"moments-backend\"}[1h]) by (method, handler))",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            }
+          }
+        },
+        "options": {
+          "showHeader": true
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}

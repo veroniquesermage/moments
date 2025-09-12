@@ -1,0 +1,14 @@
+[databases]
+moments = host=postgres port=5432 dbname=moments user=Mom3ntsAdm1n password=FgPz3l_8wQeN!g$4
+
+[pgbouncer]
+listen_addr = 0.0.0.0
+listen_port = 6432
+auth_type = plain
+admin_users = Mom3ntsAdm1n
+stats_users = statsMom3nts
+auth_file = /etc/pgbouncer/userlist.txt
+pool_mode = transaction
+max_client_conn = 100
+default_pool_size = 20
+ignore_startup_parameters = extra_float_digits
