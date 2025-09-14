@@ -1,7 +1,7 @@
 <div class="form-container">
   <form [formGroup]="giftForm" (ngSubmit)="onSubmit()">
 
-    <label>Destinataire</label>
+    <label>Destinataire du cadeau</label>
     <ng-container *ngIf="giftIdeasResponse?.gift?.id; else editableDestinataire">
       <input type="text" [readonly]="true" value="{{ giftIdeasResponse!.gift.destinataire | displayName }}" />
     </ng-container>
