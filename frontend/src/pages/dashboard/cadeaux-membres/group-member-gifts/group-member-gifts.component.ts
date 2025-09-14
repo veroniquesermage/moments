@@ -1,6 +1,6 @@
 import {Component, OnInit, Signal, signal} from '@angular/core';
 import {GiftService} from 'src/core/services/gift.service';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
@@ -48,6 +48,7 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   constructor(public giftService: GiftService,
               public router: Router,
+              private route: ActivatedRoute,
               private groupContextService: GroupContextService,
               public errorService: ErrorService) {
     this.membersSignal = this.groupContextService.getMembersSignal();
@@ -55,11 +56,32 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   async ngOnInit() {
     this.giftService.clearGifts();
+    
+    // Vérifier les query params pour restaurer l'état
+    const memberId = this.route.snapshot.queryParams['memberId'];
+    const page = this.route.snapshot.queryParams['page'];
+    
+    if (memberId && page) {
+      const members = this.membersSignal();
+      const member = members.find(m => m.id?.toString() === memberId);
+      if (member) {
+        this.selectedMember = member;
+        await this.loadMemberGifts(member.id!, parseInt(page, 10));
+      }
+    }
   }
 
   onGiftClicked(gift: GiftPublicResponse): void {
+    const queryParams: any = { context: 'cadeaux-groupe' };
+    
+    // Ajouter memberId et page si un membre est sélectionné
+    if (this.selectedMember?.id) {
+      queryParams.memberId = this.selectedMember.id;
+      queryParams.page = this.currentPage();
+    }
+    
     void this.router.navigate(['/dashboard/cadeau', gift.id], {
-      queryParams: { context: 'cadeaux-groupe' }
+      queryParams
     });
   }
 
