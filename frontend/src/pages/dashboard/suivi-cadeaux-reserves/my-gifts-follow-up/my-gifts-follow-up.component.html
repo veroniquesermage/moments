@@ -13,47 +13,68 @@
     </p>
   </section>
 
-  <p class="table-legend emphase-douce" role="group" aria-labelledby="table-legend-title">
-    <strong id="table-legend-title" class="visually-hidden">Légende du tableau</strong>
-    <span><span class="legend-dot recu" aria-hidden="true"></span> Cadeau reçu</span>
-    <span><span class="legend-dot partage" aria-hidden="true"></span> Cadeau partagé</span>
-  </p>
+  <!-- Loading state -->
+  <div *ngIf="isLoadingFollowed()" class="loading-state">
+    Chargement de vos cadeaux suivis...
+  </div>
 
-  <table aria-describedby="table-priorite-explication" class="gift-table">
-    <thead>
-    <tr>
-      <th scope="col" *ngFor="let column of displayedColumns">
-        {{ column.label || column.key | titlecase }}
-      </th>
-    </tr>
-    </thead>
-    <tbody *ngIf="giftsFollowedByAccount?.length">
-    <ng-container *ngFor="let group of giftsFollowedByAccount">
-      <!-- Ligne de séparation avec le label et le total -->
-      <tr class="separator-row">
-        <td [attr.colspan]="displayedColumns.length">
-          {{ group.accountLabel }} {{ group.total | formatMontant }} €
-        </td>
+  <!-- Contenu des cadeaux -->
+  <div *ngIf="!isLoadingFollowed()">
+    <p class="table-legend emphase-douce" role="group" aria-labelledby="table-legend-title">
+      <strong id="table-legend-title" class="visually-hidden">Légende du tableau</strong>
+      <span><span class="legend-dot recu" aria-hidden="true"></span> Cadeau reçu</span>
+      <span><span class="legend-dot partage" aria-hidden="true"></span> Cadeau partagé</span>
+    </p>
+
+    <table *ngIf="giftsFollowedByAccount?.length" aria-describedby="table-priorite-explication" class="gift-table">
+      <thead>
+      <tr>
+        <th scope="col" *ngFor="let column of displayedColumns">
+          {{ column.label || column.key | titlecase }}
+        </th>
       </tr>
-
-      <!-- Lignes cadeaux -->
-      <ng-container *ngFor="let gift of group.gifts">
-        <tr (click)="onGiftClicked(gift)"
-            [class.partage]="gift.partage || gift.estPartage"
-            [class.recu]="gift.delivery?.recu"
-            [attr.aria-label]="getAriaLabel(gift)">
-          <td *ngFor="let column of displayedColumns"
-              [attr.data-label]="column.label || column.key"
-              tabindex="0"
-              (keydown.enter)="onGiftClicked(gift)"
-              (keydown.space)="onGiftClicked(gift)">
-            {{ getGiftValue(gift, column) }}
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let group of giftsFollowedByAccount">
+        <!-- Ligne de séparation avec le label et le total -->
+        <tr class="separator-row">
+          <td [attr.colspan]="displayedColumns.length">
+            {{ group.accountLabel }} {{ group.total | formatMontant }} €
           </td>
         </tr>
+
+        <!-- Lignes cadeaux -->
+        <ng-container *ngFor="let gift of group.gifts">
+          <tr (click)="onGiftClicked(gift)"
+              [class.partage]="gift.partage || gift.estPartage"
+              [class.recu]="gift.delivery?.recu"
+              [attr.aria-label]="getAriaLabel(gift)">
+            <td *ngFor="let column of displayedColumns"
+                [attr.data-label]="column.label || column.key"
+                tabindex="0"
+                (keydown.enter)="onGiftClicked(gift)"
+                (keydown.space)="onGiftClicked(gift)">
+              {{ getGiftValue(gift, column) }}
+            </td>
+          </tr>
+        </ng-container>
       </ng-container>
-    </ng-container>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <app-pagination
+      [paginationInfo]="paginationInfo()!"
+      (pageChange)="onPageChange($event)"
+      *ngIf="paginationInfo()">
+    </app-pagination>
+
+    <!-- Message si aucun cadeau -->
+    <div *ngIf="!giftsFollowedByAccount?.length" class="no-gifts">
+      <p>Vous n'avez pas encore réservé ou pris de cadeaux.</p>
+      <p class="emphase-douce">Consultez les listes des autres membres pour commencer !</p>
+    </div>
+  </div>
 
 
   <div class="options">
