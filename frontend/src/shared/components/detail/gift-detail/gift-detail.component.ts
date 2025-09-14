@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GiftService} from 'src/core/services/gift.service';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {AuthService} from 'src/security/service/auth.service';
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
@@ -47,6 +47,7 @@ export class GiftDetailComponent implements OnInit{
               public ideaService: IdeaService,
               public sharingService: SharingService,
               public router: Router,
+              private route: ActivatedRoute,
               public authService: AuthService,
               public errorService: ErrorService) {
   }
@@ -107,7 +108,17 @@ export class GiftDetailComponent implements OnInit{
     if (this.context === 'mes-cadeaux') {
       void this.router.navigate(['/dashboard/mes-cadeaux']);
     } else if (this.context === 'cadeaux-groupe') {
-      void this.router.navigate(['/dashboard/leurs-cadeaux']);
+      // Récupérer les query params pour les transférer
+      const memberId = this.route.snapshot.queryParams['memberId'];
+      const page = this.route.snapshot.queryParams['page'];
+      
+      const queryParams: any = {};
+      if (memberId && page) {
+        queryParams.memberId = memberId;
+        queryParams.page = page;
+      }
+      
+      void this.router.navigate(['/dashboard/leurs-cadeaux'], { queryParams });
     } else if (this.context === 'suivi') {
       void this.router.navigate(['/dashboard/cadeaux-suivis']);
     } else if (this.context === 'idee-cadeau') {
