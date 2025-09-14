@@ -1,4 +1,4 @@
-import {Component, computed, OnDestroy, OnInit} from '@angular/core';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
 import {formatDate, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {Router} from '@angular/router';
@@ -17,6 +17,8 @@ import {GiftFollowedByAccount} from 'src/core/models/gift/gift-followed-by-accou
 import {AuthService} from 'src/security/service/auth.service';
 import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 import {formatEuro} from 'src/core/utils/format-montant';
+import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
+import {PaginationInfo} from 'src/core/models/common/pagination.model';
 
 @Component({
   selector: 'app-my-gifts-follow-up',
@@ -28,17 +30,21 @@ import {formatEuro} from 'src/core/utils/format-montant';
     TitleCasePipe,
     FeedbackTestComponent,
     FormatMontantPipe,
+    PaginationComponent,
   ],
   templateUrl: './my-gifts-follow-up.component.html',
   styleUrl: './my-gifts-follow-up.component.scss'
 })
 export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
-  giftsFollowedByAccount: GiftFollowedByAccount[] = []
+  giftsFollowedByAccount: GiftFollowedByAccount[] = [];
   displayedColumns: ColumnDefinition[] = [];
   portraitSub?: Subscription;
   isPortrait = false;
-  profile = computed(() => this.authService.profile())
+  profile = computed(() => this.authService.profile());
+  currentPage = signal(1);
+  paginationInfo = signal<PaginationInfo | null>(null);
+  isLoadingFollowed = signal<boolean>(false);
 
   readonly displayedColumnsPortrait:  ColumnDefinition[] = [
     {key: 'destinataire', label: 'Destinataire', formatFn: (u: UserDisplay | null | undefined) => getDisplayName(u)},
@@ -65,21 +71,37 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
                public  errorService: ErrorService) {
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.giftService.clearGifts();
     this.portraitSub = this.viewport.isPortrait$.subscribe(isPortrait => {
-      this.isPortrait = isPortrait; // <-- tu le stockes ici
+      this.isPortrait = isPortrait;
       this.displayedColumns = isPortrait
         ? this.displayedColumnsPortrait
         : this.displayedColumnsDesktop;
     });
-    const result = await this.giftService.getFollowedGifts();
+    
+    await this.loadFollowedGifts(1);
+  }
 
-    if(result.success){
-      this.giftsFollowedByAccount = result.data;
+  async loadFollowedGifts(page: number): Promise<void> {
+    this.isLoadingFollowed.set(true);
+    
+    const result = await this.giftService.getFollowedGifts(page);
+
+    if (result.success && result.data) {
+      this.currentPage.set(page);
+      this.paginationInfo.set(result.data.pagination);
+      this.giftsFollowedByAccount = result.data.items;
     } else {
-      this.errorService.showError(result.message);
+      this.errorService.showError("Erreur lors du chargement des cadeaux suivis");
     }
+    
+    this.isLoadingFollowed.set(false);
+  }
+
+  async onPageChange(page: number): Promise<void> {
+    await this.loadFollowedGifts(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   ngOnDestroy(): void {
