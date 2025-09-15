@@ -3,12 +3,12 @@
     <h1 class="dashboard-title">
       Détail de votre achat
     </h1>
-    <p class="dashboard-subtitle">Ajoutez ici les infos cruciales (ou totalement accessoires) à propos de votre achat.</p>
+    <p class="dashboard-subtitle">Consignez ici les détails de votre acquisition — qu'ils soient capitaux ou délicieusement futiles.</p>
     <p class="emphase-douce">
-      🗨️ Ce champ est votre carnet de bord : vous pouvez y noter le prix réellement payé (n'oubliez pas les frais de port même les plus honteux), le lieu d’achat, ou si vous avez pris ce cadeau au nom d’un compte tiers.
+      🗨️ Ce registre privé accueille vos annotations : le prix effectivement déboursé (frais de port inclus, même les plus scandaleux), le lieu d'acquisition, ou la mention d'un éventuel compte tiers bénéficiaire.
     </p>
     <p>
-      <strong>🔐 Note :</strong> Ces informations ne sont visibles que par vous et les participants au cadeau s’il est partagé. On garde les secrets de bons plans entre nous.
+      <strong>🔐 Confidentialité :</strong> Ces informations demeurent dans votre cercle intime — vous et vos éventuels complices de partage. Les secrets d'une bonne affaire méritent d'être préservés.
     </p>
   </section>
 
@@ -16,7 +16,7 @@
   <form [formGroup]="purchaseForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label>Prix payé (€)</label>
-      <p class="advice">Conseil : n'oubliez pas d'ajouter les frais de port et si le cadeau est partagé, indiquez le montant de votre part dans ce champ</p>
+      <p class="advice">Conseil d'usage : incluez les frais d'acheminement, et si ce présent fait l'objet d'un partage, précisez votre contribution personnelle</p>
       <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')">
     </div>
 

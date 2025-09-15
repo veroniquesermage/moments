@@ -16,20 +16,24 @@
 
     <td (click)="$event.stopPropagation()" class=" col-actions" data-label="Priorité">
       <ng-container *ngIf="userIsTabbing$ | async; else dragHandle">
-        <button data-allow-tiers class="drag-handle"
-                (click)="changeOrder(i, 'up')"
-                attr.aria-label="Monter la priorité de {{ gift.nom }}"
-                (keydown.enter)="$event.stopPropagation()"
-                (keydown.space)="$event.stopPropagation()">
-          ⬆️
-        </button>
-        <button data-allow-tiers class="drag-handle"
-                (click)="changeOrder(i, 'down')"
-                attr.aria-label="Descendre la priorité de {{ gift.nom }}"
-                (keydown.enter)="$event.stopPropagation()"
-                (keydown.space)="$event.stopPropagation()">
-          ⬇️
-        </button>
+        <div class="priority-buttons">
+          <button data-allow-tiers class="drag-handle"
+                  [disabled]="i === 0"
+                  (click)="changeOrder(i, 'up')"
+                  (keydown.enter)="changeOrder(i, 'up'); $event.stopPropagation()"
+                  (keydown.space)="changeOrder(i, 'up'); $event.stopPropagation()"
+                  attr.aria-label="Monter la priorité de {{ gift.nom }}">
+            ⬆️
+          </button>
+          <button data-allow-tiers class="drag-handle"
+                  [disabled]="i === gifts.length - 1"
+                  (click)="changeOrder(i, 'down')"
+                  (keydown.enter)="changeOrder(i, 'down'); $event.stopPropagation()"
+                  (keydown.space)="changeOrder(i, 'down'); $event.stopPropagation()"
+                  attr.aria-label="Descendre la priorité de {{ gift.nom }}">
+            ⬇️
+          </button>
+        </div>
       </ng-container>
       <ng-template #dragHandle>
         <button data-allow-tiers

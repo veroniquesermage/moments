@@ -9,7 +9,7 @@
 
   <div *ngIf="!auth.isLoggedIn() && !groupeService.isLoading()">
 
-    <p class="command-accueil"> Choisissez comment vous connecter :</p>
+    <p class="command-accueil">Veuillez choisir votre mode d'authentification :</p>
     <div class="sebou-alert">
         <span class="intro">
           <em>Dans chaque groupe sommeille un Sébou, créature sensible en guerre contre les surprises.</em>
@@ -55,7 +55,7 @@
         required
       />
       <div id="email-hint" class="form-hint">
-        Votre adresse email, par exemple : jean.dupont&#64;example.com
+        Votre adresse électronique, par exemple : jean.dupont&#64;example.com
       </div>
 
       <div
@@ -97,7 +97,7 @@
 
       <div id="password-help" class="help-msg">
         <span>🧠</span> <strong>8 caractères, une lettre, un chiffre.</strong><br />
-        <span class="subtle">Évitons “12345678”, le Sébou te regarde.</span>
+        <span class="subtle">Évitons "12345678" — le Sébou veille, souvenez-vous.</span>
       </div>
 
       <div
