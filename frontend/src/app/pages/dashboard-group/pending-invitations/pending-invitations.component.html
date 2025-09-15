@@ -1,0 +1,68 @@
+<!-- Bouton simple -->
+<button
+  class="terminal-button secondary"
+  (click)="openModal()"
+  [disabled]="isLoading">
+  {{ isLoading ? '⏳ Chargement...' : '👀 Voir les invitations en attente' }}
+</button>
+
+<!-- Modale des invitations -->
+<app-terminal-modal
+  *ngIf="showModal"
+  [title]="'📧 Invitations en attente'"
+  [actions]="[{ label: 'Fermer', eventName: 'CLOSE', style: 'secondary' }]"
+  (actionClicked)="closeModal()">
+
+  <div class="invitations-content">
+    <p class="modal-description">
+      Voici les invitations envoyées qui n'ont pas encore été acceptées.
+    </p>
+
+    <div *ngIf="isLoading" class="loading">
+      ⏳ Chargement des invitations...
+    </div>
+
+    <div *ngIf="!isLoading && invitations.length === 0" class="no-invitations">
+      ✅ Aucune invitation en attente ! Tous vos invités ont rejoint le groupe ou les invitations ont expiré.
+    </div>
+
+    <div *ngIf="!isLoading && invitations.length > 0" class="invitations-list">
+      <table class="invitations-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Envoyé par</th>
+            <th>Date d'envoi</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invitation of invitations" [class.expired]="invitation.statut === 'EXPIREE'">
+            <td>{{ invitation.email }}</td>
+            <td>{{ invitation.envoye_par_nom }}</td>
+            <td>{{ formatDate(invitation.date_envoi) }}</td>
+            <td class="status-cell">
+              <span class="status" [class]="invitation.statut.toLowerCase()">
+                {{ getStatusIcon(invitation.statut) }} {{ getStatusText(invitation.statut) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="legend">
+        <p><strong>Légende :</strong></p>
+        <p>⏳ <strong>En attente</strong> : L'invitation a été envoyée et attend une réponse</p>
+        <p>❌ <strong>Expirée</strong> : Le code d'invitation a été regeneré depuis l'envoi de cette invitation</p>
+      </div>
+    </div>
+  </div>
+</app-terminal-modal>
+
+<!-- Modale d'erreur -->
+<app-terminal-modal
+  *ngIf="errorService.errorMessage()"
+  [message]="errorService.errorMessage()!"
+  [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
+  (actionClicked)="errorService.clearError()">
+</app-terminal-modal>
