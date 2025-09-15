@@ -75,10 +75,10 @@
         aria-labelledby="modal-title">
 
         <h2 id="modal-title" class="visually-hidden">Fenêtre de confirmation</h2>
-        <p>Pour qui souhaitez-vous dupliquer ce cadeau ?</p>
+        <p>À qui destinez-vous cette reproduction de votre excellente idée ?</p>
 
         <select id="selectDest" [(ngModel)]="selectedDestId">
-          <option [ngValue]="undefined" disabled selected hidden>Choisissez un destinataire</option>
+          <option [ngValue]="undefined" disabled selected hidden>Sélectionnez un heureux bénéficiaire</option>
           <option *ngFor="let user of membersSharedGroup" [value]="user.id">{{ user | displayName }}</option>
         </select>
 

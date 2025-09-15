@@ -23,7 +23,7 @@
       aria-modal="true"
       aria-labelledby="modal-title">
       <h2 id="modal-title">Liste des modifications qui seront appliquées</h2>
-      <p *ngIf="changes.length == 0">Aucune modification n'a été apportée.</p>
+      <p *ngIf="changes.length == 0">Aucun changement dans la hiérarchie établie.</p>
       <ol *ngIf="changes.length>0">
         <li *ngFor="let member of changes" style="list-style: none"> {{member.prenom}} {{member.nom | uppercase }}
           <span> : {{ member.role }}</span>
