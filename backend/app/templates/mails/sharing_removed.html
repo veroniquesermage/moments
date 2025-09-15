@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>(Moments) Modification dans l'organisation d'un présent collectif</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #222;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .gift-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .gift-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 0.5rem;
+        }
+
+        .gift-recipient {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #6c757d;
+            background-color: #ffffff;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            display: inline-block;
+        }
+
+        .cta {
+            display: inline-block;
+            margin: 1rem 0;
+            padding: 0.75rem 1.5rem;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .footer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Bonne nouvelle : vous êtes libre</h1>
+
+        <p>
+            Bonjour {{ participant.prenom }},<br /><br />
+            <strong>{{ preneur.prenom }} {{ preneur.nom }}</strong> vous a retiré(e) de la participation
+            au cadeau ci-dessous. C'est soit parce que les plans ont changé, soit parce que
+            votre contribution n'était finalement pas indispensable. Essayons de rester positifs.
+        </p>
+
+        <p>
+            Voici le cadeau dont vous n'avez plus à vous soucier :
+        </p>
+
+        <div class="gift-details">
+            <div class="gift-name">{{ cadeau.nom }}</div>
+            <div class="gift-recipient">Pour {{ cadeau.destinataire.prenom }} {{ cadeau.destinataire.nom }}</div>
+            <div class="amount">{{ montant }}€</div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #6c757d;">
+                <em>Montant qui était prévu pour votre participation</em>
+            </p>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Pas de panique !</strong> Ces choses arrivent : changement de budget,
+            réorganisation, ou peut-être que quelqu'un d'autre avait une meilleure idée.
+            En tout cas, ce n'est pas un jugement sur vos qualités de participant.</p>
+        </div>
+
+        <p>
+            Vous pouvez toujours participer aux autres cadeaux du groupe. Il y a sûrement
+            d'autres occasions de dépenser votre argent pour des gens qui l'apprécieront.
+        </p>
+
+        <p>
+            <a class="cta" href="{{ app_url }}">Voir les cadeaux sur (Moments)</a>
+        </p>
+
+        <div class="footer">
+            — L'équipe (Moments)<br />
+            <em>Parce que les plus beaux moments méritent une parenthèse 🌟</em><br /><br />
+            <small>Modification effectuée le {{ date_envoi }} par {{ preneur.prenom }} {{ preneur.nom }}.</small>
+        </div>
+    </div>
+</body>
+</html>

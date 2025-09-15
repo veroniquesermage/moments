@@ -53,16 +53,22 @@
 </head>
 <body>
 <div class="container">
-    <h1>🎁 {{destinataire.prenom}} a mis à jour un cadeau que vous aviez {{statut}} !</h1>
+    <h1>🎁 Changement de programme</h1>
 
     <p>
         Bonjour {{gift.reserve_par.prenom}},<br /><br />
-        Vous aviez {{statut}} le cadeau <strong>"{{gift.nom}}"</strong> dans la liste de {{destinataire.prenom}}.<br />
-        Ce cadeau vient d’être modifié  ✏️. Ce n'est peut-être rien ! Mais pour vous en assurer, connectez-vous à (Moments) et consultez le cadeau.
+        <strong>{{destinataire.prenom}}</strong> a modifié le cadeau <strong>"{{gift.nom}}"</strong>
+        que vous aviez {{statut}}. Nous vous prévenons au cas où ces changements rendraient
+        votre achat... moins pertinent.
     </p>
 
     <p>
-        <a class="cta" href="{{url}}">Accéder à (Moments)</a>
+        Autant vérifier maintenant plutôt que d'avoir des surprises. Personne n'aime découvrir
+        que le cadeau parfait ne l'est plus vraiment.
+    </p>
+
+    <p>
+        <a class="cta" href="{{url}}">Voir ce qui a changé sur (Moments)</a>
     </p>
 
     <div class="footer">
