@@ -22,6 +22,7 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
 })
 export class TerminalModalComponent implements AfterViewInit{
   @Input() message: string = "Êtes-vous sûr(e) ?";
+  @Input() title: string = "";
   @Input() actions: TerminalModalAction[] = [];
   @Output() actionClicked = new EventEmitter<string>();
 

@@ -8,6 +8,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {GroupResume} from 'src/core/models/group/group-resume.model';
 import {GroupDTO} from 'src/core/models/group/groupe-dto.model';
 import {GroupDetail} from 'src/core/models/group/group-detail.model';
+import {InvitationResponse} from 'src/core/models/invitation/invitation-response.model';
 
 @Injectable({providedIn: 'root'})
 export class GroupService {
@@ -120,6 +121,18 @@ export class GroupService {
     } catch (error) {
       console.error('[GroupService] Erreur lors de la suppression du groupe', error);
       return {success: false, message: "❌ Suppression impossible. Veuillez réessayer plus tard."};
+    }
+  }
+
+  async getPendingInvitations(groupId: number): Promise<ApiResponse<InvitationResponse[]>> {
+    const codeEnc = encodeURIComponent(groupId);
+    const url = `${this.apiUrl}/${codeEnc}/invitations`;
+    try {
+      const result = await firstValueFrom(this.http.get<InvitationResponse[]>(url));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la récupération des invitations en attente', error);
+      return {success: false, message: "❌ Impossible de récupérer les invitations en attente."};
     }
   }
 
