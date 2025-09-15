@@ -7,6 +7,7 @@ import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GroupService} from 'src/core/services/group.service';
 import {ToastrService} from 'src/core/services/toastr.service';
+import {PendingInvitationsComponent} from 'src/app/pages/dashboard-group/pending-invitations/pending-invitations.component';
 
 @Component({
   selector: 'app-group-invite',
@@ -14,7 +15,8 @@ import {ToastrService} from 'src/core/services/toastr.service';
   imports: [
     FormsModule,
     CommonModule,
-    TerminalModalComponent
+    TerminalModalComponent,
+    PendingInvitationsComponent
   ],
   templateUrl: './group-invite.component.html',
   styleUrl: './group-invite.component.scss'

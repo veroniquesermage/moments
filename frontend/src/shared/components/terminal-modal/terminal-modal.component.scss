@@ -1,1 +1,117 @@
+::ng-deep .modal-title {
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+  font-family: 'Courier New', monospace !important;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+}
 
+// Styles pour le contenu des modales avec tableaux et listes
+::ng-deep .modal-box {
+  text-align: left; // Override center alignment for content
+
+  .invitations-content {
+    .modal-description {
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+      font-style: italic;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-accent);
+      font-family: 'Courier New', monospace;
+    }
+
+    .no-invitations {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-success);
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-success);
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  .invitations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+
+    th, td {
+      border: 1px solid var(--color-border);
+      padding: 0.75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--color-bg-secondary);
+      color: var(--color-accent);
+      font-weight: bold;
+    }
+
+    tbody tr {
+      background-color: var(--color-bg);
+
+      &:hover {
+        background-color: var(--color-row-hover-bg);
+      }
+
+      &.expired {
+        opacity: 0.7;
+        background-color: var(--color-bg-secondary);
+      }
+    }
+
+    .status-cell {
+      white-space: nowrap;
+    }
+
+    .status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+
+      &.en_attente {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+      }
+
+      &.expiree {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+      }
+    }
+  }
+
+  .legend {
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1rem;
+    font-size: 0.9rem;
+
+    p {
+      margin: 0.5rem 0;
+      color: var(--color-text);
+
+      &:first-child {
+        margin-top: 0;
+        color: var(--color-accent);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

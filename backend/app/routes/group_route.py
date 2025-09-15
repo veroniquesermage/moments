@@ -5,7 +5,9 @@ from app.database import get_db
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_user_from_cookie_with_tiers
 from app.models import User
 from app.schemas.group import GroupResponse, GroupCreate, GroupDetails, GroupUpdate
+from app.schemas.invitation import InvitationResponse
 from app.services.group_service import GroupService
+from app.services.invitation_service import InvitationService
 
 router = APIRouter(prefix="/api/groupe", tags=["groupe"])
 
@@ -75,3 +77,13 @@ async def update_code_invitation(
         current_user: User = Depends(get_current_user_from_cookie)
 ):
     await GroupService.update_code_invitation(db, current_user, groupId )
+
+@router.get("/{groupId}/invitations", response_model=list[InvitationResponse])
+async def get_pending_invitations(
+        groupId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+) -> list[InvitationResponse]:
+    # Vérifier que l'utilisateur est admin du groupe avant de retourner les invitations
+    await GroupService.get_group_if_admin(current_user, db, groupId)
+    return await InvitationService.get_pending_invitations(db, groupId)
