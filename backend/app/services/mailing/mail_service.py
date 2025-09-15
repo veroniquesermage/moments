@@ -4,8 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
-from app.models import Gift
-from app.models import User
+from app.models import Gift, User, Invitation
 from app.schemas.group import GroupResponse
 from app.schemas.mailing import FeedbackRequest
 from app.schemas.mailing.invite_request import InviteRequest
@@ -77,6 +76,19 @@ class MailService:
                     status_code=500,
                     detail=f"Erreur d'envoi du mail d'invitation : {response.json()}"
                 )
+            else:
+                # Enregistrer les invitations envoyées avec succès
+                from app.utils.date_helper import now_paris
+                date_now = now_paris().replace(tzinfo=None)  # Convertir en naive datetime
+                for email in valid_email:
+                    invitation = Invitation(
+                        email=email,
+                        groupe_id=group_id,
+                        envoye_par_id=current_user.id,
+                        date_envoi=date_now
+                    )
+                    db.add(invitation)
+                await db.commit()
         except Exception as e:
             logger.error(f"📨 Erreur d'envoi du mail d'invitation")
             logger.exception(e)

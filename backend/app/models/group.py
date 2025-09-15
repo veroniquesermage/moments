@@ -1,6 +1,7 @@
-from sqlalchemy import Column, String, Text, Integer
+from sqlalchemy import Column, String, Text, Integer, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+from app.utils.date_helper import now_paris
 
 
 class Group(Base):
@@ -10,5 +11,6 @@ class Group(Base):
     nom_groupe = Column("name", String(255), nullable=False)
     description = Column(Text, nullable=True)
     code = Column(String(10), unique=True, nullable=False)
+    date_refresh_code = Column(DateTime, nullable=True)
 
     utilisateurs = relationship("UserGroup", back_populates="groupe")

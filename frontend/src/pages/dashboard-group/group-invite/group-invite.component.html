@@ -30,6 +30,7 @@
   </div>
   <div class="actions-invite">
     <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Expédier les invitations</button>
+    <app-pending-invitations [groupId]="groupId!"></app-pending-invitations>
     <button class="suppress" (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
     <div class="help-msg">
       ⚠️ <strong>Le nouveau code rendra caduc l'ancien.</strong>

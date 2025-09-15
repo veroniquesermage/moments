@@ -5,6 +5,7 @@ from .gift_purchase_info import GiftPurchaseInfo
 from .gift_purchase_info import GiftPurchaseInfo
 from .gift_shared import GiftShared
 from .group import Group
+from .invitation import Invitation
 from .login_attempts import LoginAttempts
 from .refresh_token import RefreshToken
 from .trace import Trace

@@ -10,6 +10,7 @@ from app.schemas.group import GroupCreate, GroupResponse, GroupDetails, GroupUpd
 from app.services.trace_service import TraceService
 from app.services.user_group_service import UserGroupService
 from app.utils.code_generator import generate_random_code
+from app.utils.date_helper import now_paris
 
 
 class GroupService:
@@ -36,7 +37,8 @@ class GroupService:
         db_group = Group(
             nom_groupe=group_data.nom_groupe,
             description=group_data.description,
-            code=code
+            code=code,
+            date_refresh_code=now_paris().replace(tzinfo=None)
         )
         db.add(db_group)
         await db.commit()
@@ -237,6 +239,7 @@ class GroupService:
         code = generate_random_code()
 
         group.code = code
+        group.date_refresh_code = now_paris().replace(tzinfo=None)
         await db.commit()
 
         await TraceService.record_trace(
