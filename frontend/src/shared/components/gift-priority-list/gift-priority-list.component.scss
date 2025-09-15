@@ -6,7 +6,7 @@
   background: none;
   border: none;
   color: var(--color-text);
-  cursor: grab;
+  cursor: pointer;
   padding: 0;
   margin: 0;
   font-size: 1rem;
@@ -15,6 +15,22 @@
     outline: 2px solid var(--color-border);
     outline-offset: 2px;
   }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+}
+
+.priority-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: center;
 }
 
 .gift-table {

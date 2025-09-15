@@ -3,11 +3,13 @@
     <h1 class="dashboard-title">
       🛍️ Ma liste de cadeaux réservés ou pris
     </h1>
-    <p>Voici tous les cadeaux que vous avez réservés ou pris, pour vous ou un compte tiers.
-    <br> Le prix affiché correspond à ce que vous avez effectivement payé, y compris votre participation si le cadeau est partagé.</p>
-    <p class="emphase-douce">
-      Cliquez sur un cadeau pour accéder à toutes ses infos et les gérer : livraison, partage, remboursement, notes, le prix réellement payé...
-    </p>
+      <p>Voici l'ensemble de vos engagements cadeaux, qu'ils soient destinés à votre propre personne ou gracieusement pris en charge pour autrui.
+      <br>Cliquez sur un cadeau pour accéder aux détails : livraison, partage, remboursement, notes... Tout ce qu'une personne civilisée se doit de maîtriser.</p>
+
+      <p class="emphase-douce">
+        Dans le détail de chaque cadeau, cliquez sur "📝 Ajouter des informations" pour indiquer le prix payé (même la générosité mérite une comptabilité décente) ou désigner un compte tiers.
+        <br>Parce qu'il serait fâcheux de perdre la trace de nos bonnes actions.
+      </p>
     <p *ngIf="isPortrait" class="orientation-hint">
     📱 Pour plus de fonctionnalités, passez en mode paysage.
     </p>
@@ -15,7 +17,7 @@
 
   <!-- Loading state -->
   <div *ngIf="isLoadingFollowed()" class="loading-state">
-    Chargement de vos cadeaux suivis...
+    Recensement de vos nobles engagements...
   </div>
 
   <!-- Contenu des cadeaux -->
@@ -71,8 +73,8 @@
 
     <!-- Message si aucun cadeau -->
     <div *ngIf="!giftsFollowedByAccount?.length" class="no-gifts">
-      <p>Vous n'avez pas encore réservé ou pris de cadeaux.</p>
-      <p class="emphase-douce">Consultez les listes des autres membres pour commencer !</p>
+      <p>Votre registre des engagements demeure d'une pureté exemplaire.</p>
+      <p class="emphase-douce">Consultez les listes des autres membres pour entamer vos bonnes œuvres !</p>
     </div>
   </div>
 

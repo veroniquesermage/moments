@@ -4,7 +4,7 @@
   <hr class="block-separator" />
 
   <div>
-    <p class="emphase-douce"> Saisissez une adresse mail par ligne. Virgules et espaces seront convertis en retours à la ligne.</p>
+    <p class="emphase-douce">Inscrivez une adresse mail par ligne — notre système se chargera avec courtoisie de convertir virgules et espaces en retours à la ligne.</p>
     <textarea
       [(ngModel)]="mails"
       (input)="normalizeMails()"
@@ -13,29 +13,29 @@
 
   </div>
 
-  <button (click)="checkMail()">👀 Vérifier les mails</button>
+  <button (click)="checkMail()">👀 Contrôler les adresses</button>
 
   <div *ngIf="validMails?.emails!.length > 0">
-    <p>✅ Mails valides :</p>
+    <p>✅ Adresses acceptables :</p>
     <ul>
       <li *ngFor="let mail of validMails?.emails">{{ mail }}</li>
     </ul>
   </div>
 
   <div *ngIf="invalidMails.length > 0">
-    <p>❌ Mails invalides :</p>
+    <p>❌ Adresses problématiques :</p>
     <ul>
       <li *ngFor="let mail of invalidMails">{{ mail }}</li>
     </ul>
   </div>
   <div class="actions-invite">
-    <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Envoyer les invitations</button>
+    <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Expédier les invitations</button>
     <button class="suppress" (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
     <div class="help-msg">
-      ⚠️ <strong>Le nouveau code invalide l’ancien.</strong>
+      ⚠️ <strong>Le nouveau code rendra caduc l'ancien.</strong>
       <br />
       <span class="subtle">
-      Les anciens liens seront inutilisables (sauf comptes déjà créés).
+      Les anciens liens deviendront inutilisables (excepté pour les comptes déjà établis).
     </span>
     </div>
   </div>

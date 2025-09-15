@@ -4,10 +4,11 @@
       🎁 Mes cadeaux
     </h1>
     <p>
-      Les cadeaux sont triés par ordre de priorité. Utilisez la poignée ↕️ pour organiser votre liste.
+      Voici vos désirs soigneusement ordonnés par priorité. Même la convoitise mérite un certain raffinement.
     </p>
     <p class="emphase-douce">
-      Cliquez sur un cadeau pour consulter son détail, le modifier ou le supprimer.
+      Utilisez la poignée ↕️ pour réorganiser vos souhaits selon l'urgence du moment — nous ne sommes pas des sauvages.
+      <br>Cliquez sur un cadeau pour consulter son détail, le perfectionner ou, si le cœur vous en dit, l'effacer de vos préoccupations.
     </p>
     <p class="visually-hidden" id="table-priorite-explication">
       Chaque ligne commence par des boutons pour modifier la priorité : utilisez Tab pour les afficher, puis les activer avec Entrée ou Espace.
@@ -16,7 +17,7 @@
 
   <!-- Loading state -->
   <div *ngIf="giftService.isLoading()" class="loading-state">
-    Chargement des cadeaux...
+    Préparation de vos désirs en cours...
   </div>
 
   <!-- Liste des cadeaux -->
@@ -35,8 +36,8 @@
 
   <!-- Message si aucun cadeau -->
   <div *ngIf="!giftService.isLoading() && gifts().length === 0" class="no-gifts">
-    <p>Aucun cadeau dans votre liste.</p>
-    <p class="emphase-douce">Commencez par ajouter votre premier cadeau !</p>
+    <p>Votre liste semble remarquablement vide.</p>
+    <p class="emphase-douce">Il serait temps de cultiver quelques aspirations, ne trouvez-vous pas ?</p>
   </div>
 
   <div class="options">

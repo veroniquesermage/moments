@@ -4,12 +4,12 @@
       📃 Listes des autres membres
     </h1>
     <p class="emphase-douce">
-      Cliquez sur un membre pour obtenir sa liste de cadeaux.
+      Cliquez sur un membre pour consulter ses desiderata — tout ce qu'une personne civilisée se doit de connaître pour bien choisir.
     </p>
     <p>
-      🧩 Ces comptes sont sous la garde d’un autre membre.
-      Peut-être qu’ils sont trop jeunes, trop âgés, ou juste trop désintéressés par la technologie.<br>
-      <em>(Ce sont ce qu’on appelle des comptes tiers.)</em>
+      🧩 Vous noterez que certains comptes bénéficient de la tutelle bienveillante d'un autre membre.
+      Ils sont peut-être trop jeunes, trop âgés, ou simplement trop sages pour s'embarrasser de nos artifices numériques.<br>
+      <em>(Nous appelons cela, avec la plus grande élégance, des comptes tiers.)</em>
     </p>
   </section>
 
@@ -27,13 +27,13 @@
 
   <!-- Loading state pour le membre sélectionné -->
   <div *ngIf="isLoadingMember()" class="loading-state">
-    Chargement des cadeaux du membre...
+    Consultation des archives privées en cours...
   </div>
 
   <!-- Contenu des cadeaux -->
   <div *ngIf="selectedMember && !isLoadingMember()">
     <section class="intro-bloc" aria-label="Explication du fonctionnement de la liste">
-      <p class="emphase-douce"> Cliquez sur un cadeau pour obtenir son détail et le réserver ou le prendre</p>
+      <p class="emphase-douce">Cliquez sur un cadeau pour consulter ses détails et, si l'inspiration vous prend, le réserver ou le prendre sous votre garde</p>
     </section>
     
     <table *ngIf="giftPublic.length > 0" aria-describedby="table-priorite-explication" class="gift-table">
@@ -75,7 +75,8 @@
 
     <!-- Message si aucun cadeau -->
     <div *ngIf="giftPublic.length === 0" class="no-gifts">
-      <p>Ce membre n'a pas encore de cadeaux dans sa liste.</p>
+      <p>Ce membre cultive visiblement un détachement admirable envers les biens matériels.</p>
+      <p class="emphase-douce">Sa liste demeure d'une sobriété toute monastique.</p>
     </div>
   </div>
 

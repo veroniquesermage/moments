@@ -62,9 +62,9 @@ export class WelcomeComponent {
 
   validatePassword(): void {
     if (!this.password) {
-      this.passwordError = 'Le mot de passe est requis.';
+      this.passwordError = 'Un mot de passe serait fort apprécié.';
     } else if (!this.passwordRegex.test(this.password)) {
-      this.passwordError = '8 caractères minimum, avec une lettre et un chiffre.';
+      this.passwordError = 'Huit caractères au minimum, agrémentés d\'une lettre et d\'un chiffre.';
     } else {
       this.passwordError = '';
     }
@@ -86,15 +86,26 @@ export class WelcomeComponent {
 
   validateEmail(): void {
     if (!this.email) {
-      this.emailError = 'L’email est requis.';
+      this.emailError = 'Votre adresse électronique nous fait défaut.';
     } else if (!this.emailRegex.test(this.email)) {
-      this.emailError = 'Le format de l’email est incorrect.';
+      this.emailError = 'Cette adresse manque singulièrement de correction.';
     } else {
       this.emailError = '';
     }
   }
 
   async loginWithCredentials() {
+    // Valider les champs avant d'envoyer la requête
+    this.emailTouched = true;
+    this.passwordTouched = true;
+    this.validateEmail();
+    this.validatePassword();
+
+    // Si des erreurs de validation existent, ne pas continuer
+    if (this.emailError || this.passwordError) {
+      return;
+    }
+
     try {
       const res = await this.auth.loginWithCredentials(this.email, this.password, this.stayLoggedIn);
       this.auth.profile.set(res.profile);
@@ -104,32 +115,43 @@ export class WelcomeComponent {
 
       switch (err.status) {
         case 401:
-          this.message = '<strong>Ce n\'est pas le bon mot de passe !</strong><br>' +
-            'Vous pouvez réessayer (avec le bon, cette fois 😏) ou réinitialiser votre mot de passe.<br>' +
-            'Attention : vous n\'avez droit qu\'à <strong>5 tentatives</strong> !'
+          this.message = '<strong>Ce mot de passe ne saurait convenir !</strong><br>' +
+            'Vous pouvez tenter de nouveau (avec le bon, cette fois) ou procéder à sa réinitialisation.<br>' +
+            'Gardez à l\'esprit que vous ne disposez que de <strong>5 tentatives</strong> — nous ne sommes pas des sauvages, mais tout de même.'
           this.showConfirmModal = true;
           break;
         case 403:
-          this.errorService.showError('<strong>Oups, compte temporairement bloqué !</strong><br>' +
-            'On vous avait prévenu : 5 tentatives seulement...<br>' +
-            'Prenez une pause de 15 minutes et réinitialisez-le !');
+          this.errorService.showError('<strong>Compte temporairement suspendu !</strong><br>' +
+            'Nous vous avions pourtant avertis : cinq tentatives tout au plus...<br>' +
+            'Accordez-vous une pause de quinze minutes et procédez à sa réinitialisation.');
           break;
         case 404:
-          this.errorService.showError('<strong>Hmm... cette adresse ne nous dit rien !</strong><br>\n' +
-            'Aucun compte n\'existe pour cet email.<br>' +
-            'Et si c\'était le moment d\'en créer un ?');
+          this.errorService.showError('<strong>Cette adresse nous est parfaitement inconnue !</strong><br>\n' +
+            'Aucun compte ne correspond à cette adresse électronique.<br>' +
+            'Ne serait-ce point l\'occasion d\'en établir un ?');
           break;
         case 409:
-          this.errorService.showError('<strong>Ce compte existe bien, mais pas de mot de passe ici !</strong><br>' +
-            'Il est timide… il ne parle que Google. Cliquez sur le bouton juste au-dessus.');
+          this.errorService.showError('<strong>Ce compte existe bel et bien, mais point de mot de passe !</strong><br>' +
+            'Il cultive une certaine réserve... il ne converse qu\'avec Google. Cliquez donc sur le bouton ci-dessus.');
           break;
         default:
-          this.errorService.showError('Veuillez réessayer plus tard.');
+          this.errorService.showError('Un contretemps inopiné s\'est produit. Veuillez tenter de nouveau sous peu.');
       }
     }
   }
 
   async registerWithCredentials() {
+    // Valider les champs avant d'envoyer la requête
+    this.emailTouched = true;
+    this.passwordTouched = true;
+    this.validateEmail();
+    this.validatePassword();
+
+    // Si des erreurs de validation existent, ne pas continuer
+    if (this.emailError || this.passwordError) {
+      return;
+    }
+
     const credentials: LoginRequest = {
       email: this.email,
       password: this.password,
@@ -138,7 +160,7 @@ export class WelcomeComponent {
     const result = await this.auth.checkMail(credentials);
     if (result.success) {
       this.modalActions = [{ label: 'OK', eventName: 'CANCEL', style: 'primary' }];
-      this.message = '<strong>Un email vient de partir !</strong> <br> Vous avez 30min pour cliquer sur le lien et terminer votre inscription.';
+      this.message = '<strong>Un courrier électronique vient de vous être expédié !</strong> <br> Vous disposez de trente minutes pour cliquer sur le lien et parachever votre inscription.';
       this.showConfirmModal = true;
     } else {
       this.errorService.showError(result.message);
@@ -151,10 +173,10 @@ export class WelcomeComponent {
       if (response){
         this.modalActions = [
           { label: 'OK', eventName: 'CANCEL', style: 'primary' }];
-        this.message = '<strong>Un email vient de partir !</strong> <br> Cliquez sur le lien qu’il contient pour réinitialiser votre mot de passe.';
+        this.message = '<strong>Un courrier électronique vient de vous être expédié !</strong> <br> Cliquez sur le lien qu\'il contient pour réinitialiser votre mot de passe.';
       } else {
         this.showConfirmModal = false;
-        this.errorService.showError('Oups! Un problème est survenu. <br> Veuillez réessayer plus tard');
+        this.errorService.showError('Un fâcheux contretemps s\'est produit. <br> Veuillez tenter de nouveau sous peu.');
       }
 
     } else if (eventName === ModalActionType.CANCEL) {
