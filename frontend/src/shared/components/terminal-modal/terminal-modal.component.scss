@@ -43,12 +43,23 @@
     margin-bottom: 1.5rem;
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+
+    thead, tbody, tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
 
     th, td {
       border: 1px solid var(--color-border);
       padding: 0.75rem;
       text-align: left;
       vertical-align: top;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     th {
@@ -91,6 +102,37 @@
         border: 1px solid #dc3545;
       }
     }
+
+    // Responsive design pour mobiles
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+
+      th, td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+      }
+
+      // Masquer certaines colonnes sur très petit écran
+      th:nth-child(3), td:nth-child(3) { // Date d'envoi
+        display: none;
+      }
+
+      .status {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      th:nth-child(2), td:nth-child(2) { // Envoyé par
+        display: none;
+      }
+
+      th, td {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.7rem;
+      }
+    }
   }
 
   .legend {
@@ -112,6 +154,16 @@
       &:last-child {
         margin-bottom: 0;
       }
+    }
+
+    @media (max-width: 768px) {
+      padding: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.5rem;
+      font-size: 0.75rem;
     }
   }
 }
