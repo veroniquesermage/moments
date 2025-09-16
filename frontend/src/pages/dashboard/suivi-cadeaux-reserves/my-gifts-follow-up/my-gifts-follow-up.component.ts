@@ -85,18 +85,27 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
   async loadFollowedGifts(page: number): Promise<void> {
     this.isLoadingFollowed.set(true);
-    
-    const result = await this.giftService.getFollowedGifts(page);
 
-    if (result.success && result.data) {
-      this.currentPage.set(page);
-      this.paginationInfo.set(result.data.pagination);
-      this.giftsFollowedByAccount = result.data.items;
-    } else {
+    try {
+      const result = await this.giftService.getFollowedGifts(page);
+
+      if (result.success) {
+        this.currentPage.set(page);
+        this.paginationInfo.set(result.data.pagination);
+        this.giftsFollowedByAccount = result.data.items || [];
+      } else {
+        const errorMessage = result.message;
+        console.error('Erreur lors du chargement des cadeaux suivis:', errorMessage);
+        this.giftsFollowedByAccount = [];
+        this.errorService.showError(errorMessage);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des cadeaux suivis:', error);
+      this.giftsFollowedByAccount = [];
       this.errorService.showError("Erreur lors du chargement des cadeaux suivis");
+    } finally {
+      this.isLoadingFollowed.set(false);
     }
-    
-    this.isLoadingFollowed.set(false);
   }
 
   async onPageChange(page: number): Promise<void> {
