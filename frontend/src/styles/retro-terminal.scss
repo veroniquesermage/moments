@@ -376,6 +376,21 @@ body.compte-tiers {
   min-width: 250px;
   max-width: 90%;
   text-align: center;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    max-width: 95%;
+    margin: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    max-width: 98%;
+    margin: 0.25rem;
+    max-height: 95vh;
+  }
 }
 
 .modal-actions {
