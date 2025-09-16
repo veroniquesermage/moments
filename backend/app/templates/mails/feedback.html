@@ -1,25 +1,97 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Nouveau feedback</title>
+    <meta charset="UTF-8" />
+    <title>(Moments) Nouveau feedback reçu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #222;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feedback-content {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+
+        .user-info {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        .footer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 2rem;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            padding-top: 1rem;
+        }
+    </style>
 </head>
-<body style="font-family: sans-serif; color: #333; line-height: 1.6;">
-<h2 style="color: #444;">✅ Nouveau feedback reçu</h2>
+<body>
+    <div class="container">
+        <h1>💬 Nouveau feedback utilisateur</h1>
 
-<p><strong>🧩 Composant concerné :</strong> {{ feedback_request.composant }}</p>
-<p><strong>📅 Envoyé le :</strong> {{ date_envoi }}</p>
+        <div class="info-section">
+            <div class="user-info">
+                <span class="label">Utilisateur :</span>
+                <span>{{ user.prenom }} {{ user.nom }}</span>
 
-<h3 style="margin-top: 1.5rem;">👤 Utilisateur</h3>
-<ul>
-    <li><strong>Prénom :</strong> {{ user.prenom }}</li>
-    <li><strong>Nom :</strong> {{ user.nom }}</li>
-    <li><strong>ID :</strong> {{ user.id }}</li>
-</ul>
+                <span class="label">Composant :</span>
+                <span>{{ feedback_request.composant }}</span>
 
-<h3 style="margin-top: 1.5rem;">💬 Commentaire</h3>
-<div style="border:1px solid #ccc; padding:1rem; background:#f9f9f9;">
-    {{ feedback_request.commentaire }}
-</div>
+                <span class="label">Date d'envoi :</span>
+                <span>{{ date_envoi }}</span>
+
+                <span class="label">ID utilisateur :</span>
+                <span>{{ user.id }}</span>
+            </div>
+        </div>
+
+        <div class="feedback-content">{{ feedback_request.commentaire }}</div>
+
+        <div class="footer">
+            — Feedback système (Moments)<br />
+            <em>Retour utilisateur automatique</em>
+        </div>
+    </div>
 </body>
 </html>
