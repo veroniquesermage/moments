@@ -9,36 +9,13 @@
       [(ngModel)]="mails"
       (input)="normalizeMails()"
       rows="4"
+      placeholder="email1@example.com&#10;email2@example.com"
     ></textarea>
-
   </div>
 
-  <button (click)="checkMail()">👀 Contrôler les adresses</button>
-
-  <div *ngIf="validMails?.emails!.length > 0">
-    <p>✅ Adresses acceptables :</p>
-    <ul>
-      <li *ngFor="let mail of validMails?.emails">{{ mail }}</li>
-    </ul>
-  </div>
-
-  <div *ngIf="invalidMails.length > 0">
-    <p>❌ Adresses problématiques :</p>
-    <ul>
-      <li *ngFor="let mail of invalidMails">{{ mail }}</li>
-    </ul>
-  </div>
   <div class="actions-invite">
-    <button *ngIf="invalidMails.length==0 && validMails?.emails!.length >0" (click)="sendInvitation()">💌 Expédier les invitations</button>
+    <button (click)="sendInvitation()">💌 Expédier les invitations</button>
     <app-pending-invitations [groupId]="groupId!"></app-pending-invitations>
-    <button class="suppress" (click)="refreshInviteCode()">🔄 Régénérer le code d'invitation</button>
-    <div class="help-msg">
-      ⚠️ <strong>Le nouveau code rendra caduc l'ancien.</strong>
-      <br />
-      <span class="subtle">
-      Les anciens liens deviendront inutilisables (excepté pour les comptes déjà établis).
-    </span>
-    </div>
   </div>
 </div>
 
@@ -48,3 +25,9 @@
   [actions]="[{ label: 'Ok', eventName: 'CLOSE', style: 'danger' }]"
   (actionClicked)="errorService.clearError()"
 ></app-terminal-modal>
+
+<app-invitation-recap-modal
+  [isVisible]="showRecapModal"
+  [inviteResponse]="inviteResponse"
+  (close)="onRecapModalClose()"
+></app-invitation-recap-modal>

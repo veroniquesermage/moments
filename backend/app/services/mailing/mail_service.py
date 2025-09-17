@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import logger
 from app.models import Gift, User, Invitation
 from app.schemas.group import GroupResponse
-from app.schemas.mailing import FeedbackRequest
+from app.schemas.mailing import FeedbackRequest, InviteResponse
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.group_service import GroupService
 from app.services.mailing.mailjet_adapter import MailjetAdapter
 from app.services.trace_service import TraceService
 from app.services.user_group_service import UserGroupService
+from app.utils.email_validator import validate_email_format, sanitize_email_list, generate_invitation_token, calculate_expiration_date
 
 
 class MailService:
@@ -53,49 +54,90 @@ class MailService:
             group_id: int,
             db : AsyncSession,
             current_user: User
-    ) -> None:
+    ) -> InviteResponse:
 
+        # Nettoyer et normaliser les emails
+        cleaned_emails = sanitize_email_list(invites_request.emails)
+
+        # Valider le format des emails
+        emails_valides = []
+        emails_invalides = []
+        for email in cleaned_emails:
+            if validate_email_format(email):
+                emails_valides.append(email)
+            else:
+                emails_invalides.append(email)
+
+        # Récupérer le groupe et les utilisateurs existants
         group: GroupResponse = await GroupService.get_group(db, group_id)
-        existing_users = await UserGroupService.get_existing_users_in_group(db, group_id, invites_request)
-        valid_email = [mail for mail in invites_request.emails if mail not in existing_users]
+        existing_users = await UserGroupService.get_existing_users_in_group(db, group_id, InviteRequest(emails=emails_valides))
 
-        try:
-            response = MailjetAdapter.send_invites(valid_email, group, current_user)
-            if response.status_code != 200:
-                await TraceService.record_trace(
-                    db,
-                    f"{current_user.prenom} {current_user.nom}",
-                    "ERROR",
-                    f"Erreur lors de l'envoi d'un mail d'invitation",
-                    {"emails": json.dumps(invites_request.emails),
-                     "group_id": group_id,
-                     "user_id": current_user.id}
-                )
+        # Séparer les emails à envoyer et ceux déjà membres
+        emails_a_envoyer = [email for email in emails_valides if email not in existing_users]
+        emails_deja_membres = [email for email in emails_valides if email in existing_users]
 
+        emails_envoyes = []
+
+        if emails_a_envoyer:
+            try:
+                # Créer les invitations avec tokens avant l'envoi
+                invitations_data = []
+                from app.utils.date_helper import now_paris
+                date_now = now_paris().replace(tzinfo=None)
+                date_expiration = calculate_expiration_date().replace(tzinfo=None)
+
+                for email in emails_a_envoyer:
+                    token = generate_invitation_token()
+                    invitation_data = {
+                        'email': email,
+                        'token': token,
+                        'groupe_id': group_id,
+                        'envoye_par_id': current_user.id,
+                        'date_envoi': date_now,
+                        'date_expiration': date_expiration,
+                        'utilise': False
+                    }
+                    invitations_data.append(invitation_data)
+
+                # Envoyer les emails avec les tokens
+                response = MailjetAdapter.send_invites_with_tokens(invitations_data, group, current_user)
+
+                if response.status_code != 200:
+                    await TraceService.record_trace(
+                        db,
+                        f"{current_user.prenom} {current_user.nom}",
+                        "ERROR",
+                        f"Erreur lors de l'envoi d'un mail d'invitation",
+                        {"emails": json.dumps(emails_a_envoyer),
+                         "group_id": group_id,
+                         "user_id": current_user.id}
+                    )
+
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Erreur d'envoi du mail d'invitation : {response.json()}"
+                    )
+                else:
+                    # Enregistrer les invitations en base
+                    for invitation_data in invitations_data:
+                        invitation = Invitation(**invitation_data)
+                        db.add(invitation)
+                    await db.commit()
+                    emails_envoyes = emails_a_envoyer
+
+            except Exception as e:
+                logger.error(f"📨 Erreur d'envoi du mail d'invitation")
+                logger.exception(e)
                 raise HTTPException(
                     status_code=500,
-                    detail=f"Erreur d'envoi du mail d'invitation : {response.json()}"
+                    detail="Une erreur est survenue lors de l'envoi de l'email. Merci de réessayer plus tard."
                 )
-            else:
-                # Enregistrer les invitations envoyées avec succès
-                from app.utils.date_helper import now_paris
-                date_now = now_paris().replace(tzinfo=None)  # Convertir en naive datetime
-                for email in valid_email:
-                    invitation = Invitation(
-                        email=email,
-                        groupe_id=group_id,
-                        envoye_par_id=current_user.id,
-                        date_envoi=date_now
-                    )
-                    db.add(invitation)
-                await db.commit()
-        except Exception as e:
-            logger.error(f"📨 Erreur d'envoi du mail d'invitation")
-            logger.exception(e)
-            raise HTTPException(
-                status_code=500,
-                detail="Une erreur est survenue lors de l’envoi de l’email. Merci de réessayer plus tard."
-            )
+
+        return InviteResponse(
+            emails_envoyes=emails_envoyes,
+            emails_invalides=emails_invalides,
+            emails_deja_membres=emails_deja_membres
+        )
 
     @staticmethod
     async def send_alert_update(

@@ -68,13 +68,13 @@ async def test_send_invites_filters_existing_and_handles_status(unit_db_session,
 
     captured = {}
 
-    def fake_send_invites(valid_email, group_resp, current_user):
+    def fake_send_invites(invitations_data, group_resp, current_user):
         # should have filtered 'exists@example.com'
-        captured["emails"] = valid_email
+        captured["emails"] = [invitation['email'] for invitation in invitations_data]
         return DummyResp(200)
 
     monkeypatch.setattr(
-        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_invites",
+        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_invites_with_tokens",
         fake_send_invites,
     )
 
@@ -84,8 +84,8 @@ async def test_send_invites_filters_existing_and_handles_status(unit_db_session,
 
     # Error path -> non-200 raises
     monkeypatch.setattr(
-        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_invites",
-        lambda valid_email, group_resp, current_user: DummyResp(500, {"err": True}),
+        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_invites_with_tokens",
+        lambda invitations_data, group_resp, current_user: DummyResp(500, {"err": True}),
     )
     with pytest.raises(Exception):
         await MailService.send_invites(invites, group.id, unit_db_session, owner)
