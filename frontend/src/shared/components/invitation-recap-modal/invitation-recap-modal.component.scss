@@ -1,0 +1,49 @@
+.invitations-content {
+  .section {
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.5rem;
+
+      li {
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-style: italic;
+    }
+
+    &.success {
+      h3, li {
+        color: var(--color-success, #00ff00);
+      }
+    }
+
+    &.error {
+      h3, li {
+        color: var(--color-error, #ff0000);
+      }
+    }
+
+    &.warning {
+      h3, li {
+        color: var(--color-warning, #ffaa00);
+      }
+    }
+
+    &.info {
+      h3, p {
+        color: var(--color-accent);
+      }
+    }
+  }
+}

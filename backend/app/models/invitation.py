@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 from app.utils.date_helper import now_paris
@@ -12,6 +12,9 @@ class Invitation(Base):
     groupe_id = Column(Integer, ForeignKey("groupe.id"), nullable=False)
     envoye_par_id = Column(Integer, ForeignKey("utilisateur.id"), nullable=False)
     date_envoi = Column(DateTime, nullable=False)
+    token = Column(String(255), unique=True, nullable=False, index=True)
+    date_expiration = Column(DateTime, nullable=True)
+    utilise = Column(Boolean, default=False, nullable=False)
 
     # Relations
     groupe = relationship("Group", backref="invitations")

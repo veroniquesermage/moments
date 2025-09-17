@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_group_id, \
     get_current_user_from_cookie_with_tiers
-from app.main import get_db
+from app.database import get_db
 from app.models import User
 from app.schemas.auth import GoogleAuthRequest, CompleteProfileRequest, RegisterRequest
 from app.schemas.auth.change_password import ChangePassword
@@ -12,6 +12,7 @@ from app.schemas.auth.login_request import LoginRequest
 from app.schemas.auth.reset_password_payload import ResetPasswordPayload
 from app.schemas.user import UserSchema
 from app.services.auth.auth_service import AuthService
+from app.core.logger import logger
 
 router = APIRouter(prefix="/api/auth", tags=["Authentification"])
 
@@ -20,6 +21,7 @@ async def authenticate_with_google(
     request: GoogleAuthRequest,
     db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
+    logger.debug("Authentification via Google")
     return await AuthService.authenticate_google_user(request, db)
 
 @router.post("/credentials", status_code=200)
