@@ -77,11 +77,11 @@ export class AppComponent {
 
   private async loadGroupsAfterLogin() {
     this.groupService.isLoading.set(true);
-    const inviteCode = localStorage.getItem('app_kdo.codeInvit');
+    const inviteToken = localStorage.getItem('app_kdo.inviteToken');
 
-    if (inviteCode) {
+    if (inviteToken) {
       if (!this.router.url.startsWith('/groupe/onboarding/rejoindre')) {
-        await this.router.navigateByUrl(`/groupe/onboarding/rejoindre?inviteCode=${inviteCode}`);
+        await this.router.navigateByUrl(`/groupe/onboarding/rejoindre?inviteToken=${inviteToken}`);
       }
       return;
     }

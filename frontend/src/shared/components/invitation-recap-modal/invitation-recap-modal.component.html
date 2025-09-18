@@ -1,0 +1,38 @@
+<app-terminal-modal
+  *ngIf="isVisible"
+  title="Récapitulatif des invitations"
+  [actions]="actions"
+  (actionClicked)="onActionClicked($event)">
+
+  <div *ngIf="inviteResponse" class="invitations-content">
+    <!-- Invitations envoyées avec succès -->
+    <div *ngIf="inviteResponse.emails_envoyes.length > 0" class="section success">
+      <h3>✅ Invitations envoyées ({{ inviteResponse.emails_envoyes.length }})</h3>
+      <ul>
+        <li *ngFor="let email of inviteResponse.emails_envoyes">{{ email }}</li>
+      </ul>
+    </div>
+
+    <!-- Emails invalides -->
+    <div *ngIf="inviteResponse.emails_invalides.length > 0" class="section error">
+      <h3>❌ Emails invalides ({{ inviteResponse.emails_invalides.length }})</h3>
+      <ul>
+        <li *ngFor="let email of inviteResponse.emails_invalides">{{ email }}</li>
+      </ul>
+    </div>
+
+    <!-- Utilisateurs déjà membres -->
+    <div *ngIf="inviteResponse.emails_deja_membres.length > 0" class="section warning">
+      <h3>⚠️ Déjà membres du groupe ({{ inviteResponse.emails_deja_membres.length }})</h3>
+      <ul>
+        <li *ngFor="let email of inviteResponse.emails_deja_membres">{{ email }}</li>
+      </ul>
+    </div>
+
+    <!-- Message si aucune invitation envoyée -->
+    <div *ngIf="inviteResponse.emails_envoyes.length === 0" class="section info">
+      <p>Aucune invitation n'a été envoyée.</p>
+    </div>
+  </div>
+
+</app-terminal-modal>

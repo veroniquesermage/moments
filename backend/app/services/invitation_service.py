@@ -2,8 +2,10 @@ from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import Invitation, User, UserGroup
-from app.schemas.invitation import InvitationResponse
+from app.models import Invitation, User, UserGroup, Group
+from app.schemas.invitation_response import InvitationResponse
+from app.schemas.invitation_validation_result import InvitationValidationResult
+from app.utils.date_helper import now_paris
 
 
 class InvitationService:
@@ -62,3 +64,70 @@ class InvitationService:
             )
 
         return pending_invitations
+
+    @staticmethod
+    async def validate_and_use_token(
+        db: AsyncSession,
+        token: str
+    ) -> InvitationValidationResult:
+        """
+        Valide un token d'invitation et le marque comme utilisé si valide.
+        """
+        # Récupérer l'invitation avec le token
+        result = await db.execute(
+            select(Invitation)
+            .options(selectinload(Invitation.groupe))
+            .where(Invitation.token == token)
+        )
+        invitation = result.scalar_one_or_none()
+
+        if not invitation:
+            return InvitationValidationResult(
+                is_valid=False,
+                error_message="Ce lien d'invitation n'est plus valide"
+            )
+
+        # Vérifier si déjà utilisé
+        if invitation.utilise:
+            return InvitationValidationResult(
+                is_valid=False,
+                error_message="Vous avez déjà rejoint ce groupe avec cette invitation"
+            )
+
+        # Vérifier l'expiration
+        current_time = now_paris().replace(tzinfo=None)
+        if invitation.date_expiration and current_time > invitation.date_expiration:
+            return InvitationValidationResult(
+                is_valid=False,
+                error_message="Ce lien d'invitation a expiré"
+            )
+
+        # Marquer comme utilisé
+        invitation.utilise = True
+        await db.commit()
+
+        return InvitationValidationResult(
+            is_valid=True,
+            invitation=invitation,
+            group=invitation.groupe
+        )
+
+    @staticmethod
+    async def get_group_from_token(
+        db: AsyncSession,
+        token: str
+    ) -> Group | None:
+        """
+        Récupère le groupe associé à un token d'invitation sans le valider.
+        """
+        result = await db.execute(
+            select(Invitation)
+            .options(selectinload(Invitation.groupe))
+            .where(and_(
+                Invitation.token == token,
+                Invitation.utilise == False
+            ))
+        )
+        invitation = result.scalar_one_or_none()
+
+        return invitation.groupe if invitation else None

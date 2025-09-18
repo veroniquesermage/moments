@@ -9,8 +9,6 @@ from app.models import User, Group, UserGroup
 from app.schemas.group import GroupCreate, GroupResponse, GroupDetails, GroupUpdate
 from app.services.trace_service import TraceService
 from app.services.user_group_service import UserGroupService
-from app.utils.code_generator import generate_random_code
-from app.utils.date_helper import now_paris
 
 
 class GroupService:
@@ -33,12 +31,9 @@ class GroupService:
             )
 
         # 2. Création du groupe
-        code = generate_random_code()
         db_group = Group(
             nom_groupe=group_data.nom_groupe,
-            description=group_data.description,
-            code=code,
-            date_refresh_code=now_paris().replace(tzinfo=None)
+            description=group_data.description
         )
         db.add(db_group)
         await db.commit()
@@ -96,42 +91,49 @@ class GroupService:
 
         return GroupResponse.model_validate(result)
 
+
     @staticmethod
-    async def join_group(
+    async def join_group_with_token(
         db: AsyncSession,
         current_user: User,
-        code: str
+        token: str
     ) -> GroupResponse:
-        # 1. Chercher le groupe existant
-        result = await db.execute(select(Group).where(Group.code == code))
-        existing = result.scalars().first()
-        if not existing:
-            logger.info(f"Code d'invitation invalide : {code}")
+        # Import local pour éviter les imports circulaires
+        from app.services.invitation_service import InvitationService
+
+        # 1. Valider le token et marquer comme utilisé
+        validation_result = await InvitationService.validate_and_use_token(db, token)
+
+        if not validation_result.is_valid:
+            logger.info(f"Token d'invitation invalide : {token}")
             raise HTTPException(
                 status_code=400,
-                detail="Ce code d'invitation n'est relié à aucun groupe."
+                detail=validation_result.error_message
             )
 
-        # 2. Vérifier que l’utilisateur n’est pas déjà membre
+        group = validation_result.group
+        invitation = validation_result.invitation
+
+        # 2. Vérifier que l'utilisateur n'est pas déjà membre
         result = await db.execute(
             select(UserGroup).where(
                 and_(
                     UserGroup.utilisateur_id == current_user.id,
-                    UserGroup.groupe_id == existing.id
+                    UserGroup.groupe_id == group.id
                 )
             )
         )
         if result.scalars().first():
-            logger.info(f"Utilisateur {current_user.id} est déjà dans le groupe {existing.id}")
+            logger.info(f"Utilisateur {current_user.id} est déjà dans le groupe {group.id}")
             raise HTTPException(
                 status_code=400,
-                detail="Utilisateur déjà dans ce groupe."
+                detail="Vous êtes déjà membre de ce groupe."
             )
 
         # 3. Ajouter le lien Membre
         link = UserGroup(
             utilisateur_id=current_user.id,
-            groupe_id=existing.id,
+            groupe_id=group.id,
             role=RoleEnum.MEMBRE
         )
         db.add(link)
@@ -141,11 +143,11 @@ class GroupService:
             db,
             f"{current_user.prenom} {current_user.nom}",
             "GROUP_JOINED",
-            f"{current_user.prenom} a rejoint le groupe {existing.id}",
-            {"group_id": existing.id, "user_id": current_user.id},
+            f"{current_user.prenom} a rejoint le groupe {group.id} via token",
+            {"group_id": group.id, "user_id": current_user.id, "invitation_id": invitation.id},
         )
 
-        return GroupResponse.model_validate(existing)
+        return GroupResponse.model_validate(group)
 
     @staticmethod
     async def get_group_details(
@@ -231,24 +233,6 @@ class GroupService:
         )
 
 
-    @staticmethod
-    async def update_code_invitation(db: AsyncSession,
-                                     current_user: User,
-                                     group_id: int):
-        group = await GroupService.get_group_if_admin(current_user, db, group_id)
-        code = generate_random_code()
-
-        group.code = code
-        group.date_refresh_code = now_paris().replace(tzinfo=None)
-        await db.commit()
-
-        await TraceService.record_trace(
-            db,
-            f"{current_user.nom} {current_user.prenom}",
-            "CODE_INVIT",
-            "Refresh du code d'invitation",
-            {"user_id": current_user.id, "groupe": group_id},
-        )
 
     @staticmethod
     async def get_group_if_admin(current_user: User,

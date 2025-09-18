@@ -32,26 +32,13 @@ async def test_create_and_join_group_flow(unit_db_session, mock_trace_service):
     )).first()
     assert ug is not None and ug[0] == RoleEnum.ADMIN
 
-    # Join with code
-    group_db = await GroupService.get_group(unit_db_session, created.id)
-    joined = await GroupService.join_group(unit_db_session, joiner, group_db.code)
-    assert joined.id == created.id
-
-    # get_groups for joiner
+    # Note: join_group functionality now tested in test_group_service_tokens.py
+    # get_groups for joiner should be empty since they haven't joined
     groups = await GroupService.get_groups(unit_db_session, joiner)
-    assert len(groups) == 1 and groups[0].id == created.id
+    assert len(groups) == 0
 
 
-@pytest.mark.unit
-@pytest.mark.asyncio
-async def test_join_group_invalid_code(unit_db_session):
-    u = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="A", nom="B")
-    unit_db_session.add(u)
-    await unit_db_session.commit()
-    await unit_db_session.refresh(u)
-
-    with pytest.raises(Exception):
-        await GroupService.join_group(unit_db_session, u, "NOTACODE")
+# Note: join_group with invalid code functionality moved to test_group_service_tokens.py
 
 
 @pytest.mark.unit
@@ -59,7 +46,7 @@ async def test_join_group_invalid_code(unit_db_session):
 async def test_update_group_admin_only(unit_db_session, mock_trace_service):
     admin = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Admin", nom="A")
     member = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Member", nom="M")
-    group = Group(nom_groupe="G", description="d", code=uuid4().hex[:10])
+    group = Group(nom_groupe="G", description="d")
     unit_db_session.add_all([admin, member, group])
     await unit_db_session.commit()
     for obj in (admin, member, group):
@@ -84,24 +71,7 @@ async def test_update_group_admin_only(unit_db_session, mock_trace_service):
     assert updated.nom_groupe == "Nouveau"
 
 
-@pytest.mark.unit
-@pytest.mark.asyncio
-async def test_update_code_invitation_changes(unit_db_session, mock_trace_service):
-    admin = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Admin", nom="A")
-    group = Group(nom_groupe="G2", description=None, code=uuid4().hex[:10])
-    unit_db_session.add_all([admin, group])
-    await unit_db_session.commit()
-    await unit_db_session.refresh(admin)
-    await unit_db_session.refresh(group)
-
-    unit_db_session.add(UserGroup(utilisateur_id=admin.id, groupe_id=group.id, role=RoleEnum.ADMIN))
-    await unit_db_session.commit()
-
-    old = group.code
-    await GroupService.update_code_invitation(unit_db_session, admin, group.id)
-    # reload
-    group_db = await GroupService.get_group(unit_db_session, group.id)
-    assert group_db.code != old
+# Note: update_code_invitation functionality removed as part of token-based invitation system
 
 
 @pytest.mark.unit
@@ -110,7 +80,7 @@ async def test_get_group_details(unit_db_session, mock_trace_service):
     admin1 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Alfa", nom="Z")
     admin2 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Bravo", nom="Z")
     viewer = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Viewer", nom="V")
-    group = Group(nom_groupe="GG", description=None, code="LMNOPQRSTU")
+    group = Group(nom_groupe="GG", description=None)
     unit_db_session.add_all([admin1, admin2, viewer, group])
     await unit_db_session.commit()
     for obj in (admin1, admin2, viewer, group):
@@ -136,7 +106,7 @@ async def test_get_group_details(unit_db_session, mock_trace_service):
 @pytest.mark.asyncio
 async def test_delete_group_as_admin(unit_db_session, mock_trace_service):
     admin = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Admin", nom="A")
-    group = Group(nom_groupe="ToDelete", description=None, code="Q" * 10)
+    group = Group(nom_groupe="ToDelete", description=None)
     unit_db_session.add_all([admin, group])
     await unit_db_session.commit()
     await unit_db_session.refresh(admin)

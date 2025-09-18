@@ -55,6 +55,7 @@ def get_current_user_from_cookie_with_tiers():
     return Depends(wrapper)
 
 async def get_current_group_id(x_group_id: int = Header(...)) -> int:
+    print(f"🔥 X-Group-Id reçu: {x_group_id}")
     if not x_group_id:
         raise HTTPException(status_code=400, detail="Le groupe actif est requis via X-Group-Id.")
     return x_group_id

@@ -13,7 +13,7 @@ from app.services.ideas_service import GiftIdeasService
 async def test_create_gift_idea_success(unit_db_session, mock_trace_service):
     proposer = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Proposer", nom="N")
     dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Dest", nom="D")
-    group = Group(nom_groupe="G", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="G", description=None)
     unit_db_session.add_all([proposer, dest, group])
     await unit_db_session.commit()
     for obj in (proposer, dest, group):
@@ -60,7 +60,7 @@ async def test_create_gift_idea_for_self_forbidden(unit_db_session):
 async def test_get_my_ideas(unit_db_session, mock_trace_service):
     proposer = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Pro", nom="P")
     dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Des", nom="T")
-    group = Group(nom_groupe="Ideas", description=None, code="QQQQQQQQQQ")
+    group = Group(nom_groupe="Ideas", description=None)
     unit_db_session.add_all([proposer, dest, group])
     await unit_db_session.commit()
     for obj in (proposer, dest, group):

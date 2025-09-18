@@ -17,7 +17,7 @@ from app.services.builders import (
 @pytest.mark.asyncio
 async def test_build_user_display_success(unit_db_session):
     user = User(email="u1@example.com", prenom="U1", nom="Test")
-    group = Group(nom_groupe="G1", description="", code="ABC1234567")
+    group = Group(nom_groupe="G1", description="")
     unit_db_session.add_all([user, group])
     await unit_db_session.commit()
     await unit_db_session.refresh(user)
@@ -38,7 +38,7 @@ async def test_build_user_display_success(unit_db_session):
 @pytest.mark.asyncio
 async def test_build_user_display_not_in_group_raises(unit_db_session):
     user = User(email="u2@example.com", prenom="U2", nom="Test")
-    group = Group(nom_groupe="G2", description="", code="DEF1234567")
+    group = Group(nom_groupe="G2", description="")
     unit_db_session.add_all([user, group])
     await unit_db_session.commit()
     await unit_db_session.refresh(user)
@@ -53,7 +53,7 @@ async def test_build_user_display_not_in_group_raises(unit_db_session):
 async def test_build_gift_public_response_basic(unit_db_session):
     # Arrange: users and group
     dest = User(email="dest@example.com", prenom="Dest", nom="One")
-    group = Group(nom_groupe="Gifts", description=None, code="XYZ1234567")
+    group = Group(nom_groupe="Gifts", description=None)
     unit_db_session.add_all([dest, group])
     await unit_db_session.commit()
     await unit_db_session.refresh(dest)
@@ -93,7 +93,7 @@ async def test_build_gift_idea_and_shared_schema(unit_db_session):
     participant = User(email="pa@example.com", prenom="Part", nom="T")
     proposer = User(email="pp@example.com", prenom="Prop", nom="E")
     dest = User(email="d@example.com", prenom="Dest", nom="D")
-    group = Group(nom_groupe="G3", description=None, code="CODE123456")
+    group = Group(nom_groupe="G3", description=None)
     unit_db_session.add_all([preneur, participant, proposer, dest, group])
     await unit_db_session.commit()
     for u in (preneur, participant, proposer, dest):

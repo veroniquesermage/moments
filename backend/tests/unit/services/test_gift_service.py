@@ -366,7 +366,7 @@ async def test_set_gift_delivery_create_and_unauthorized(unit_db_session, mock_t
     await unit_db_session.refresh(taker)
 
     # group exists only to pass ID around; GiftService.set_gift_detail relies on builders using group membership
-    group = Group(nom_groupe="Gifts", description=None, code=group_code)
+    group = Group(nom_groupe="Gifts", description=None)
     unit_db_session.add(group)
     await unit_db_session.commit()
     await unit_db_session.refresh(group)
@@ -395,7 +395,7 @@ async def test_update_gift_purchase_paths(unit_db_session, mock_trace_service):
     dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D", nom="D")
     taker = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="T", nom="T")
     tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="X", nom="Y", is_compte_tiers=True)
-    group = Group(nom_groupe="GP", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GP", description=None)
     unit_db_session.add_all([dest, taker, tiers, group])
     await unit_db_session.commit()
     for u in (dest, taker, tiers, group):
@@ -501,7 +501,7 @@ async def test_get_visible_gifts_for_member_visibility(unit_db_session):
 async def test_update_gift_delivery_update_existing_and_unauthorized(unit_db_session, mock_trace_service):
     u = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="U", nom="U")
     other = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="O", nom="O")
-    group = Group(nom_groupe="GLiv", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GLiv", description=None)
     unit_db_session.add_all([u, other, group])
     await unit_db_session.commit()
     for o in (u, other, group):
@@ -533,7 +533,7 @@ async def test_get_gifts_by_account_grouping_and_totals(unit_db_session, mock_tr
     dest1 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D1", nom="N")
     dest2 = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D2", nom="N")
     tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Tiers", nom="N")
-    group = Group(nom_groupe="GAcc", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GAcc", description=None)
     unit_db_session.add_all([current, dest1, dest2, tiers, group])
     await unit_db_session.commit()
     for o in (current, dest1, dest2, tiers, group):

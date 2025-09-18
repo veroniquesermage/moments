@@ -4,6 +4,7 @@ import {firstValueFrom} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {environment} from 'src/environments/environment';
 import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
+import {InviteResponse} from 'src/core/models/mailing/invite-response.model';
 import {FeedbackRequest} from 'src/core/models/mailing/feedback-request.model';
 
 @Injectable({providedIn: 'root'})
@@ -27,13 +28,13 @@ export class MailingService {
     }
   }
 
-  async sendinvitesMail(inviteRequest: InviteRequest): Promise<ApiResponse<void>> {
+  async sendinvitesMail(inviteRequest: InviteRequest): Promise<ApiResponse<InviteResponse>> {
     const url = `${this.apiUrl}/invitation`;
     try {
-      await firstValueFrom(
-        this.http.post<void>(url, inviteRequest)
+      const response = await firstValueFrom(
+        this.http.post<InviteResponse>(url, inviteRequest)
       );
-      return {success: true, data: undefined};
+      return {success: true, data: response};
 
     } catch (error) {
       console.error('[MailingService] Erreur lors de l\'envoi des invitations', error);
