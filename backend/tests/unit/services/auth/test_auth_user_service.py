@@ -72,7 +72,7 @@ async def test_complete_and_change_and_reset_password(unit_db_session, mock_trac
 @pytest.mark.asyncio
 async def test_create_and_get_managed_accounts(unit_db_session, mock_trace_service):
     parent = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Par", nom="Ent")
-    group = Group(nom_groupe="UG", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="UG", description=None)
     unit_db_session.add_all([parent, group])
     await unit_db_session.commit()
     await unit_db_session.refresh(parent)

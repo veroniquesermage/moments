@@ -48,17 +48,18 @@ export class GroupService {
     }
   }
 
-  async joinGroup(code: string): Promise<ApiResponse<GroupResume>> {
+
+  async joinGroupWithToken(token: string): Promise<ApiResponse<GroupResume>> {
     try {
-      const codeEnc = encodeURIComponent(code);
-      const url = `${this.apiUrl + environment.api.rejoindre}/${codeEnc}`;
+      const tokenEnc = encodeURIComponent(token);
+      const url = `${this.apiUrl}/rejoindre/token/${tokenEnc}`;
 
       const groupeJoined = await firstValueFrom(this.http.post<GroupResume>(url, {}));
       await this.groupContextService.setGroupContext(groupeJoined.id);
       return {success: true, data: groupeJoined};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);
-      return {success: false, message: "❌ Code invalide ou groupe inexistant."};
+      return {success: false, message: "❌ Token invalide ou expiré."};
     }
   }
 
@@ -112,17 +113,6 @@ export class GroupService {
 
   }
 
-  async regenererCodeInvitation(groupId: number): Promise<ApiResponse<any>> {
-    const codeEnc = encodeURIComponent(groupId);
-    const url = `${this.apiUrl}/${codeEnc}/code-invitation`;
-    try {
-      await firstValueFrom(this.http.patch<void>(url, {}));
-      return {success: true, data: 'ok'};
-    } catch (error) {
-      console.error('[GroupService] Erreur lors de la suppression du groupe', error);
-      return {success: false, message: "❌ Suppression impossible. Veuillez réessayer plus tard."};
-    }
-  }
 
   async getPendingInvitations(groupId: number): Promise<ApiResponse<InvitationResponse[]>> {
     const codeEnc = encodeURIComponent(groupId);

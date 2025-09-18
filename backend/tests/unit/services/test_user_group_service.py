@@ -17,7 +17,7 @@ async def test_get_users_lists(unit_db_session):
     a = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="A", nom="A")
     b = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="B", nom="B")
     c = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="C", nom="C")
-    g = Group(nom_groupe="G1", description=None, code=uuid4().hex[:10])
+    g = Group(nom_groupe="G1", description=None)
     unit_db_session.add_all([a, b, c, g])
     await unit_db_session.commit()
     for o in (a, b, c, g):
@@ -44,7 +44,7 @@ async def test_get_users_lists(unit_db_session):
 async def test_get_group_admins_and_user_group(unit_db_session):
     admin = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Admin", nom="A")
     member = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Mem", nom="M")
-    g = Group(nom_groupe="G2", description=None, code="B" * 10)
+    g = Group(nom_groupe="G2", description=None)
     unit_db_session.add_all([admin, member, g])
     await unit_db_session.commit()
     for o in (admin, member, g):
@@ -67,7 +67,7 @@ async def test_get_group_admins_and_user_group(unit_db_session):
 @pytest.mark.asyncio
 async def test_update_nickname_and_delete_self(unit_db_session, mock_trace_service):
     u = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="U", nom="U")
-    g = Group(nom_groupe="G3", description=None, code="C" * 10)
+    g = Group(nom_groupe="G3", description=None)
     unit_db_session.add_all([u, g])
     await unit_db_session.commit()
     await unit_db_session.refresh(u)
@@ -97,7 +97,7 @@ async def test_update_nickname_and_delete_self(unit_db_session, mock_trace_servi
 async def test_delete_member_as_admin_and_update_role(unit_db_session, mock_trace_service):
     admin = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Admin", nom="A")
     member = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Mem", nom="M")
-    g = Group(nom_groupe="G4", description=None, code=uuid4().hex[:10])
+    g = Group(nom_groupe="G4", description=None)
     unit_db_session.add_all([admin, member, g])
     await unit_db_session.commit()
     for o in (admin, member, g):
@@ -139,7 +139,7 @@ async def test_delete_member_as_admin_and_update_role(unit_db_session, mock_trac
 @pytest.mark.asyncio
 async def test_add_user_to_group_and_duplicates(unit_db_session):
     u = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="U", nom="U")
-    g = Group(nom_groupe="G5", description=None, code=uuid4().hex[:10])
+    g = Group(nom_groupe="G5", description=None)
     unit_db_session.add_all([u, g])
     await unit_db_session.commit()
     await unit_db_session.refresh(u)
@@ -157,8 +157,8 @@ async def test_add_user_to_group_and_duplicates(unit_db_session):
 async def test_get_all_groups_for_user_and_existing_emails(unit_db_session):
     a = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="A", nom="A")
     b = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="B", nom="B")
-    g1 = Group(nom_groupe="G6", description=None, code=uuid4().hex[:10])
-    g2 = Group(nom_groupe="G7", description=None, code=uuid4().hex[:10])
+    g1 = Group(nom_groupe="G6", description=None)
+    g2 = Group(nom_groupe="G7", description=None)
     unit_db_session.add_all([a, b, g1, g2])
     await unit_db_session.commit()
     for o in (a, b, g1, g2):
@@ -186,8 +186,8 @@ async def test_get_users_with_shared_groups(unit_db_session):
     a = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="A", nom="A")
     b = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="B", nom="B")
     c = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="C", nom="C")
-    g1 = Group(nom_groupe="G8", description=None, code="H" * 10)
-    g2 = Group(nom_groupe="G9", description=None, code="I" * 10)
+    g1 = Group(nom_groupe="G8", description=None)
+    g2 = Group(nom_groupe="G9", description=None)
     unit_db_session.add_all([a, b, c, g1, g2])
     await unit_db_session.commit()
     for o in (a, b, c, g1, g2):
@@ -212,7 +212,7 @@ async def test_remove_tiers_from_group_success_and_errors(unit_db_session, mock_
     parent = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Par", nom="Ent")
     tiers = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Kid", nom="K", is_compte_tiers=True)
     stranger = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Str", nom="A")
-    group = Group(nom_groupe="GRT", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GRT", description=None)
     unit_db_session.add_all([parent, tiers, stranger, group])
     await unit_db_session.commit()
     for o in (parent, tiers, stranger, group):
