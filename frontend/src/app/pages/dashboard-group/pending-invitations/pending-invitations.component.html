@@ -27,33 +27,19 @@
     </div>
 
     <div *ngIf="!isLoading && invitations.length > 0" class="invitations-list">
-      <table class="invitations-table">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Envoyé par</th>
-            <th>Date d'envoi</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let invitation of invitations" [class.expired]="invitation.statut === 'EXPIREE'">
-            <td>{{ invitation.email }}</td>
-            <td>{{ invitation.envoye_par_nom }}</td>
-            <td>{{ formatDate(invitation.date_envoi) }}</td>
-            <td class="status-cell">
-              <span class="status" [class]="invitation.statut.toLowerCase()">
-                {{ getStatusIcon(invitation.statut) }} {{ getStatusText(invitation.statut) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="legend">
-        <p><strong>Légende :</strong></p>
-        <p>⏳ <strong>En attente</strong> : L'invitation a été envoyée et attend une réponse</p>
-        <p>❌ <strong>Expirée</strong> : Le code d'invitation a été regeneré depuis l'envoi de cette invitation</p>
+      <div class="invitations-compact">
+        <div *ngFor="let invitation of invitations" class="invitation-item" [class.expired]="invitation.statut === 'EXPIREE'">
+          <div class="invitation-header">
+            <span class="email">📧 {{ invitation.email }}</span>
+            <span class="status" [class]="invitation.statut.toLowerCase()">
+              {{ getStatusIcon(invitation.statut) }} {{ getStatusText(invitation.statut) }}
+            </span>
+          </div>
+          <div class="invitation-details">
+            <span class="sender">📤 Envoyé par {{ invitation.envoye_par_nom }}</span>
+            <span class="date">📅 {{ formatDate(invitation.date_envoi) }}</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
