@@ -4,7 +4,9 @@ import {CommonModule} from '@angular/common';
 import {MailingService} from 'src/core/services/mailing.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {InviteRequest} from 'src/core/models/mailing/invite-request.model';
+import {InviteResponse} from 'src/core/models/mailing/invite-response.model';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
+import {InvitationRecapModalComponent} from 'src/shared/components/invitation-recap-modal/invitation-recap-modal.component';
 import {GroupService} from 'src/core/services/group.service';
 import {ToastrService} from 'src/core/services/toastr.service';
 import {PendingInvitationsComponent} from 'src/app/pages/dashboard-group/pending-invitations/pending-invitations.component';
@@ -16,6 +18,7 @@ import {PendingInvitationsComponent} from 'src/app/pages/dashboard-group/pending
     FormsModule,
     CommonModule,
     TerminalModalComponent,
+    InvitationRecapModalComponent,
     PendingInvitationsComponent
   ],
   templateUrl: './group-invite.component.html',
@@ -26,8 +29,10 @@ export class GroupInviteComponent {
   @Input()
   groupId: number | undefined;
   mails: string = '';
-  validMails: InviteRequest = { emails: [] };
-  invalidMails: string[] = [];
+
+  // Variables pour la modale de recap
+  showRecapModal: boolean = false;
+  inviteResponse: InviteResponse | null = null;
 
   constructor(private mailingService: MailingService,
               public errorService: ErrorService,
@@ -35,40 +40,40 @@ export class GroupInviteComponent {
               private toastrService: ToastrService) {
   }
 
-  private isValidEmail(email: string): boolean {
-    // Regex simple, pas parano, mais efficace
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email.trim());
-  }
+  async sendInvitation() {
+    if (!this.mails.trim()) {
+      this.errorService.showError('Veuillez saisir au moins une adresse email.');
+      return;
+    }
 
-  checkMail() {
-    this.validMails.emails = [];
-    this.invalidMails = [];
+    // Nettoyer et transformer les emails en liste
     const emails: string[] = this.mails
       .split(/\r?\n/)
       .map(e => e.trim())
       .filter(e => e.length > 0);
 
-    for (const email of emails) {
-      if (this.isValidEmail(email)) {
-        this.validMails.emails.push(email);
-      } else {
-        this.invalidMails.push(email);
-      }
-    }
-  }
-
-  async sendInvitation() {
-    const result = await this.mailingService.sendinvitesMail(this.validMails!);
+    const inviteRequest: InviteRequest = { emails };
+    const result = await this.mailingService.sendinvitesMail(inviteRequest);
 
     if (!result.success) {
       this.errorService.showError(result.message);
       return;
     }
 
-    this.mails = '';
-    this.validMails = {emails: []} ;
-    this.invalidMails = [];
+    // Afficher la modale de recap
+    this.inviteResponse = result.data!;
+    this.showRecapModal = true;
+  }
+
+  onRecapModalClose() {
+    this.showRecapModal = false;
+
+    // Vider le champ emails seulement si des invitations ont été envoyées
+    if (this.inviteResponse?.emails_envoyes.length! > 0) {
+      this.mails = '';
+    }
+
+    this.inviteResponse = null;
   }
 
   normalizeMails() {
@@ -80,17 +85,4 @@ export class GroupInviteComponent {
   }
 
 
-  async refreshInviteCode() {
-
-    if (!this.groupId) {
-      this.errorService.showError('Veuillez réessayer plus tard.');
-      return;
-    }
-    const result = await this.groupeService.regenererCodeInvitation(this.groupId);
-    if(result.success){
-      this.toastrService.show({ message: "Le code d'invitation du groupe a bien été modifié 👍", type: 'success' });
-    } else {
-      this.errorService.showError('Veuillez réessayer plus tard.');
-    }
-  }
 }

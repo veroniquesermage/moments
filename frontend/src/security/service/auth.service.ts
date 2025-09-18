@@ -164,6 +164,9 @@ export class AuthService {
     this.incompleteUser.set(null);
     this.profile.set(data);
     this.isLoggedIn.set(true);
+
+    // Redirect to onboarding after profile completion
+    void this.router.navigate(['/groupe/onboarding']);
   }
 
   async registerWithCredentials(givenName: string, familyName: string | undefined, token: string | null) {
@@ -183,6 +186,9 @@ export class AuthService {
         if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
+
+          // Redirect to onboarding after registration
+          void this.router.navigate(['/groupe/onboarding']);
         }
       })
       .catch(err => console.error('[Backend] Erreur :', err));

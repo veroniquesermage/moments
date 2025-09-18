@@ -172,7 +172,7 @@ async def test_switch_to_tiers_and_parent(unit_db_session, mock_trace_service):
     tiers.gere_par = parent.id
     await unit_db_session.commit()
 
-    group = Group(nom_groupe="GAuth", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GAuth", description=None)
     unit_db_session.add(group)
     await unit_db_session.commit()
     await unit_db_session.refresh(group)

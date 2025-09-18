@@ -60,8 +60,8 @@ class MailjetAdapter:
 
 
     @staticmethod
-    def send_invites(
-            valid_email: list[str],
+    def send_invites_with_tokens(
+            invitations_data: list[dict],
             group: GroupResponse,
             user: User):
 
@@ -71,38 +71,37 @@ class MailjetAdapter:
         template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "invite.html"
         template_str = template_path.read_text(encoding="utf-8")
 
-        # Création d’un template Jinja2
+        # Création d'un template Jinja2
         template = Template(template_str)
 
+        messages = []
+        for invitation_data in invitations_data:
+            # Créer l'URL avec le token au lieu du code
+            invite_url = f"{settings.invitation_link.replace('inviteCode=', 'inviteToken=')}{invitation_data['token']}"
 
-        invite_url = f"{settings.invitation_link}{group.code}"
+            # Rendu avec les vraies données
+            html_rendered = template.render(
+                groupe=group,
+                user=user,
+                url_avec_code=invite_url
+            )
 
-        # Rendu avec les vraies données
-        html_rendered = template.render(
-            groupe= group,
-            user=user,
-            url_avec_code=invite_url
-        )
+            messages.append({
+                "From": {
+                    "Email": sender_email,
+                    "Name": "Moments-ep"
+                },
+                "To": [
+                    {
+                        "Email": invitation_data['email'],
+                    }
+                ],
+                "Subject": "Invitation à rejoindre un groupe sur (Moments)",
+                "HTMLPart": html_rendered
+            })
 
         mailjet = MailjetAdapter._get_mailjet_client()
-        data = {
-            'Messages': [
-                {
-                    "From": {
-                        "Email": sender_email,
-                        "Name": "Moments-ep"
-                    },
-                    "To": [
-                        {
-                            "Email": mail,
-                        }
-                    ],
-                    "Subject": "Invitation à rejoindre un groupe sur (Moments)",
-                    "HTMLPart": html_rendered
-                }
-                for mail in valid_email
-            ]
-        }
+        data = {'Messages': messages}
 
         return mailjet.send.create(data=data)
 

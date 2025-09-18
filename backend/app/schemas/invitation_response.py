@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
+from typing import Optional, Any
 
 
 class InvitationResponse(BaseModel):
@@ -10,3 +11,5 @@ class InvitationResponse(BaseModel):
     statut: str  # "EN_ATTENTE" ou "EXPIREE"
 
     model_config = {"from_attributes": True}
+
+

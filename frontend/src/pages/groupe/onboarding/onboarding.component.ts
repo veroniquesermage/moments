@@ -26,10 +26,20 @@ export class OnboardingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if there's a stored invitation token from email link
+    const storedToken = localStorage.getItem('app_kdo.inviteToken');
+    if (storedToken) {
+      // Redirect to the join page with the token
+      void this.router.navigate(['/groupe/onboarding/rejoindre'], {
+        queryParams: { inviteToken: storedToken }
+      });
+      return;
+    }
+
     this.groupService.loadGroupesIfEmpty().then(result => {
       if ('success' in result && result.success) {
         console.log('📦 Groupes récupérés :', result.data);
-        // Si tu veux faire des actions ici (auto-select, etc.), c’est l’endroit
+        // Si tu veux faire des actions ici (auto-select, etc.), c'est l'endroit
       } else {
         this.errorMessage = result.message ?? "Erreur inconnue";
       }
