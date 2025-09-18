@@ -1,3 +1,4 @@
+import base64
 from pathlib import Path
 
 from jinja2 import Template
@@ -28,6 +29,20 @@ class MailjetAdapter:
         # Création d'un template Jinja2
         template = Template(template_str)
 
+        # Lire le guide utilisateur PDF et l'encoder en base64
+        guide_pdf_path = Path(__file__).resolve().parents[4] / "frontend" / "src" / "assets" / "docs" / "Guide utilisateur - Invités Moments.pdf"
+        guide_pdf_base64 = None
+
+        try:
+            if guide_pdf_path.exists():
+                pdf_content = guide_pdf_path.read_bytes()
+                guide_pdf_base64 = base64.b64encode(pdf_content).decode()
+                logger.info(f"📖 Guide utilisateur chargé pour envoi en pièce jointe")
+            else:
+                logger.warning(f"📖 Guide utilisateur non trouvé: {guide_pdf_path}")
+        except Exception as e:
+            logger.error(f"📖 Erreur lors du chargement du guide utilisateur: {e}")
+
         messages = []
         for invitation_data in invitations_data:
             # Créer l'URL avec le token au lieu du code
@@ -40,7 +55,7 @@ class MailjetAdapter:
                 url_avec_code=invite_url
             )
 
-            messages.append({
+            message = {
                 "From": {
                     "Email": sender_email,
                     "Name": "Moments-ep"
@@ -52,7 +67,19 @@ class MailjetAdapter:
                 ],
                 "Subject": "Invitation à rejoindre un groupe sur (Moments)",
                 "HTMLPart": html_rendered
-            })
+            }
+
+            # Ajouter la pièce jointe si le PDF a été chargé
+            if guide_pdf_base64:
+                message["Attachments"] = [
+                    {
+                        "ContentType": "application/pdf",
+                        "Filename": "Guide utilisateur - Invités Moments.pdf",
+                        "Base64Content": guide_pdf_base64
+                    }
+                ]
+
+            messages.append(message)
 
         mailjet = MailjetAdapter._get_mailjet_client()
         data = {'Messages': messages}
