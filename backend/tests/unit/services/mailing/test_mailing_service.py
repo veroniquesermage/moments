@@ -54,7 +54,7 @@ async def test_send_invites_filters_existing_and_handles_status(unit_db_session,
     await unit_db_session.refresh(owner)
     await unit_db_session.refresh(member)
 
-    group = Group(nom_groupe="GMail", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GMail", description=None)
     unit_db_session.add(group)
     await unit_db_session.commit()
     await unit_db_session.refresh(group)

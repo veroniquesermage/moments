@@ -5,7 +5,7 @@ from app.database import get_db
 from app.dependencies.current_user import get_current_user_from_cookie, get_current_user_from_cookie_with_tiers
 from app.models import User
 from app.schemas.group import GroupResponse, GroupCreate, GroupDetails, GroupUpdate
-from app.schemas.invitation import InvitationResponse
+from app.schemas.invitation_response import InvitationResponse
 from app.services.group_service import GroupService
 from app.services.invitation_service import InvitationService
 
@@ -28,14 +28,13 @@ async def get_groups(
 ):
     return await GroupService.get_groups(db, current_user )
 
-@router.post("/rejoindre/{code}", response_model=GroupResponse)
-async def get_groups(
-        code: str,
+@router.post("/rejoindre/token/{token}", response_model=GroupResponse)
+async def join_group_with_token(
+        token: str,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user_from_cookie)
-
 ):
-    return await GroupService.join_group(db, current_user, code)
+    return await GroupService.join_group_with_token(db, current_user, token)
 
 @router.get("/{groupId}", response_model=GroupResponse)
 async def get_group(
@@ -70,13 +69,6 @@ async def get_group_details(
 ) -> GroupDetails:
     return await GroupService.get_group_details(db, current_user, groupId)
 
-@router.patch("/{groupId}/code-invitation", status_code=204 )
-async def update_code_invitation(
-        groupId: int,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user_from_cookie)
-):
-    await GroupService.update_code_invitation(db, current_user, groupId )
 
 @router.get("/{groupId}/invitations", response_model=list[InvitationResponse])
 async def get_pending_invitations(

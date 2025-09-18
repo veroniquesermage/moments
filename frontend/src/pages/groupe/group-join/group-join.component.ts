@@ -19,7 +19,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 export class GroupJoinComponent implements OnInit{
 
   composant: string = "GroupJoinComponent";
-  codeInvitation: string = '';
+  inviteToken: string = '';
   private route = inject(ActivatedRoute);
 
   constructor(private groupeService: GroupService,
@@ -31,18 +31,19 @@ export class GroupJoinComponent implements OnInit{
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.codeInvitation = params['inviteCode'] ?? '';
+      this.inviteToken = params['inviteToken'] ?? '';
       if (!this.authService.isLoggedIn()) {
-        localStorage.setItem('app_kdo.codeInvit', this.codeInvitation);
+        localStorage.setItem('app_kdo.inviteToken', this.inviteToken);
         this.authService.login();
       } else {
-        localStorage.removeItem('app_kdo.codeInvit');
+        // User is logged in, clear any stored token since we have it in the URL
+        localStorage.removeItem('app_kdo.inviteToken');
       }
     });
   }
 
   async rejoindre() {
-      const result = await this.groupeService.joinGroup(this.codeInvitation);
+      const result = await this.groupeService.joinGroupWithToken(this.inviteToken);
       if (result.success) {
         await this.groupServiceContext.updateMemberSignal();
         await this.router.navigate(['/dashboard']);

@@ -47,7 +47,8 @@ export class StartupService {
   private isCurrentRoutePublic(): boolean {
     const publicRoutes = [
       '/auth/initialiser',
-      '/auth/reset-password'
+      '/auth/reset-password',
+      '/groupe/onboarding/rejoindre'  // Allow access to invitation join page
       // ajoute ici d'autres routes publiques si besoin
     ];
 

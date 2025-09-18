@@ -21,7 +21,7 @@ async def test_save_all_shares_and_status_toggle(unit_db_session, mock_trace_ser
     dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Dest", nom="D")
     preneur = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Preneur", nom="P")
     part = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Part", nom="T")
-    group = Group(nom_groupe="S", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="S", description=None)
     unit_db_session.add_all([dest, preneur, part, group])
     await unit_db_session.commit()
     for o in (dest, preneur, part, group):
@@ -62,7 +62,7 @@ async def test_save_all_shares_and_status_toggle(unit_db_session, mock_trace_ser
 async def test_get_shares_for_user(unit_db_session):
     a = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="A", nom="A")
     b = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="B", nom="B")
-    group = Group(nom_groupe="GS", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GS", description=None)
     unit_db_session.add_all([a, b, group])
     await unit_db_session.commit()
     for o in (a, b, group):
@@ -96,7 +96,7 @@ async def test_set_gift_refund_and_delete_share(unit_db_session, mock_trace_serv
     dest = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="D", nom="D")
     preneur = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="P", nom="P")
     part = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="T", nom="T")
-    group = Group(nom_groupe="GZ", description=None, code=uuid4().hex[:10])
+    group = Group(nom_groupe="GZ", description=None)
     unit_db_session.add_all([dest, preneur, part, group])
     await unit_db_session.commit()
     for o in (dest, preneur, part, group):
