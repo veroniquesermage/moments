@@ -45,11 +45,9 @@ class InvitationService:
             if invitation.email in existing_emails:
                 continue
 
-            # Déterminer le statut: expirée si envoyée avant le dernier refresh du code
-            is_expired = (
-                invitation.groupe.date_refresh_code and
-                invitation.date_envoi < invitation.groupe.date_refresh_code
-            )
+            # Déterminer le statut: pour l'instant, vérifier seulement la date d'expiration
+            now = now_paris().replace(tzinfo=None)
+            is_expired = invitation.date_expiration and now > invitation.date_expiration
 
             status = "EXPIREE" if is_expired else "EN_ATTENTE"
 

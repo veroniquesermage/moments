@@ -1,2 +1,90 @@
 // Styles pour le bouton - hérite du style global des boutons terminal
 // Les styles de la modale sont maintenant dans terminal-modal.component.scss
+
+// Nouvelle structure compacte pour remplacer le tableau
+:host ::ng-deep app-terminal-modal .modal-box {
+  max-height: 70vh !important;
+  max-width: 80vw !important;
+
+  .invitations-content {
+    max-height: calc(70vh - 6rem) !important;
+    overflow-y: auto !important;
+
+    .invitations-list {
+      max-height: calc(60vh - 4rem) !important;
+      overflow-y: auto !important;
+    }
+
+    .invitations-compact {
+      .invitation-item {
+        background-color: var(--color-bg);
+        border: 1px solid var(--color-border);
+        margin-bottom: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+
+        &.expired {
+          opacity: 0.7;
+          background-color: var(--color-bg-secondary);
+        }
+
+        &:hover {
+          background-color: var(--color-row-hover-bg);
+        }
+
+        .invitation-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.25rem;
+
+          .email {
+            font-weight: bold;
+            color: var(--color-accent);
+            word-break: break-all;
+            flex: 1;
+            margin-right: 1rem;
+          }
+
+          .status {
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            white-space: nowrap;
+
+            &.en_attente {
+              background-color: rgba(255, 193, 7, 0.2);
+              color: #ffc107;
+              border: 1px solid #ffc107;
+            }
+
+            &.expiree {
+              background-color: rgba(220, 53, 69, 0.2);
+              color: #dc3545;
+              border: 1px solid #dc3545;
+            }
+          }
+        }
+
+        .invitation-details {
+          display: flex;
+          gap: 1rem;
+          font-size: 0.7rem;
+          color: var(--color-text);
+
+          .sender, .date {
+            opacity: 0.8;
+          }
+
+          @media (max-width: 480px) {
+            flex-direction: column;
+            gap: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+}
