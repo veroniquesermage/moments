@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import logger
 from app.models import Gift, User, Invitation
 from app.schemas.group import GroupResponse
-from app.schemas.mailing import FeedbackRequest, InviteResponse
+from app.schemas.mailing import InviteResponse
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.group_service import GroupService
 from app.services.mailing.mailjet_adapter import MailjetAdapter
@@ -16,37 +16,6 @@ from app.utils.email_validator import validate_email_format, sanitize_email_list
 
 
 class MailService:
-
-    @staticmethod
-    async def send_feedback(
-            feedback_request: FeedbackRequest,
-            db : AsyncSession,
-            current_user: User
-    ) -> None:
-
-        try:
-            response = MailjetAdapter.send_feedback(feedback_request, current_user)
-            if response.status_code != 200:
-                await TraceService.record_trace(
-                    db,
-                    f"{current_user.prenom} {current_user.nom}",
-                    "ERROR",
-                    f"Erreur lors de l'envoi d'un mail de feedback",
-                    {"composant": feedback_request.composant,
-                            "user_id": current_user.id}
-                )
-
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Erreur d'envoi du mail d'invitation : {response.json()}"
-                )
-        except Exception as e:
-            logger.error(f"📨 Erreur d'envoi du mail d'invitation")
-            logger.exception(e)
-            raise HTTPException(
-                status_code=500,
-                detail="Une erreur est survenue lors de l’envoi de l’email. Merci de réessayer plus tard."
-            )
 
     @staticmethod
     async def send_invites(

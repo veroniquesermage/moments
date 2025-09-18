@@ -3,7 +3,6 @@ import {GroupService} from 'src/core/services/group.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {GroupDetail} from 'src/core/models/group/group-detail.model';
 import {AuthService} from 'src/security/service/auth.service';
 import {ErrorService} from 'src/core/services/error.service';
@@ -11,13 +10,12 @@ import {ErrorService} from 'src/core/services/error.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FeedbackTestComponent],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit{
 
-  composant: string = "DashboardComponent";
   selectedGroup: GroupDetail | undefined = undefined;
   isAdmin = false;
   isManagedTiers = false;

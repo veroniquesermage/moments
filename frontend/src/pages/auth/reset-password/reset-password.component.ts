@@ -1,5 +1,4 @@
 import {Component, inject, OnInit, signal} from '@angular/core';
-import {FeedbackTestComponent} from "src/shared/components/feedback-test/feedback-test.component";
 import {FormsModule} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {IncompleteUser} from 'src/security/model/incomplete_user.model';
@@ -12,7 +11,6 @@ import {ToastrService} from 'src/core/services/toastr.service';
 @Component({
   selector: 'app-reset-password',
     imports: [
-        FeedbackTestComponent,
         FormsModule,
         NgIf,
     ],

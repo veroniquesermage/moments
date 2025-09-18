@@ -8,16 +8,13 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {GiftDeliveryUpdate} from 'src/core/models/gift/gift-delivery-update.model';
 import {GiftDelivery} from 'src/core/models/gift/gift-delivery.model';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
-
 @Component({
   selector: 'app-gift-deliver',
   imports: [
     NgIf,
     TerminalModalComponent,
     FormsModule,
-    ReactiveFormsModule,
-    FeedbackTestComponent
+    ReactiveFormsModule
   ],
   standalone: true,
   templateUrl: './gift-deliver.component.html',
@@ -34,7 +31,6 @@ export class GiftDeliverComponent implements OnInit {
   id: number | undefined = undefined;
   gift: GiftPublicResponse | undefined = undefined;
   delivery: GiftDelivery | undefined = undefined;
-  composant: string = "GiftDeliverComponent";
 
   constructor(private giftService: GiftService,
               public router: Router,

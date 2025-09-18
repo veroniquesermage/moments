@@ -15,7 +15,6 @@ import {ToastrService} from 'src/core/services/toastr.service';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {UserService} from 'src/core/services/user.service';
 import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
 
@@ -28,7 +27,6 @@ import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
     TerminalModalComponent,
     FormsModule,
     DisplayNamePipe,
-    FeedbackTestComponent,
     FormatMontantPipe
   ],
   templateUrl: './my-gifts-ideas.component.html',
@@ -45,7 +43,6 @@ export class MyGiftsIdeasComponent implements OnInit {
   selectedDestId?: number;
   showDuplicationModal = false;
   membersSignal: Signal<UserDisplay[]>;
-  composant: string = "MyGiftsIdeasComponent";
   membersSharedGroup: UserDisplay[] = [];
 
 
