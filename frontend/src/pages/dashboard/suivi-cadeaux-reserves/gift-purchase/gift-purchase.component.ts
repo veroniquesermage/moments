@@ -1,5 +1,4 @@
 import {Component, computed, inject, OnInit} from '@angular/core';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
@@ -17,7 +16,6 @@ import {UserTiersResponse} from 'src/core/models/user-tiers-response.model';
   selector: 'app-gift-purchase',
   standalone: true,
   imports: [
-    FeedbackTestComponent,
     FormsModule,
     ReactiveFormsModule,
     TerminalModalComponent,
@@ -40,7 +38,6 @@ export class GiftPurchaseComponent implements OnInit{
   giftDetail?: GiftDetailResponse;
   purchase?: GiftPurchaseInfoSchema;
   managedAccounts = computed(() => this.userService.userTiersResponse());
-  composant: string = "GiftPurchaseComponent";
 
   constructor(private giftService: GiftService,
               public router: Router,

@@ -5,20 +5,18 @@ import {GroupService} from 'src/core/services/group.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ErrorService} from 'src/core/services/error.service';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {AuthService} from 'src/security/service/auth.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-group-join',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FeedbackTestComponent, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TerminalModalComponent, FormsModule],
   templateUrl: './group-join.component.html',
   styleUrl: './group-join.component.scss'
 })
 export class GroupJoinComponent implements OnInit{
 
-  composant: string = "GroupJoinComponent";
   inviteToken: string = '';
   private route = inject(ActivatedRoute);
 
