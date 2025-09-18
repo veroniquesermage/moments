@@ -4,20 +4,18 @@ import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {GiftPriorityListComponent} from 'src/shared/components/gift-priority-list/gift-priority-list.component';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
 import {PaginationInfo} from 'src/core/models/common/pagination.model';
 
 @Component({
   selector: 'app-user-gifts',
-  imports: [CommonModule, GiftPriorityListComponent, FeedbackTestComponent, PaginationComponent],
+  imports: [CommonModule, GiftPriorityListComponent,PaginationComponent],
   standalone: true,
   templateUrl: './user-gifts.component.html',
   styleUrl: './user-gifts.component.scss'
 })
 export class UserGiftsComponent implements OnInit{
 
-  composant: string = "UserGiftsComponent";
   currentPage = signal(1);
   paginationInfo = signal<PaginationInfo | null>(null);
   gifts = signal<GiftResponse[]>([]);
@@ -32,7 +30,7 @@ export class UserGiftsComponent implements OnInit{
 
   async loadGifts(page: number): Promise<void> {
     const result = await this.giftService.fetchGifts(undefined, page);
-    
+
     if (result.success && result.data) {
       this.currentPage.set(page);
       this.paginationInfo.set(result.data.pagination);

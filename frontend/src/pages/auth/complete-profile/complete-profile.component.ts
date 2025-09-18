@@ -2,7 +2,6 @@ import {Component, inject, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {AuthService} from 'src/security/service/auth.service';
 import {CommonModule} from '@angular/common';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {ErrorService} from 'src/core/services/error.service';
 import {ActivatedRoute} from '@angular/router';
@@ -14,7 +13,6 @@ import {IncompleteUser} from 'src/security/model/incomplete_user.model';
   imports: [
     FormsModule,
     CommonModule,
-    FeedbackTestComponent,
     TerminalModalComponent
   ],
   templateUrl: './complete-profile.component.html',
@@ -22,7 +20,6 @@ import {IncompleteUser} from 'src/security/model/incomplete_user.model';
 })
 export class CompleteProfileComponent implements OnInit{
 
-  composant: string = "CompleteProfileComponent";
   givenName: string | undefined ='';
   familyName: string | undefined ='';
   user: IncompleteUser | null = null;

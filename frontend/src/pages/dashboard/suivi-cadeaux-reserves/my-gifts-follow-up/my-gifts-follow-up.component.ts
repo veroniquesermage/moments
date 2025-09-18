@@ -12,7 +12,6 @@ import {GiftFollowed} from 'src/core/models/gift/gift-followed.model';
 import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {getDisplayName} from 'src/core/utils/display-name';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {GiftFollowedByAccount} from 'src/core/models/gift/gift-followed-by-account.model';
 import {AuthService} from 'src/security/service/auth.service';
 import {FormatMontantPipe} from 'src/core/pipes/format-montant.pipe';
@@ -28,7 +27,6 @@ import {PaginationInfo} from 'src/core/models/common/pagination.model';
     TerminalModalComponent,
     NgForOf,
     TitleCasePipe,
-    FeedbackTestComponent,
     FormatMontantPipe,
     PaginationComponent,
   ],
@@ -79,7 +77,7 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
         ? this.displayedColumnsPortrait
         : this.displayedColumnsDesktop;
     });
-    
+
     await this.loadFollowedGifts(1);
   }
 
@@ -170,5 +168,4 @@ export class MyGiftsFollowUpComponent implements OnInit, OnDestroy{
 
 
   protected readonly Number = Number;
-  composant: string = "MyGiftsFollowUpComponent";
 }

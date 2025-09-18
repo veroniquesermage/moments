@@ -12,7 +12,6 @@ import {IdeaService} from 'src/core/services/idea.service';
 import {CommonModule} from '@angular/common';
 import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 
 @Component({
   selector: 'app-ideas-create',
@@ -20,8 +19,7 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
   imports: [
     TerminalModalComponent,
     GiftIdeaFormComponent,
-    CommonModule,
-    FeedbackTestComponent
+    CommonModule
   ],
   templateUrl: './ideas-create.component.html',
   styleUrl: './ideas-create.component.scss'
@@ -34,7 +32,6 @@ export class IdeasCreateComponent {
   membersSignal: Signal<UserDisplay[]>;
   giftIdeaCreate: GiftIdeaCreate | undefined;
   showModal = false;
-  composant: string = "IdeasCreateComponent";
 
   constructor(public router: Router,
               private groupContextService: GroupContextService,

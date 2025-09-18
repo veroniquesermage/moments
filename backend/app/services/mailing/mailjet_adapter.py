@@ -8,56 +8,10 @@ from app.core.enum import GiftStatusEnum
 from app.core.logger import logger
 from app.models import User, Gift
 from app.schemas.group import GroupResponse
-from app.schemas.mailing import FeedbackRequest
 from app.utils.date_helper import now_paris
 
 
 class MailjetAdapter:
-
-    @staticmethod
-    def send_feedback(
-            feedback_request: FeedbackRequest,
-            user: User
-    ):
-        sender_email = settings.mj_sender_email
-        feedback_email = settings.mj_feedback_email
-
-        # Lecture du fichier HTML
-        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "feedback.html"
-        template_str = template_path.read_text(encoding="utf-8")
-
-        # Création d’un template Jinja2
-        template = Template(template_str)
-
-        # Rendu avec les vraies données
-        html_rendered = template.render(
-            feedback_request=feedback_request,
-            user=user,
-            date_envoi=now_paris().strftime("%d/%m/%Y à %Hh%M"),
-            user_id=user.id
-        )
-
-        mailjet = MailjetAdapter._get_mailjet_client()
-        data = {
-            'Messages': [
-                {
-                    "From": {
-                        "Email": sender_email,
-                        "Name": "Moments-ep"
-                    },
-                    "To": [
-                        {
-                            "Email": feedback_email,
-                        }
-                    ],
-                    "Subject": "Feedback envoyé",
-                    "HTMLPart": html_rendered
-                }
-            ]
-        }
-
-        return mailjet.send.create(data=data)
-
 
     @staticmethod
     def send_invites_with_tokens(

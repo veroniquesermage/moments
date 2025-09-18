@@ -9,7 +9,6 @@ import {GiftTableColumn} from 'src/core/models/gift/gift-table-column.model';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
 import {formatEuro} from 'src/core/utils/format-montant';
 import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
 import {PaginationInfo} from 'src/core/models/common/pagination.model';
@@ -21,7 +20,6 @@ import {PaginationInfo} from 'src/core/models/common/pagination.model';
     CommonModule,
     TerminalModalComponent,
     DisplayNamePipe,
-    FeedbackTestComponent,
     PaginationComponent
   ],
   templateUrl: './group-member-gifts.component.html',
@@ -30,7 +28,6 @@ import {PaginationInfo} from 'src/core/models/common/pagination.model';
 export class GroupMemberGiftsComponent implements OnInit {
 
   protected readonly DisplayNamePipe = DisplayNamePipe;
-  composant: string = "GroupMemberGiftsComponent";
   membersSignal: Signal<UserDisplay[]>;
   selectedMember: UserDisplay | undefined = undefined;
   giftPublic: GiftPublicResponse[] = [];
@@ -56,11 +53,11 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   async ngOnInit() {
     this.giftService.clearGifts();
-    
+
     // Vérifier les query params pour restaurer l'état
     const memberId = this.route.snapshot.queryParams['memberId'];
     const page = this.route.snapshot.queryParams['page'];
-    
+
     if (memberId && page) {
       const members = this.membersSignal();
       const member = members.find(m => m.id?.toString() === memberId);
@@ -73,13 +70,13 @@ export class GroupMemberGiftsComponent implements OnInit {
 
   onGiftClicked(gift: GiftPublicResponse): void {
     const queryParams: any = { context: 'cadeaux-groupe' };
-    
+
     // Ajouter memberId et page si un membre est sélectionné
     if (this.selectedMember?.id) {
       queryParams.memberId = this.selectedMember.id;
       queryParams.page = this.currentPage();
     }
-    
+
     void this.router.navigate(['/dashboard/cadeau', gift.id], {
       queryParams
     });
@@ -98,13 +95,13 @@ export class GroupMemberGiftsComponent implements OnInit {
       this.errorService.showError("❌ Impossible d\'accéder au membre. Veuillez réessayer plus tard.");
       return;
     }
-    
+
     await this.loadMemberGifts(user.id, 1);
   }
 
   async loadMemberGifts(userId: number, page: number): Promise<void> {
     this.isLoadingMember.set(true);
-    
+
     const result = await this.giftService.getVisibleGiftsForMember(userId, page);
     if (result.success && result.data) {
       this.currentPage.set(page);
@@ -115,7 +112,7 @@ export class GroupMemberGiftsComponent implements OnInit {
     } else {
       this.errorService.showError("❌ Impossible d\'afficher la liste de ce membre. Veuillez réessayer plus tard.");
     }
-    
+
     this.isLoadingMember.set(false);
   }
 
