@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, signal, OnInit} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {AuthService} from 'src/security/service/auth.service';
 import {LoadingComponent} from 'src/shared/components/loading/loading.component';
@@ -17,7 +17,7 @@ import {ModalActionType} from 'src/core/enum/modal-action.enum';
   styleUrls: ['./welcome.component.scss'],
   imports: [CommonModule, LoadingComponent, FormsModule, NgOptimizedImage, TerminalModalComponent],
 })
-export class WelcomeComponent {
+export class WelcomeComponent implements OnInit {
 
   showPassword = signal<boolean>(false);
   email: string='';
@@ -39,6 +39,11 @@ export class WelcomeComponent {
     public auth: AuthService,
     public groupeService: GroupService,
     public errorService: ErrorService) {
+  }
+
+  ngOnInit(): void {
+    // Force le scroll vers le haut de la page pour éviter les clics accidentels sur mobile
+    window.scrollTo(0, 0);
   }
 
   googleLogin() {
