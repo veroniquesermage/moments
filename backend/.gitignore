@@ -9,6 +9,7 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+.iml
 
 # Garder uniquement les paramètres de projet utiles
 .idea/*

@@ -2,6 +2,7 @@
 .vscode/
 .idea/
 /.idea
+.iml
 
 # OS
 .DS_Store
