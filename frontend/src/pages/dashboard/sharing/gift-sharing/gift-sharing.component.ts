@@ -11,8 +11,6 @@ import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.mode
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
-import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedback-test.component';
-
 @Component({
   selector: 'app-gift-sharing',
   standalone: true,
@@ -20,7 +18,6 @@ import {FeedbackTestComponent} from 'src/shared/components/feedback-test/feedbac
     FormsModule,
     CommonModule,
     DisplayNamePipe,
-    FeedbackTestComponent
   ],
   templateUrl: './gift-sharing.component.html',
   styleUrl: './gift-sharing.component.scss'
@@ -34,7 +31,6 @@ export class GiftSharingComponent implements OnInit {
   gift: GiftPublicResponse | undefined = undefined;
   membersSignal: Signal<UserDisplay[]>;
   contextBrut: string | null = null;
-  composant: string = "GiftSharingComponent";
 
   constructor(private sharingService: SharingService,
               private giftService: GiftService,

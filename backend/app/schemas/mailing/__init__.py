@@ -1,2 +1,1 @@
-from .feedback_request import FeedbackRequest
 from .invite_response import InviteResponse
