@@ -32,8 +32,12 @@ export class ResponsiveService {
   isDesktop = signal(true);
 
   constructor() {
+    // Initialisation immédiate des valeurs selon la taille actuelle
+    this.initializeBreakpoints();
+
     // Détection mobile (< 768px)
     this.breakpointObserver.observe(['(max-width: 767px)']).subscribe(result => {
+      console.log('[ResponsiveService] Mobile breakpoint:', result.matches);
       this.isMobile.set(result.matches);
       if (result.matches) {
         this.isTablet.set(false);
@@ -43,6 +47,7 @@ export class ResponsiveService {
 
     // Détection tablet (768px - 1024px)
     this.breakpointObserver.observe(['(min-width: 768px) and (max-width: 1024px)']).subscribe(result => {
+      console.log('[ResponsiveService] Tablet breakpoint:', result.matches);
       this.isTablet.set(result.matches);
       if (result.matches) {
         this.isMobile.set(false);
@@ -52,6 +57,7 @@ export class ResponsiveService {
 
     // Détection desktop (> 1024px)
     this.breakpointObserver.observe(['(min-width: 1025px)']).subscribe(result => {
+      console.log('[ResponsiveService] Desktop breakpoint:', result.matches);
       this.isDesktop.set(result.matches);
       if (result.matches) {
         this.isMobile.set(false);
@@ -60,13 +66,34 @@ export class ResponsiveService {
     });
   }
 
+  private initializeBreakpoints(): void {
+    const width = window.innerWidth;
+    console.log('[ResponsiveService] Window width at init:', width);
+
+    if (width <= 767) {
+      this.isMobile.set(true);
+      this.isTablet.set(false);
+      this.isDesktop.set(false);
+    } else if (width <= 1024) {
+      this.isMobile.set(false);
+      this.isTablet.set(true);
+      this.isDesktop.set(false);
+    } else {
+      this.isMobile.set(false);
+      this.isTablet.set(false);
+      this.isDesktop.set(true);
+    }
+  }
+
   /**
    * Retourne la taille de page appropriée selon l'écran actuel
    */
   getCurrentPageSize(): number {
-    if (this.isMobile()) return PAGE_SIZES.mobile;
-    if (this.isTablet()) return PAGE_SIZES.tablet;
-    return PAGE_SIZES.desktop;
+    const pageSize = this.isMobile() ? PAGE_SIZES.mobile :
+                     this.isTablet() ? PAGE_SIZES.tablet :
+                     PAGE_SIZES.desktop;
+    console.log('[ResponsiveService] getCurrentPageSize:', pageSize, 'Mobile:', this.isMobile(), 'Tablet:', this.isTablet(), 'Desktop:', this.isDesktop());
+    return pageSize;
   }
 
   /**
@@ -74,7 +101,9 @@ export class ResponsiveService {
    */
   getPageSizeForContext(context: keyof typeof PAGINATION_CONFIGS): number {
     const config = PAGINATION_CONFIGS[context] || PAGINATION_CONFIGS.default;
-    return this.isMobile() ? config.mobile : config.desktop;
+    const pageSize = this.isMobile() ? config.mobile : config.desktop;
+    console.log('[ResponsiveService] getPageSizeForContext:', context, 'PageSize:', pageSize, 'Mobile:', this.isMobile());
+    return pageSize;
   }
 
   /**
