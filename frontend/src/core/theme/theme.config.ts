@@ -6,7 +6,7 @@ export const AVAILABLE_THEMES: ThemeMeta[] = [
     label: 'Véro douce',
     description: 'Sombre, doux pour les yeux.',
     histoire: 'Le tout premier thème, celui dans lequel Véronique a imaginé (Moments). Inspiré par sa sœur jumelle, pour qui le rose était une évidence. C’est aussi la couleur des filles de la famille, comme un fil tendre qui relie les générations. Un thème pour respirer, tout simplement.',
-    resume: 'Celui qu’on choisit quand on veut un peu de douceur et beaucoup de soi.'
+    resume: 'Celui qu’on choisit quand on veut un peu de douceur et de la sérénité.'
   },
   {
     value: 'light',
