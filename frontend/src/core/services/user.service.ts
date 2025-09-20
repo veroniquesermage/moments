@@ -19,10 +19,12 @@ export class UserService {
   async fetchUserGroup(idGroup: number): Promise<ApiResponse<UserDisplay[]>> {
     try {
       const url = `${this.apiUrl + environment.api.groupes}/${idGroup}`;
+      console.log('[UserService] fetchUserGroup - URL:', url);
       const users = await firstValueFrom(this.http.get<UserDisplay[]>(url));
+      console.log('[UserService] fetchUserGroup - Réponse:', users);
       return {success: true, data: users};
     } catch (error) {
-      console.error('[UserGroupService] Erreur lors de la récupération des membres du groupe', error);
+      console.error('[UserService] Erreur lors de la récupération des membres du groupe', error);
       return {success: false, message: "❌ Groupe inexistant."};
     }
   }

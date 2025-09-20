@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, Signal} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GiftService} from 'src/core/services/gift.service';
 import {ErrorService} from 'src/core/services/error.service';
@@ -11,6 +11,7 @@ import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.mode
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {UserService} from 'src/core/services/user.service';
 @Component({
   selector: 'app-gift-sharing',
   standalone: true,
@@ -29,15 +30,16 @@ export class GiftSharingComponent implements OnInit {
   partages: GiftShared[] | undefined = [];
   partagesDraft: GiftSharedDraft[] = [];
   gift: GiftPublicResponse | undefined = undefined;
-  membersSignal: Signal<UserDisplay[]>;
+  members = signal<UserDisplay[]>([]);
+  isLoadingMembers = signal<boolean>(false);
   contextBrut: string | null = null;
 
   constructor(private sharingService: SharingService,
               private giftService: GiftService,
               private groupContextService: GroupContextService,
               public router: Router,
-              public errorService: ErrorService) {
-    this.membersSignal = this.groupContextService.getMembersSignal();
+              public errorService: ErrorService,
+              private userService: UserService) {
   }
 
   async ngOnInit() {
@@ -49,12 +51,35 @@ export class GiftSharingComponent implements OnInit {
       this.errorService.showError("❌ Impossible de modifier le partage.");
       return;
     }
+
+    await this.loadMembers();
+
     const result = await this.giftService.getGift(this.idGift);
     if (result.success) {
       this.gift = result.data.gift;
       this.partages = result.data.partage;
     } else {
       this.errorService.showError("❌ Impossible de modifier le partage.");
+    }
+  }
+
+  private async loadMembers(): Promise<void> {
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError('❌ Aucun groupe actif.');
+      return;
+    }
+
+    this.isLoadingMembers.set(true);
+    try {
+      const result = await this.userService.fetchUserGroup(groupId);
+      if (result.success) {
+        this.members.set(result.data);
+      } else {
+        this.errorService.showError(result.message);
+      }
+    } finally {
+      this.isLoadingMembers.set(false);
     }
   }
 

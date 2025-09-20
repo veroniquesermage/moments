@@ -1,56 +1,49 @@
-import {Injectable, Signal, signal} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {UserDisplay} from 'src/core/models/user-display.model';
-import {UserService} from 'src/core/services/user.service';
+import {PersistenceService} from 'src/core/services/persistence.service';
 
 @Injectable({ providedIn: 'root' })
 export class GroupContextService{
 
-  membersSignal = signal<UserDisplay[]>([]);
+  constructor(private router: Router,
+              private persistenceService: PersistenceService) {
+  }
 
-  constructor(private userService: UserService,
-              private router: Router) {}
+  setGroupContext(id: number): void {
+    try {
+      // 1. Nettoyer le contexte précédent
+      this.clearNavigationStates();
 
-  async setGroupContext(id: number): Promise<void> {
-    const groupUsers = await this.userService.fetchUserGroup(id);
-    if (groupUsers.success) {
-      this.membersSignal.set(groupUsers.data);
-    } else {
-      console.warn('[GroupContext] Échec du fetch des membres pour le groupe', id);
+      // 2. Sauvegarder le nouveau groupId
+      const safeId = Number(id);
+      this.persistenceService.saveActiveGroupId(safeId);
+
+      console.log(`[GroupContext] Contexte groupe ${safeId} défini (sans cache des membres)`);
+    } catch (error) {
+      console.error('[GroupContext] Erreur lors du changement de contexte:', error);
     }
-    const safeId = Number(id);
-    localStorage.setItem('app_kdo.activeGroupId', safeId.toString());
   }
 
   getGroupId(): number | null {
-    const id = localStorage.getItem('app_kdo.activeGroupId');
-    if (!id || isNaN(Number(id))) {
+    const id = this.persistenceService.getActiveGroupId();
+    if (!id) {
       void this.router.navigate(['/groupe/onboarding']);
       return null;
     }
-    return Number(id);
-  }
-
-  getMembersSignal(): Signal<UserDisplay[]> {
-    return this.membersSignal;
-  }
-
-  async updateMemberSignal() {
-    const id = this.getGroupId();
-    if (!id) {
-      this.membersSignal.set([]);
-      return;
-    }
-
-    const groupUsers = await this.userService.fetchUserGroup(id);
-    if (groupUsers.success) {
-      this.membersSignal.set(groupUsers.data);
-    }
+    return id;
   }
 
   clearGroupCache(){
-    localStorage.removeItem('app_kdo.activeGroupId');
-    this.membersSignal.set([]);
+    this.persistenceService.clearActiveGroupId();
+    console.log('[GroupContext] Cache groupe nettoyé');
+  }
+
+  /**
+   * Nettoyer les états de navigation lors du changement de groupe
+   */
+  private clearNavigationStates(): void {
+    this.persistenceService.clearAllNavigationStates();
+    console.log('[GroupContext] États de navigation nettoyés');
   }
 
 }
