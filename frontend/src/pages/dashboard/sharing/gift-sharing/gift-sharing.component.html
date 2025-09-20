@@ -20,7 +20,7 @@
   <tr *ngFor="let partage of partages; let i = index">
     <td>{{ partage.participant | displayName }}</td>
     <td>
-      <input type="number" [(ngModel)]="partages![i].montant" />
+      <input type="text" [(ngModel)]="partages![i].montant" appNumericInput />
     </td>
     <td>
       <button class="test-align"
@@ -39,7 +39,7 @@
       </select>
     </td>
     <td>
-      <input type="number" [(ngModel)]="draft.montant" />
+      <input type="text" [(ngModel)]="draft.montant" appNumericInput />
     </td>
     <td>
       <button class="test-align"
