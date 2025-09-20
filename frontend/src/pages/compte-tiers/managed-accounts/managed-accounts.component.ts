@@ -40,7 +40,10 @@ export class ManagedAccountsComponent implements OnInit{
   showExportUser: boolean = false;
   selectedGroupId: number | undefined;
   groupes = computed(() => this.groupService.groupes());
-  groupFiltered = computed(() => this.groupes().filter(gr => gr.id !== this.groupContextService.getGroupId()));
+  groupFiltered = computed(() => {
+    const currentGroupId = this.groupContextService.getGroupId();
+    return this.groupes().filter(gr => gr.id !== currentGroupId);
+  });
 
   constructor(private userService: UserService,
               private groupService: GroupService,

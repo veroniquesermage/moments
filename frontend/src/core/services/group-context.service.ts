@@ -22,10 +22,11 @@ export class GroupContextService{
     localStorage.setItem('app_kdo.activeGroupId', safeId.toString());
   }
 
-  getGroupId(): number {
+  getGroupId(): number | null {
     const id = localStorage.getItem('app_kdo.activeGroupId');
     if (!id || isNaN(Number(id))) {
-      void this.router.navigate(['/onboarding']);
+      void this.router.navigate(['/groupe/onboarding']);
+      return null;
     }
     return Number(id);
   }
@@ -36,6 +37,11 @@ export class GroupContextService{
 
   async updateMemberSignal() {
     const id = this.getGroupId();
+    if (!id) {
+      this.membersSignal.set([]);
+      return;
+    }
+
     const groupUsers = await this.userService.fetchUserGroup(id);
     if (groupUsers.success) {
       this.membersSignal.set(groupUsers.data);

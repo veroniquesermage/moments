@@ -1,16 +1,19 @@
 <div class="terminal" aria-labelledby="Menu principal">
-  <section class="intro-section" aria-labelledby="titre-groupe">
-    <h1 class="dashboard-title">
-      🪶 Bienvenue dans le salon de <strong>{{ selectedGroup!.groupe.nomGroupe }}</strong>
-    </h1>
-    <p class="dashboard-subtitle">
-      Rien ne presse ici. Sauf peut-être l’envie de partager.
-    </p>
 
-    <p *ngIf="selectedGroup!.groupe.description">
-      <em>Ce groupe a été décrit — probablement avec soin et une tasse de thé — comme suit :</em><br />
-      <span class="emphase-douce">« {{ selectedGroup!.groupe.description }} »</span>
-    </p>
+  <!-- Contenu normal si données chargées -->
+  <div *ngIf="selectedGroup?.groupe && !loadingError">
+    <section class="intro-section" aria-labelledby="titre-groupe">
+      <h1 class="dashboard-title">
+        🪶 Bienvenue dans le salon de <strong>{{ selectedGroup?.groupe?.nomGroupe }}</strong>
+      </h1>
+      <p class="dashboard-subtitle">
+        Rien ne presse ici. Sauf peut-être l'envie de partager.
+      </p>
+
+      <p *ngIf="selectedGroup?.groupe?.description">
+        <em>Ce groupe a été décrit — probablement avec soin et une tasse de thé — comme suit :</em><br />
+        <span class="emphase-douce">« {{ selectedGroup?.groupe?.description }} »</span>
+      </p>
 
     <p class="question">
       👉 Que souhaitez-vous faire aujourd’hui ?
@@ -46,5 +49,16 @@
       <button (click)="goToGestionGroupe()">🛠️ Gérer le groupe</button>
     </li>
   </ul>
+  </div>
+
+  <!-- Gestion d'erreur - seulement après échec des retries automatiques -->
+  <div *ngIf="loadingError">
+    <section class="error-section">
+      <h1 class="dashboard-title">❌ Erreur de chargement</h1>
+      <p>Impossible de charger les informations du groupe après plusieurs tentatives.</p>
+      <button (click)="manualRetry()">🔄 Réessayer</button>
+    </section>
+  </div>
+
 </div>
 
