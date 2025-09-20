@@ -1,4 +1,4 @@
-import {Component, OnInit, Signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {ErrorService} from 'src/core/services/error.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
@@ -12,6 +12,7 @@ import {UserDisplay} from 'src/core/models/user-display.model';
 import {GroupDetail} from 'src/core/models/group/group-detail.model';
 import {User} from 'src/security/model/user.model';
 import {AuthService} from 'src/security/service/auth.service';
+import {UserService} from 'src/core/services/user.service';
 
 @Component({
   selector: 'app-profile-group',
@@ -26,10 +27,10 @@ import {AuthService} from 'src/security/service/auth.service';
 })
 export class ProfileGroupComponent implements OnInit{
 
-  membersSignal: Signal<UserDisplay[]>;
+  members = signal<UserDisplay[]>([]);
+  isLoadingMembers = signal<boolean>(false);
   user: User | null = null;
   group: GroupDetail | undefined
-  members: string[] = []
   showMemberModal: boolean = false;
   showNicknameModal: boolean = false;
   showConfirmModal: boolean = false;
@@ -43,13 +44,34 @@ export class ProfileGroupComponent implements OnInit{
               public errorService: ErrorService,
               private router: Router,
               private groupContextService: GroupContextService,
-              private authService: AuthService) {
-    this.membersSignal = this.groupContextService.getMembersSignal();
+              private authService: AuthService,
+              private userService: UserService) {
   }
 
   async ngOnInit(){
+      await this.loadMembers();
       await this.loadGroupDetail();
       this.user = this.authService.profile();
+  }
+
+  private async loadMembers(): Promise<void> {
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError('❌ Aucun groupe actif.');
+      return;
+    }
+
+    this.isLoadingMembers.set(true);
+    try {
+      const result = await this.userService.fetchUserGroup(groupId);
+      if (result.success) {
+        this.members.set(result.data);
+      } else {
+        this.errorService.showError(result.message);
+      }
+    } finally {
+      this.isLoadingMembers.set(false);
+    }
   }
 
   async getAllMembers() {
@@ -107,7 +129,7 @@ export class ProfileGroupComponent implements OnInit{
         return;
       }
       await this.userGroupService.deleteUserInGroup(groupId);
-      await this.groupContextService.updateMemberSignal();
+      await this.loadMembers();
       await this.router.navigate(['/groupe/onboarding']);
       this.showConfirmModal = false;
     } catch (err) {
