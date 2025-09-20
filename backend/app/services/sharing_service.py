@@ -64,7 +64,10 @@ class SharingService:
             )
         )).scalars().all()
 
-        shared_schema = [await build_gift_shared_schema(sh, group_id, db) for sh in shared_refresh]
+        shared_schema = []
+        for sh in shared_refresh:
+            schema = await build_gift_shared_schema(sh, group_id, db)
+            shared_schema.append(schema)
         new_status: GiftStatus
         if gift.statut == GiftStatusEnum.PRIS and len(shared_schema) > 0:
             gift.statut = GiftStatusEnum.PARTAGE
@@ -190,7 +193,11 @@ class SharingService:
             )
         )
         shared_entries = query.scalars().all()
-        return [await build_gift_shared_schema(entry, group_id, db) for entry in shared_entries]
+        result = []
+        for entry in shared_entries:
+            schema = await build_gift_shared_schema(entry, group_id, db)
+            result.append(schema)
+        return result
 
     @staticmethod
     async def delete_share(db: AsyncSession,
