@@ -30,6 +30,11 @@ export class ManageGroupComponent implements OnInit{
 
   async ngOnInit() {
     this.groupId = this.groupServiceContext.getGroupId() || undefined;
+
+    // Recharger les membres si le signal est vide (après F5 par exemple)
+    if (this.membersSignal().length === 0) {
+      await this.groupServiceContext.updateMemberSignal();
+    }
   }
 
   reloadMembers() {
