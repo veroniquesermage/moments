@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {MailingService} from 'src/core/services/mailing.service';
@@ -29,6 +29,9 @@ export class GroupInviteComponent {
 
   @Input()
   groupId: number | undefined;
+
+  @Output()
+  membersUpdated = new EventEmitter<void>();
   mails: string = '';
 
   // Variables pour la modale de recap
@@ -74,7 +77,7 @@ export class GroupInviteComponent {
     if (this.inviteResponse?.emails_envoyes.length! > 0) {
       this.mails = '';
       // Rafraîchir la liste des membres après envoi d'invitations
-      await this.groupContextService.updateMemberSignal();
+      this.membersUpdated.emit();
     }
 
     this.inviteResponse = null;

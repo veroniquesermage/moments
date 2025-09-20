@@ -33,7 +33,7 @@
     <td>
       <select [(ngModel)]="draft.participant">
         <option [ngValue]="null">choisir</option>
-        <option *ngFor="let membre of membersSignal()" [ngValue]="membre">
+        <option *ngFor="let membre of members()" [ngValue]="membre">
           {{ membre | displayName }}
         </option>
       </select>

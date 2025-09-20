@@ -3,18 +3,25 @@
   <div class="block-title">🧏🏻 Mon compte </div>
   <hr class="block-separator" />
 
-  <div *ngIf="user; else loading">
-    <p> Prénom : {{user.prenom}}</p>
-    <p> Nom : {{user.nom}}</p>
-    <p *ngIf="user.hasPassword"> Email : {{user.email}}</p>
+  <!-- État de chargement -->
+  <div *ngIf="isLoading()" class="loading-state">
+    Chargement du profil utilisateur...
+  </div>
+
+  <!-- Profil utilisateur -->
+  <div *ngIf="user() && !isLoading()">
+    <p> Prénom : {{user()!.prenom}}</p>
+    <p> Nom : {{user()!.nom}}</p>
+    <p *ngIf="user()!.hasPassword"> Email : {{user()!.email}}</p>
 
     <div class="options">
       <button (click)="disconnect()">Déconnexion</button>
-      <button *ngIf="user.hasPassword" (click)="changePassword()">Changer mon mot de passe</button>
+      <button *ngIf="user()!.hasPassword" (click)="changePassword()">Changer mon mot de passe</button>
     </div>
   </div>
 
-  <ng-template #loading>
-    <p>Chargement...</p>
-  </ng-template>
+  <!-- Aucun profil et pas de chargement -->
+  <div *ngIf="!user() && !isLoading()" class="no-profile">
+    <p>Aucune information de profil disponible.</p>
+  </div>
 </div>

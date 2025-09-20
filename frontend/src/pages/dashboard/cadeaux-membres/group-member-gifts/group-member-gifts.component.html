@@ -13,9 +13,14 @@
     </p>
   </section>
 
-  <div class="user-buttons">
+  <!-- Loading state pour les membres -->
+  <div *ngIf="isLoadingMembers()" class="loading-state">
+    Chargement des membres...
+  </div>
+
+  <div class="user-buttons" *ngIf="!isLoadingMembers()">
     <button
-      *ngFor="let user of membersSignal()"
+      *ngFor="let user of members()"
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
     >

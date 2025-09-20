@@ -25,7 +25,7 @@ export class ThemeComponent implements OnInit {
               private router : Router) {}
 
   ngOnInit(): void {
-    this.selectedTheme = this.themeService.current;
+    this.selectedTheme = this.themeService.current();
   }
 
   onThemeChange(themeValue: string): void {
