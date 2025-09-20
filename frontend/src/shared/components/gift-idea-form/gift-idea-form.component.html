@@ -26,11 +26,11 @@
     <label>Url du cadeau</label>
     <input formControlName="url" type="text" />
     <label>Quantité</label>
-    <input formControlName="quantite" type="text" />
+    <input formControlName="quantite" type="text" appIntegerInput />
     <label>Prix unitaire (€)</label>
-    <input type="text" formControlName="prix" (input)="sanitizeDecimal($event, 'prix')" />
+    <input type="text" formControlName="prix" appNumericInput (input)="sanitizeDecimal($event, 'prix')" />
     <label>Frais de port (€)</label>
-    <input type="text" formControlName="fraisPort" (input)="sanitizeDecimal($event, 'fraisPort')" />
+    <input type="text" formControlName="fraisPort" appNumericInput (input)="sanitizeDecimal($event, 'fraisPort')" />
     <label>Commentaire</label>
     <textarea formControlName="commentaire"></textarea>
 

@@ -5,11 +5,13 @@ import {Router} from '@angular/router';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
 import {GiftPublicResponse} from 'src/core/models/gift/gift-public-response.model';
 import {ErrorService} from 'src/core/services/error.service';
+import {NumericInputDirective} from '../../directives/numeric-input.directive';
+import {IntegerInputDirective} from '../../directives/integer-input.directive';
 
 @Component({
   selector: 'app-gift-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NumericInputDirective, IntegerInputDirective],
   templateUrl: './gift-form.component.html',
   styleUrl: './gift-form.component.scss'
 })
