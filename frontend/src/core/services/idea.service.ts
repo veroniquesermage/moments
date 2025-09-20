@@ -19,6 +19,9 @@ export class IdeaService {
 
   async fetchIdeas(): Promise<ApiResponse<GiftIdeasResponse[]>> {
     const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      return {success: false, message: "❌ Aucun groupe actif."};
+    }
     const idEnc = encodeURIComponent(groupId);
     const url = `${this.apiUrl}/${idEnc}`;
     try {

@@ -70,7 +70,12 @@ export class ProfileGroupComponent implements OnInit{
   }
 
   async confirmNickname() {
-    const result = await this.userGroupService.updateNickname(this.groupContextService.getGroupId(), this.nickname);
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError("❌ Aucun groupe actif.");
+      return;
+    }
+    const result = await this.userGroupService.updateNickname(groupId, this.nickname);
 
     if(result.success){
       await this.loadGroupDetail();
@@ -96,7 +101,12 @@ export class ProfileGroupComponent implements OnInit{
       this.showConfirmModal = false;
     }
     try {
-      await this.userGroupService.deleteUserInGroup(this.groupContextService.getGroupId());
+      const groupId = this.groupContextService.getGroupId();
+      if (!groupId) {
+        this.errorService.showError("❌ Aucun groupe actif.");
+        return;
+      }
+      await this.userGroupService.deleteUserInGroup(groupId);
       await this.groupContextService.updateMemberSignal();
       await this.router.navigate(['/groupe/onboarding']);
       this.showConfirmModal = false;
@@ -106,7 +116,12 @@ export class ProfileGroupComponent implements OnInit{
   }
 
   async loadGroupDetail(){
-    const result = await this.groupService.getGroupDetail(this.groupContextService.getGroupId());
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError("❌ Aucun groupe actif.");
+      return;
+    }
+    const result = await this.groupService.getGroupDetail(groupId);
     if(result.success){
       this.group = result.data;
       if (this.group.surnom){

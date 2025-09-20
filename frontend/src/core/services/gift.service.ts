@@ -202,7 +202,12 @@ export class GiftService {
   ): Promise<ApiResponse<PaginatedResponse<GiftFollowedByAccount>>> {
     
     const limit = customLimit || this.responsiveService.getPageSizeForContext('followed-gifts');
-    const groupId = this.groupContextService.getGroupId()!;
+    const groupId = this.groupContextService.getGroupId();
+
+    if (!groupId) {
+      return {success: false, message: "❌ Aucun groupe actif."};
+    }
+
     const idEnc = encodeURIComponent(groupId);
     
     let params = new HttpParams()

@@ -21,7 +21,7 @@ async def authenticate_with_google(
     request: GoogleAuthRequest,
     db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
-    logger.debug("Authentification via Google")
+    logger.info("Authentification via Google demandée")
     return await AuthService.authenticate_google_user(request, db)
 
 @router.post("/credentials", status_code=200)

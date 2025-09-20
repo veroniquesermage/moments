@@ -61,7 +61,7 @@ export class StartupService {
   }
 
   private async redirectToCorrectPage(): Promise<void> {
-    const groupId = localStorage.getItem('current_group_id');
+    const groupId = localStorage.getItem('app_kdo.activeGroupId');
 
     if (groupId) {
       await this.router.navigate(['/dashboard']);
