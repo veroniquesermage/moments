@@ -19,6 +19,9 @@ export class DashboardComponent implements OnInit{
   selectedGroup: GroupDetail | undefined = undefined;
   isAdmin = false;
   isManagedTiers = false;
+  loadingError = false;
+  retryCount = 0;
+  maxRetries = 3;
 
   constructor(
     public groupService: GroupService,
@@ -81,12 +84,46 @@ export class DashboardComponent implements OnInit{
   }
 
   async loadGroupDetail(){
-    const groupId = this.groupContextService.getGroupId();
-    const result = await this.groupService.getGroupDetail(groupId);
+    try {
+      this.loadingError = false;
+      const groupId = this.groupContextService.getGroupId();
 
-    if(result.success){
-      this.selectedGroup = result.data;
-      this.isAdmin = this.selectedGroup.role == 'ADMIN';
+      if (!groupId) {
+        // Pas de groupe valide, arrêter ici car redirection en cours
+        return;
+      }
+
+      const result = await this.groupService.getGroupDetail(groupId);
+
+      if(result.success){
+        this.selectedGroup = result.data;
+        this.isAdmin = this.selectedGroup.role == 'ADMIN';
+        this.retryCount = 0; // Reset sur succès
+      } else {
+        await this.handleLoadingError(result.message || "Erreur lors du chargement du groupe");
+      }
+    } catch (error) {
+      await this.handleLoadingError("Erreur lors du chargement du groupe");
     }
+  }
+
+  private async handleLoadingError(message: string) {
+    this.retryCount++;
+
+    if (this.retryCount <= this.maxRetries) {
+      console.info(`Tentative de rechargement automatique ${this.retryCount}/${this.maxRetries}`);
+      // Retry automatique avec délai progressif
+      const delay = this.retryCount * 1000; // 1s, 2s, 3s
+      setTimeout(() => this.loadGroupDetail(), delay);
+    } else {
+      // Échec définitif après tous les retries
+      this.loadingError = true;
+      this.errorService.showError(`${message}. Veuillez rafraîchir la page.`);
+    }
+  }
+
+  async manualRetry() {
+    this.retryCount = 0; // Reset pour permettre nouveaux auto-retries
+    await this.loadGroupDetail();
   }
 }

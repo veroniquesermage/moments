@@ -134,9 +134,9 @@ class AuthService:
                 user_id: int = int(payload.get("sub"))
                 jti: str = payload.get("jti")
                 await TokenService.revoke_refresh_token(db, jti, user_id)
-            except Exception:
-                pass
-
+            except Exception as e:
+                logger.warning(f"Erreur lors de la révocation du refresh token lors de la déconnexion: {e}")
+                
         response = JSONResponse(content={"message": "Déconnexion réussie"})
         response.delete_cookie(key="access_token", path="/")
         response.delete_cookie(key="refresh_token", path="/")
