@@ -38,7 +38,7 @@ export class GroupMemberGiftsComponent implements OnInit {
   isLoadingMembers = signal<boolean>(false);
 
   displayedColumns = [
-    {key: 'nom', label: 'Nom'},
+    {key: 'nom', label: 'Titre du cadeau'},
     {key: 'prix', label: 'Prix unitaire (€)', formatFn: formatEuro},
     {key: 'fraisPort', label: 'Frais de port (€)', formatFn: formatEuro},
     {key: 'quantite', label: 'Quantité'},
