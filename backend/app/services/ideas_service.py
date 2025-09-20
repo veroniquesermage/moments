@@ -150,6 +150,13 @@ class GiftIdeasService:
             gift_data = GiftCreate.model_validate(existing, from_attributes=True).model_dump()
             gift_data["destinataire_id"] = new_dest_id
 
+            # CORRECTION: Remettre le cadeau dupliqué à DISPONIBLE
+            gift_data["statut"] = "DISPONIBLE"
+            # Supprimer les données de réservation
+            gift_data.pop("reserve_par_id", None)
+            gift_data.pop("date_reservation", None)
+            gift_data.pop("expiration_reservation", None)
+
             gift_idea_create = GiftIdeaCreate(
                 gift=GiftCreate(**gift_data),
                 visibilite=existing.gift_idea.visibilite
