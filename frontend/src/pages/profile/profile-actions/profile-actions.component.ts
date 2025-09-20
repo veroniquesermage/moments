@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
+import {AuthService} from '../../../security/service/auth.service';
 
 @Component({
   selector: 'app-profile-actions',
@@ -11,7 +12,7 @@ import {CommonModule} from '@angular/common';
 })
 export class ProfileActionsComponent {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
   }
 
   async changeGroup() {
@@ -20,6 +21,10 @@ export class ProfileActionsComponent {
 
   async back() {
     await this.router.navigate(['/dashboard']);
+  }
+
+  async logout() {
+    await this.authService.logout();
   }
 
 }
