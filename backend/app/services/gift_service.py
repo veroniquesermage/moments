@@ -525,8 +525,21 @@ class GiftService:
         logger.info(f"Récupération paginée des cadeaux suivis pour l'utilisateur {current_user.id} dans le groupe {group_id} - Page {page}, Limit {limit}")
         
         # Récupérer tous les cadeaux (suivis + partagés)
-        gifts_followed = await GiftService._get_gifts_followed(db, current_user, group_id)
-        gifts_shared = await GiftService._get_gifts_shared(db, current_user, group_id)
+        try:
+            logger.info(f"Récupération des cadeaux suivis pour utilisateur {current_user.id}")
+            gifts_followed = await GiftService._get_gifts_followed(db, current_user, group_id)
+            logger.info(f"Cadeaux suivis récupérés: {len(gifts_followed)}")
+        except Exception as e:
+            logger.error(f"ERREUR dans _get_gifts_followed pour utilisateur {current_user.id}: {e}")
+            raise
+
+        try:
+            logger.info(f"Récupération des cadeaux partagés pour utilisateur {current_user.id}")
+            gifts_shared = await GiftService._get_gifts_shared(db, current_user, group_id)
+            logger.info(f"Cadeaux partagés récupérés: {len(gifts_shared)}")
+        except Exception as e:
+            logger.error(f"ERREUR dans _get_gifts_shared pour utilisateur {current_user.id}: {e}")
+            raise
 
         all_gifts = gifts_followed + gifts_shared
         grouped = GiftService._group_gifts_by_account(all_gifts)

@@ -150,6 +150,20 @@ export class AuthService {
     return this.http.post<void>(`${this.baseUrl}/logout`, null);
   }
 
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const user = await firstValueFrom(this.http.get<User>(`${environment.backendBaseUrl}/api/utilisateurs/me`));
+      this.profile.set(user);
+      this.isLoggedIn.set(true);
+      return user;
+    } catch (error) {
+      console.error('[AuthService] Erreur lors de la récupération du profil utilisateur', error);
+      this.profile.set(null);
+      this.isLoggedIn.set(false);
+      return null;
+    }
+  }
+
   async completeProfile(givenName: string, familyName: string | undefined): Promise<void> {
     const res = await fetch(`${this.baseUrl}/complete-profile`, {
       method: 'PATCH',

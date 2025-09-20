@@ -29,7 +29,7 @@ export class ManageGroupComponent implements OnInit{
   }
 
   async ngOnInit() {
-    this.groupId = this.groupServiceContext.getGroupId();
+    this.groupId = this.groupServiceContext.getGroupId() || undefined;
   }
 
   reloadMembers() {
