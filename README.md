@@ -88,3 +88,11 @@ crontab -l
 ```bash
 dos2unix cleanup.cron
 ```
+### sauvegarder la base de données :
+```bash
+docker exec -it moments-postgres pg_dump -U Mom3ntsAdm1n -d moments > backup_prod.sql
+```
+A partir du pc récupérer le fichier sql :
+```bash
+scp admin@193.181.210.186:/home/admin/backup_prod.sql ./backup_prod.sql
+```

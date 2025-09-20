@@ -632,16 +632,17 @@ class GiftService:
         )
 
         rows = result.all()
-        return [
-            GiftFollowed(
+        gifts_followed = []
+        for gift, gift_shared in rows:
+            gift_followed = GiftFollowed(
                 gift=await build_gift_public_response(gift, group_id, db),
                 delivery=GiftDeliverySchema.model_validate(gift.gift_delivery, from_attributes=True) if gift.gift_delivery else None,
                 partage=await build_gift_shared_schema(gift_shared, group_id, db),
                 est_partage= True,
                 purchase_info=GiftPurchaseInfoSchema.from_model(gift.gift_purchase_info) if gift.gift_purchase_info else None,
             )
-            for gift, gift_shared in rows
-        ]
+            gifts_followed.append(gift_followed)
+        return gifts_followed
 
     @staticmethod
     def _group_gifts_by_account(gifts: list[GiftFollowed]) -> list[GiftFollowedByAccount]:

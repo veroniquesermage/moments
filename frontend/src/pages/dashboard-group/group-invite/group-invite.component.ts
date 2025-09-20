@@ -10,6 +10,7 @@ import {InvitationRecapModalComponent} from 'src/shared/components/invitation-re
 import {GroupService} from 'src/core/services/group.service';
 import {ToastrService} from 'src/core/services/toastr.service';
 import {PendingInvitationsComponent} from 'src/app/pages/dashboard-group/pending-invitations/pending-invitations.component';
+import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
   selector: 'app-group-invite',
@@ -37,7 +38,8 @@ export class GroupInviteComponent {
   constructor(private mailingService: MailingService,
               public errorService: ErrorService,
               private groupeService: GroupService,
-              private toastrService: ToastrService) {
+              private toastrService: ToastrService,
+              private groupContextService: GroupContextService) {
   }
 
   async sendInvitation() {
@@ -65,12 +67,14 @@ export class GroupInviteComponent {
     this.showRecapModal = true;
   }
 
-  onRecapModalClose() {
+  async onRecapModalClose() {
     this.showRecapModal = false;
 
     // Vider le champ emails seulement si des invitations ont été envoyées
     if (this.inviteResponse?.emails_envoyes.length! > 0) {
       this.mails = '';
+      // Rafraîchir la liste des membres après envoi d'invitations
+      await this.groupContextService.updateMemberSignal();
     }
 
     this.inviteResponse = null;
