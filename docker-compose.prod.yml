@@ -34,8 +34,8 @@ services:
     depends_on:
       - pgbouncer
     volumes:
-      - ./backend/logs:/app/logs
-      - ./backend/backups:/app/backups
+      - /home/user/moments-data/logs:/app/logs
+      - /home/user/moments-data/backups:/app/backups
     env_file:
       - .env  # Ce fichier contient APP_ENV=dev (ou prod)
     ports:
@@ -148,7 +148,7 @@ services:
       - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml
 
       # Application logs
-      - ./backend/logs:/app/logs:ro
+      - /home/user/moments-data/logs:/app/logs:ro
 
       # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro
