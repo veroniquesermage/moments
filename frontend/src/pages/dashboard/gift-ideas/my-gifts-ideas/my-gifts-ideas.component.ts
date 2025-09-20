@@ -1,4 +1,4 @@
-import {Component, OnInit, Signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {TerminalModalComponent} from 'src/shared/components/terminal-modal/terminal-modal.component';
 import {GiftIdeasResponse} from 'src/core/models/gift/gift-ideas-response.model';
@@ -42,7 +42,8 @@ export class MyGiftsIdeasComponent implements OnInit {
   ideaId: number | undefined;
   selectedDestId?: number;
   showDuplicationModal = false;
-  membersSignal: Signal<UserDisplay[]>;
+  members = signal<UserDisplay[]>([]);
+  isLoadingMembers = signal<boolean>(false);
   membersSharedGroup: UserDisplay[] = [];
 
 
@@ -53,16 +54,36 @@ export class MyGiftsIdeasComponent implements OnInit {
               public errorService: ErrorService,
               private toastrService: ToastrService,
               private userService: UserService) {
-    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
+    await this.loadMembers();
     await this.loadIdeas();
     const result = await this.userService.getUsersWithSharedGroups();
     if (result.success) {
       this.membersSharedGroup = result.data;
     } else {
       console.warn('[UserService] Échec du fetch des membres partageant un groupe');
+    }
+  }
+
+  private async loadMembers(): Promise<void> {
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError('❌ Aucun groupe actif.');
+      return;
+    }
+
+    this.isLoadingMembers.set(true);
+    try {
+      const result = await this.userService.fetchUserGroup(groupId);
+      if (result.success) {
+        this.members.set(result.data);
+      } else {
+        this.errorService.showError(result.message);
+      }
+    } finally {
+      this.isLoadingMembers.set(false);
     }
   }
 

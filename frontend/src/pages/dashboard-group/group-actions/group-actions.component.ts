@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, Signal} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GroupService} from 'src/core/services/group.service';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {Router} from '@angular/router';
@@ -28,7 +28,7 @@ export class GroupActionsComponent {
   @Input()
   groupId: number | undefined;
   @Input()
-  membersSignal!: Signal<UserDisplay[]>;
+  members: UserDisplay[] = [];
   @Output() membersUpdated = new EventEmitter<void>();
 
   selectedMemberID?: number;
@@ -69,7 +69,7 @@ export class GroupActionsComponent {
 
   excludeMember() {
     if(this.selectedMemberID){
-      const user: UserDisplay | undefined = this.membersSignal().find(m => m.id == this.selectedMemberID);
+      const user: UserDisplay | undefined = this.members.find(m => m.id == this.selectedMemberID);
       this.message = `Etes vous sûr de vouloir exclure définitivement <strong>${user!.prenom} ${user!.nom}</strong> du groupe ?`
       this.showConfirmModal = true;
     }
@@ -79,7 +79,7 @@ export class GroupActionsComponent {
     if (eventName === ModalActionType.EXCLURE) {
       const result = await this.userGroupService.deleteUserInGroup(this.groupId!, this.selectedMemberID);
       if(result.success){
-        await this.groupContextService.updateMemberSignal();
+        this.membersUpdated.emit();
         this.clearModal();
       }
     } else if (eventName === ModalActionType.CANCEL) {

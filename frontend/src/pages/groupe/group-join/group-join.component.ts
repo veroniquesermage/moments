@@ -43,7 +43,6 @@ export class GroupJoinComponent implements OnInit{
   async rejoindre() {
       const result = await this.groupeService.joinGroupWithToken(this.inviteToken);
       if (result.success) {
-        await this.groupServiceContext.updateMemberSignal();
         await this.router.navigate(['/dashboard']);
       } else {
         this.errorService.showError(result.message);

@@ -13,15 +13,16 @@
   <app-group-info
   [groupId] = "groupId"></app-group-info>
   <app-group-invite
-    [groupId]="groupId">
+    [groupId]="groupId"
+    (membersUpdated)="reloadMembers()">
   </app-group-invite>
   <app-group-roles
-    [membersSignal]="membersSignal"
+    [members]="members()"
     [groupId]="groupId">
   </app-group-roles>
   <app-group-actions
     [groupId]="groupId"
-    [membersSignal]="membersSignal"
+    [members]="members()"
     (membersUpdated)="reloadMembers()">
   </app-group-actions>
 </div>

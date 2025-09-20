@@ -1,4 +1,4 @@
-import {Component, OnInit, Signal, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {GiftService} from 'src/core/services/gift.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -12,6 +12,7 @@ import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {formatEuro} from 'src/core/utils/format-montant';
 import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
 import {PaginationInfo} from 'src/core/models/common/pagination.model';
+import {UserService} from 'src/core/services/user.service';
 
 @Component({
   selector: 'app-group-member-gifts',
@@ -28,12 +29,13 @@ import {PaginationInfo} from 'src/core/models/common/pagination.model';
 export class GroupMemberGiftsComponent implements OnInit {
 
   protected readonly DisplayNamePipe = DisplayNamePipe;
-  membersSignal: Signal<UserDisplay[]>;
+  members = signal<UserDisplay[]>([]);
   selectedMember: UserDisplay | undefined = undefined;
   giftPublic: GiftPublicResponse[] = [];
   currentPage = signal(1);
   paginationInfo = signal<PaginationInfo | null>(null);
   isLoadingMember = signal<boolean>(false);
+  isLoadingMembers = signal<boolean>(false);
 
   displayedColumns = [
     {key: 'nom', label: 'Nom'},
@@ -47,24 +49,54 @@ export class GroupMemberGiftsComponent implements OnInit {
               public router: Router,
               private route: ActivatedRoute,
               private groupContextService: GroupContextService,
+              private userService: UserService,
               public errorService: ErrorService) {
-    this.membersSignal = this.groupContextService.getMembersSignal();
   }
 
   async ngOnInit() {
     this.giftService.clearGifts();
 
-    // Vérifier les query params pour restaurer l'état
+    // 1. Charger les membres du groupe
+    await this.loadMembers();
+
+    // 2. Vérifier les query params pour restaurer l'état
     const memberId = this.route.snapshot.queryParams['memberId'];
     const page = this.route.snapshot.queryParams['page'];
 
     if (memberId && page) {
-      const members = this.membersSignal();
+      const members = this.members();
       const member = members.find(m => m.id?.toString() === memberId);
       if (member) {
         this.selectedMember = member;
         await this.loadMemberGifts(member.id!, parseInt(page, 10));
       }
+    }
+  }
+
+  private async loadMembers(): Promise<void> {
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      console.error('[GroupMemberGifts] Aucun groupId trouvé');
+      return;
+    }
+
+    this.isLoadingMembers.set(true);
+    console.log('[GroupMemberGifts] Chargement des membres pour le groupe', groupId);
+
+    try {
+      const result = await this.userService.fetchUserGroup(groupId);
+      if (result.success) {
+        this.members.set(result.data);
+        console.log('[GroupMemberGifts] Membres chargés:', result.data.length);
+      } else {
+        console.error('[GroupMemberGifts] Erreur lors du chargement des membres:', result.message);
+        this.errorService.showError("❌ Impossible de charger les membres du groupe");
+      }
+    } catch (error) {
+      console.error('[GroupMemberGifts] Exception lors du chargement des membres:', error);
+      this.errorService.showError("❌ Erreur lors du chargement des membres");
+    } finally {
+      this.isLoadingMembers.set(false);
     }
   }
 

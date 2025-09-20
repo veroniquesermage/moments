@@ -1,10 +1,11 @@
-import {Component, Signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {TerminalModalComponent} from "src/shared/components/terminal-modal/terminal-modal.component";
 import {TerminalModalAction} from 'src/core/models/terminal-modal-action.model';
 import {Router} from '@angular/router';
 import {GiftIdeaFormComponent} from 'src/shared/components/gift-idea-form/gift-idea-form.component';
 import {GroupContextService} from 'src/core/services/group-context.service';
 import {ErrorService} from 'src/core/services/error.service';
+import {UserService} from 'src/core/services/user.service';
 import {GiftIdeaCreate} from 'src/core/models/gift/gift-idea-create.model';
 import {GiftCreate} from 'src/core/models/gift/gift-create.model';
 import {GiftStatus} from 'src/core/enum/gift-status.enum';
@@ -24,20 +25,45 @@ import {UserDisplay} from 'src/core/models/user-display.model';
   templateUrl: './ideas-create.component.html',
   styleUrl: './ideas-create.component.scss'
 })
-export class IdeasCreateComponent {
+export class IdeasCreateComponent implements OnInit {
 
   message = 'Souhaitez-vous rendre cette idée visible aux membres du groupe ?\n'
   modalActions: TerminalModalAction[] = [{ label: 'Privé', eventName: 'PRIVATE', style: 'primary' },
                                           { label: 'Public', eventName: 'PUBLIC', style: 'primary' }];
-  membersSignal: Signal<UserDisplay[]>;
+  members = signal<UserDisplay[]>([]);
+  isLoadingMembers = signal<boolean>(false);
   giftIdeaCreate: GiftIdeaCreate | undefined;
   showModal = false;
 
   constructor(public router: Router,
               private groupContextService: GroupContextService,
               public errorService: ErrorService,
-              private ideaService: IdeaService) {
-    this.membersSignal = this.groupContextService.getMembersSignal();
+              private ideaService: IdeaService,
+              private userService: UserService) {
+  }
+
+  async ngOnInit() {
+    await this.loadMembers();
+  }
+
+  private async loadMembers(): Promise<void> {
+    const groupId = this.groupContextService.getGroupId();
+    if (!groupId) {
+      this.errorService.showError('❌ Aucun groupe actif.');
+      return;
+    }
+
+    this.isLoadingMembers.set(true);
+    try {
+      const result = await this.userService.fetchUserGroup(groupId);
+      if (result.success) {
+        this.members.set(result.data);
+      } else {
+        this.errorService.showError(result.message);
+      }
+    } finally {
+      this.isLoadingMembers.set(false);
+    }
   }
 
   async onSubmit(giftFormData: GiftIdeaFormData): Promise<void> {
