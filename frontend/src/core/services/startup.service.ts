@@ -19,6 +19,8 @@ export class StartupService {
     const rememberMe = this.tokenService.hasRememberMe();
 
     if (!isExpired) {
+      // Récupérer le profil utilisateur si le token est valide
+      await this.authService.getCurrentUser();
       if (this.router.url === '/') {
         await this.redirectToCorrectPage();
       }
@@ -28,6 +30,7 @@ export class StartupService {
     if (rememberMe) {
       try {
         await firstValueFrom(this.authService.refreshToken());
+        await this.authService.getCurrentUser();
         await this.redirectToCorrectPage();
 
       } catch (error) {
