@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TerminalModalComponent } from 'src/shared/components/terminal-modal/terminal-modal.component';
 import { ErrorService } from 'src/core/services/error.service';
@@ -11,7 +11,7 @@ import { InvitationResponse } from 'src/core/models/invitation/invitation-respon
   templateUrl: './pending-invitations.component.html',
   styleUrl: './pending-invitations.component.scss'
 })
-export class PendingInvitationsComponent implements OnInit {
+export class PendingInvitationsComponent {
   @Input() groupId!: number;
 
   invitations: InvitationResponse[] = [];
@@ -22,10 +22,6 @@ export class PendingInvitationsComponent implements OnInit {
     private groupService: GroupService,
     public errorService: ErrorService
   ) {}
-
-  async ngOnInit() {
-    await this.loadInvitations();
-  }
 
   async loadInvitations() {
     if (!this.groupId) return;
@@ -45,9 +41,9 @@ export class PendingInvitationsComponent implements OnInit {
     }
   }
 
-  openModal() {
+  async openModal() {
     this.showModal = true;
-    this.loadInvitations();
+    await this.loadInvitations();
   }
 
   closeModal() {
