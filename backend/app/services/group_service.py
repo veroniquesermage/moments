@@ -19,44 +19,58 @@ class GroupService:
         current_user: User,
         group_data: GroupCreate
     ) -> GroupResponse:
-        # 1. Vérif unicité du nom
-        result = await db.execute(
-            select(Group).where(Group.nom_groupe == group_data.nom_groupe)
-        )
-        if result.scalars().first():
-            logger.info(f"Un groupe existe déjà avec le nom {group_data.nom_groupe}")
-            raise HTTPException(
-                status_code=400,
-                detail="Un groupe avec ce nom existe déjà."
+        try:
+            # 1. Vérif unicité du nom
+            result = await db.execute(
+                select(Group).where(Group.nom_groupe == group_data.nom_groupe)
+            )
+            if result.scalars().first():
+                logger.info(f"Un groupe existe déjà avec le nom {group_data.nom_groupe}")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Un groupe avec ce nom existe déjà."
+                )
+
+            # 2. Création du groupe et du lien ADMIN en une seule transaction
+            db_group = Group(
+                nom_groupe=group_data.nom_groupe,
+                description=group_data.description
+            )
+            db.add(db_group)
+            await db.flush()  # Flush pour obtenir l'ID sans commit
+
+            # 3. Lien ADMIN avec l'utilisateur créateur
+            link = UserGroup(
+                utilisateur_id=current_user.id,
+                groupe_id=db_group.id,
+                role=RoleEnum.ADMIN
+            )
+            db.add(link)
+
+            # Commit atomique des deux opérations
+            await db.commit()
+            await db.refresh(db_group)
+
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "GROUP_CREATED",
+                f"Creation du groupe {db_group.nom_groupe}",
+                {"group_id": db_group.id, "user_id": current_user.id},
             )
 
-        # 2. Création du groupe
-        db_group = Group(
-            nom_groupe=group_data.nom_groupe,
-            description=group_data.description
-        )
-        db.add(db_group)
-        await db.commit()
-        await db.refresh(db_group)
+            return GroupResponse.model_validate(db_group)
 
-        # 3. Lien ADMIN avec l’utilisateur créateur
-        link = UserGroup(
-            utilisateur_id=current_user.id,
-            groupe_id=db_group.id,
-            role=RoleEnum.ADMIN
-        )
-        db.add(link)
-        await db.commit()
-
-        await TraceService.record_trace(
-            db,
-            f"{current_user.prenom} {current_user.nom}",
-            "GROUP_CREATED",
-            f"Creation du groupe {db_group.nom_groupe}",
-            {"group_id": db_group.id, "user_id": current_user.id},
-        )
-
-        return GroupResponse.model_validate(db_group)
+        except HTTPException:
+            # Re-raise HTTPException sans rollback (pas de modifications dans la DB)
+            raise
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Erreur lors de la création du groupe: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Erreur lors de la création du groupe"
+            )
 
 
     @staticmethod
@@ -217,20 +231,26 @@ class GroupService:
         group = await GroupService.get_group_if_admin(current_user, db, group_id)
 
         try:
+            # Suppression atomique : utilisateurs puis groupe
             await UserGroupService.delete_all_users_from_group(db, group_id)
             await db.delete(group)
             await db.commit()
-        except Exception:
-            await db.rollback()
-            raise HTTPException(status_code=500, detail="❌ Une erreur est survenue pendant la suppression.")
 
-        await TraceService.record_trace(
-            db,
-            f"{current_user.prenom} {current_user.nom}",
-            "GROUP_DELETED",
-            f"Suppression du groupe {group_id}",
-            {"group_id": group_id, "user_id": current_user.id},
-        )
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "GROUP_DELETED",
+                f"Suppression du groupe {group_id}",
+                {"group_id": group_id, "user_id": current_user.id},
+            )
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Erreur lors de la suppression du groupe {group_id}: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="❌ Une erreur est survenue pendant la suppression du groupe"
+            )
 
 
 

@@ -27,7 +27,10 @@ export class GroupContextService{
   getGroupId(): number | null {
     const id = this.persistenceService.getActiveGroupId();
     if (!id) {
-      void this.router.navigate(['/groupe/onboarding']);
+      // Ne pas rediriger si on est sur la page d'accueil (pour éviter d'interrompre l'inscription)
+      if (this.router.url !== '/') {
+        void this.router.navigate(['/groupe/onboarding']);
+      }
       return null;
     }
     return id;

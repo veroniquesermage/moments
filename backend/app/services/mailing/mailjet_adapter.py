@@ -229,6 +229,102 @@ class MailjetAdapter:
         return response
 
     @staticmethod
+    async def send_sharing_added(
+            cadeau: Gift,
+            participant: User,
+            preneur: User,
+            montant: float
+    ):
+        """Envoie un email quand un participant est ajouté à un partage"""
+        sender_email = settings.mj_sender_email
+
+        # Lecture du template
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "sharing_added.html"
+        template_str = template_path.read_text(encoding="utf-8")
+        template = Template(template_str)
+
+        # Rendu avec les données
+        html_rendered = template.render(
+            participant=participant,
+            preneur=preneur,
+            cadeau=cadeau,
+            montant=montant,
+            url=settings.google_redirect_uri,
+            date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": participant.email,
+                        }
+                    ],
+                    "Subject": "(Moments) Vous participez à un présent collectif",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+        logger.info(f"📧 Email partage ajouté envoyé à {participant.email}, status: {response.status_code}")
+        return response
+
+    @staticmethod
+    async def send_sharing_removed(
+            cadeau: Gift,
+            participant: User,
+            preneur: User,
+            montant: float
+    ):
+        """Envoie un email quand un participant est retiré d'un partage"""
+        sender_email = settings.mj_sender_email
+
+        # Lecture du template
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "sharing_removed.html"
+        template_str = template_path.read_text(encoding="utf-8")
+        template = Template(template_str)
+
+        # Rendu avec les données
+        html_rendered = template.render(
+            participant=participant,
+            preneur=preneur,
+            cadeau=cadeau,
+            montant=montant,
+            url=settings.google_redirect_uri,
+            date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": participant.email,
+                        }
+                    ],
+                    "Subject": "(Moments) Modification dans l'organisation d'un présent collectif",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+        logger.info(f"📧 Email partage retiré envoyé à {participant.email}, status: {response.status_code}")
+        return response
+
+    @staticmethod
     def _get_mailjet_client():
         api_key = settings.mj_apikey_public
         api_secret = settings.mj_apikey_private
