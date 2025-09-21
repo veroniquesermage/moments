@@ -35,57 +35,66 @@ class SharingService:
                 detail="Seul le preneur peut modifier le partage."
             )
 
-        # 2. Suppression des anciens partages
-        result = await db.execute(
-            delete(GiftShared).where(GiftShared.cadeau_id == gift_id)
-        )
-
-        logger.debug(f"Nombre de partages supprimés pour le cadeau {gift_id} : {result.rowcount}")
-
-        # 3. Insertion des nouveaux partages
-        for partage in updates:
-            db.add(GiftShared(
-                cadeau_id=gift_id,
-                preneur_id=current_user.id,
-                participant_id=partage.participant.id,
-                montant=partage.montant,
-                rembourse=partage.rembourse
-            ))
-
-        # 4. Commit
-        await db.commit()
-
-        shared_refresh = (await db.execute(
-            select(GiftShared)
-            .where(GiftShared.cadeau_id == gift_id)
-            .options(
-                selectinload(GiftShared.participant),
-                selectinload(GiftShared.preneur)
+        try:
+            # 2. Suppression des anciens partages
+            result = await db.execute(
+                delete(GiftShared).where(GiftShared.cadeau_id == gift_id)
             )
-        )).scalars().all()
 
-        shared_schema = []
-        for sh in shared_refresh:
-            schema = await build_gift_shared_schema(sh, group_id, db)
-            shared_schema.append(schema)
-        new_status: GiftStatus
-        if gift.statut == GiftStatusEnum.PRIS and len(shared_schema) > 0:
-            gift.statut = GiftStatusEnum.PARTAGE
-            new_status = GiftStatus(status=GiftStatusEnum.PARTAGE)
-            await GiftService.change_status(db, current_user, gift_id, new_status)
+            logger.debug(f"Nombre de partages supprimés pour le cadeau {gift_id} : {result.rowcount}")
 
-        elif gift.statut == GiftStatusEnum.PARTAGE and len(shared_schema) == 0:
-            gift.statut = GiftStatusEnum.PRIS
-            new_status = GiftStatus(status=GiftStatusEnum.PRIS)
-            await GiftService.change_status(db, current_user, gift_id, new_status)
+            # 3. Insertion des nouveaux partages
+            for partage in updates:
+                db.add(GiftShared(
+                    cadeau_id=gift_id,
+                    preneur_id=current_user.id,
+                    participant_id=partage.participant.id,
+                    montant=partage.montant,
+                    rembourse=partage.rembourse
+                ))
 
-        await TraceService.record_trace(
-            db,
-            f"{current_user.prenom} {current_user.nom}",
-            "SHARING_SAVED",
-            f"Enregistrement des partages pour le cadeau {gift_id}",
-            {"gift_id": gift_id, "user_id": current_user.id},
-        )
+            # 4. Flush pour obtenir les IDs sans commit complet
+            await db.flush()
+
+            # 5. Vérification du nombre réel de partages en base (logique originale)
+            shared_refresh = (await db.execute(
+                select(GiftShared)
+                .where(GiftShared.cadeau_id == gift_id)
+                .options(
+                    selectinload(GiftShared.participant),
+                    selectinload(GiftShared.preneur)
+                )
+            )).scalars().all()
+
+            shared_schema = []
+            for sh in shared_refresh:
+                schema = await build_gift_shared_schema(sh, group_id, db)
+                shared_schema.append(schema)
+
+            # 6. Déterminer le statut selon le nombre RÉEL en base (logique originale)
+            if gift.statut == GiftStatusEnum.PRIS and len(shared_schema) > 0:
+                gift.statut = GiftStatusEnum.PARTAGE
+            elif gift.statut == GiftStatusEnum.PARTAGE and len(shared_schema) == 0:
+                gift.statut = GiftStatusEnum.PRIS
+
+            # 7. Commit atomique : partages + statut cadeau
+            await db.commit()
+
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "SHARING_SAVED",
+                f"Enregistrement des partages pour le cadeau {gift_id}",
+                {"gift_id": gift_id, "user_id": current_user.id},
+            )
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Erreur lors de la sauvegarde des partages pour le cadeau {gift_id}: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Erreur lors de la sauvegarde des partages"
+            )
         # 5. Retour d’un GiftDetailResponse mis à jour
         return await GiftService.set_gift_detail(gift, current_user, group_id, db, shared_schema)
 
@@ -145,39 +154,49 @@ class SharingService:
         if not existing:
             raise HTTPException(status_code=403, detail="Ce cadeau n'est pas un cadeau partagé.")
 
-        # Maj du remboursement
-        existing.rembourse = shared.rembourse
+        try:
+            # Pré-chargement du cadeau avec ses relations AVANT modification
+            gift: Gift = (await db.execute(
+                select(Gift)
+                .where(Gift.id == shared.cadeau_id)
+                .options(
+                    selectinload(Gift.destinataire),
+                    selectinload(Gift.reserve_par),
+                    selectinload(Gift.gift_delivery),
+                    selectinload(Gift.gift_idea),
+                    selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
+                )
+            )).scalars().first()
 
-        await db.commit()
-        await db.refresh(existing)
+            if not gift:
+                raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
-        # 🔁 Requête : lignes de partage avec les relations nécessaires
-        partage = (await db.execute(
-            select(GiftShared)
-            .where(GiftShared.cadeau_id == shared.cadeau_id)
-            .options(
-                selectinload(GiftShared.participant),
-                selectinload(GiftShared.preneur)
+            # Maj du remboursement
+            existing.rembourse = shared.rembourse
+
+            # Commit de la modification
+            await db.commit()
+            await db.refresh(existing)
+
+            # Récupération des partages après commit (données à jour)
+            partage = (await db.execute(
+                select(GiftShared)
+                .where(GiftShared.cadeau_id == shared.cadeau_id)
+                .options(
+                    selectinload(GiftShared.participant),
+                    selectinload(GiftShared.preneur)
+                )
+            )).scalars().all()
+
+            partage_schema = [GiftSharedSchema.model_validate(p) for p in partage]
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Erreur lors de la mise à jour du remboursement pour le cadeau {shared.cadeau_id}: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Erreur lors de la mise à jour du remboursement"
             )
-        )).scalars().all()
-
-        partage_schema = [GiftSharedSchema.model_validate(p) for p in partage]
-
-        # 🔁 Requête : le cadeau avec ses relations
-        gift: Gift = (await db.execute(
-            select(Gift)
-            .where(Gift.id == shared.cadeau_id)
-            .options(
-                selectinload(Gift.destinataire),
-                selectinload(Gift.reserve_par),
-                selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea),
-                selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers)
-            )
-        )).scalars().first()
-
-        if not gift:
-            raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         from app.services.gift_service import GiftService
         return await GiftService.set_gift_detail(gift, current_user, group_id, db, partage_schema)
