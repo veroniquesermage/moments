@@ -6,6 +6,28 @@
   text-align: center;
 }
 
+/* Styles pour la modale de confirmation email */
+::ng-deep .email-confirmation {
+  text-align: center;
+  line-height: 1.6;
+
+  .success-message {
+    margin-bottom: 1rem;
+    color: var(--color-toast-success);
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .instruction-message {
+    margin: 0;
+    color: var(--color-text);
+
+    strong {
+      color: var(--color-highlight);
+    }
+  }
+}
+
 /* Bouton Google */
 .google-btn {
   display: flex;
