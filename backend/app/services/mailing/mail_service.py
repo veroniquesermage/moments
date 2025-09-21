@@ -201,5 +201,67 @@ class MailService:
             logger.exception(e)
             raise HTTPException(
                 status_code=500,
-                detail="Une erreur est survenue lors de l’envoi d'un mail de réinitialisation de mot de passe. Merci de réessayer plus tard."
+                detail="Une erreur est survenue lors de l'envoi d'un mail de réinitialisation de mot de passe. Merci de réessayer plus tard."
             )
+
+    @staticmethod
+    async def send_sharing_added(
+            db: AsyncSession,
+            cadeau: Gift,
+            participant: User,
+            preneur: User,
+            montant: float
+    ):
+        """Envoie un email de notification quand un participant est ajouté à un partage"""
+        try:
+            response = await MailjetAdapter.send_sharing_added(cadeau, participant, preneur, montant)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{preneur.prenom} {preneur.nom}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail de notification de partage ajouté",
+                    {"cadeau_id": cadeau.id, "participant_id": participant.id, "preneur_id": preneur.id}
+                )
+            else:
+                await TraceService.record_trace(
+                    db,
+                    f"{preneur.prenom} {preneur.nom}",
+                    "SHARING_EMAIL_SENT",
+                    f"Email de partage ajouté envoyé à {participant.prenom}",
+                    {"cadeau_id": cadeau.id, "participant_id": participant.id, "preneur_id": preneur.id}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur d'envoi du mail de partage ajouté")
+            logger.exception(e)
+
+    @staticmethod
+    async def send_sharing_removed(
+            db: AsyncSession,
+            cadeau: Gift,
+            participant: User,
+            preneur: User,
+            montant: float
+    ):
+        """Envoie un email de notification quand un participant est retiré d'un partage"""
+        try:
+            response = await MailjetAdapter.send_sharing_removed(cadeau, participant, preneur, montant)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{preneur.prenom} {preneur.nom}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail de notification de partage retiré",
+                    {"cadeau_id": cadeau.id, "participant_id": participant.id, "preneur_id": preneur.id}
+                )
+            else:
+                await TraceService.record_trace(
+                    db,
+                    f"{preneur.prenom} {preneur.nom}",
+                    "SHARING_EMAIL_SENT",
+                    f"Email de partage retiré envoyé à {participant.prenom}",
+                    {"cadeau_id": cadeau.id, "participant_id": participant.id, "preneur_id": preneur.id}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur d'envoi du mail de partage retiré")
+            logger.exception(e)
