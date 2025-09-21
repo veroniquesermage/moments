@@ -39,14 +39,22 @@ export class ManageGroupComponent implements OnInit{
     await this.loadMembers();
   }
 
-  private async loadMembers(): Promise<void> {
-    if (!this.groupId) return;
 
+  private async loadMembers(): Promise<void> {
+    if (!this.groupId) {
+      console.log('[ManageGroupComponent] Pas de groupId, abandon du chargement');
+      return;
+    }
+
+    console.log('[ManageGroupComponent] Chargement des membres pour le groupe:', this.groupId);
     this.isLoadingMembers.set(true);
     try {
       const result = await this.userService.fetchUserGroup(this.groupId);
       if (result.success) {
+        console.log('[ManageGroupComponent] Membres chargés:', result.data);
         this.members.set(result.data);
+      } else {
+        console.error('[ManageGroupComponent] Échec du chargement des membres:', result.message);
       }
     } catch (error) {
       console.error('[ManageGroupComponent] Erreur lors du chargement des membres:', error);

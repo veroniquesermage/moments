@@ -1,4 +1,4 @@
-import {Component, effect, EventEmitter, Input, Output} from '@angular/core';
+import {Component, effect, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnInit} from '@angular/core';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {CommonModule} from '@angular/common';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
@@ -17,7 +17,7 @@ import {ErrorService} from 'src/core/services/error.service';
   templateUrl: './group-roles.component.html',
   styleUrl: './group-roles.component.scss'
 })
-export class GroupRolesComponent {
+export class GroupRolesComponent implements OnInit, OnChanges {
 
   @Input()
   members: UserDisplay[] = [];
@@ -35,11 +35,24 @@ export class GroupRolesComponent {
               private errorService: ErrorService) {
   }
 
-  private _syncMembersEffect = effect(() => {
-    if (this.members) {
+  ngOnInit(): void {
+    console.log('[GroupRolesComponent] OnInit - members:', this.members);
+    this.initMembersEdition();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['members'] && this.members) {
+      console.log('[GroupRolesComponent] Members updated:', this.members);
+      this.initMembersEdition();
+    }
+  }
+
+  private initMembersEdition(): void {
+    if (this.members && this.members.length > 0) {
+      console.log('[GroupRolesComponent] Initializing members edition with:', this.members);
       this.membersEdition = this.members.map(m => ({ ...m }));
     }
-  });
+  }
 
   private buildRoleChanges(): void {
      for (const edited of this.membersEdition) {

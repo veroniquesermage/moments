@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <button (click)="confirmRole()">✔️ Confirmer les nouveaux rôles</button>
+  <button *ngIf="members.length > 1" (click)="confirmRole()">✔️ Confirmer les nouveaux rôles</button>
 </div>
 
 <ng-container  *ngIf="showMemberModal">
