@@ -11,7 +11,6 @@
 
   <div class="options">
     <button (click)="router.navigate(['/groupe/onboarding/creer'])">Créer un groupe</button>
-    <button (click)="router.navigate(['/groupe/onboarding/rejoindre'])">Rejoindre un groupe</button>
   </div>
 
   <div *ngIf="groupService.groupes().length > 0" class="existing-groups">

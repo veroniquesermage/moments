@@ -12,6 +12,7 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
 import {UserService} from 'src/core/services/user.service';
+import {NumericInputDirective} from 'src/shared/directives/numeric-input.directive';
 @Component({
   selector: 'app-gift-sharing',
   standalone: true,
@@ -19,6 +20,7 @@ import {UserService} from 'src/core/services/user.service';
     FormsModule,
     CommonModule,
     DisplayNamePipe,
+    NumericInputDirective
   ],
   templateUrl: './gift-sharing.component.html',
   styleUrl: './gift-sharing.component.scss'

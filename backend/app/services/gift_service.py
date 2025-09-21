@@ -588,7 +588,7 @@ class GiftService:
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
                 selectinload(Gift.gift_delivery),
-                selectinload(Gift.gift_idea),
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par),
                 selectinload(Gift.partages),
                 selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
             )
@@ -628,6 +628,7 @@ class GiftService:
                 selectinload(Gift.gift_purchase_info).selectinload(GiftPurchaseInfo.compte_tiers),
                 selectinload(Gift.destinataire),
                 selectinload(Gift.reserve_par),
+                selectinload(Gift.gift_idea).selectinload(GiftIdeas.proposee_par),
             )
         )
 
