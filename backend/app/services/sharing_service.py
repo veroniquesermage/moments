@@ -36,14 +36,26 @@ class SharingService:
             )
 
         try:
-            # 2. Suppression des anciens partages
+            # 2. Récupération des anciens partages pour comparaison (avant suppression)
+            anciens_partages_result = await db.execute(
+                select(GiftShared)
+                .where(GiftShared.cadeau_id == gift_id)
+                .options(selectinload(GiftShared.participant))
+            )
+            anciens_partages = anciens_partages_result.scalars().all()
+
+            # Créer des maps pour faciliter la comparaison
+            anciens_map = {p.participant_id: p for p in anciens_partages}
+            nouveaux_map = {p.participant.id: p for p in updates}
+
+            # 3. Suppression des anciens partages
             result = await db.execute(
                 delete(GiftShared).where(GiftShared.cadeau_id == gift_id)
             )
 
             logger.debug(f"Nombre de partages supprimés pour le cadeau {gift_id} : {result.rowcount}")
 
-            # 3. Insertion des nouveaux partages
+            # 4. Insertion des nouveaux partages
             for partage in updates:
                 db.add(GiftShared(
                     cadeau_id=gift_id,
@@ -53,7 +65,7 @@ class SharingService:
                     rembourse=partage.rembourse
                 ))
 
-            # 4. Flush pour obtenir les IDs sans commit complet
+            # 5. Flush pour obtenir les IDs sans commit complet
             await db.flush()
 
             # 5. Vérification du nombre réel de partages en base (logique originale)
@@ -79,6 +91,11 @@ class SharingService:
 
             # 7. Commit atomique : partages + statut cadeau
             await db.commit()
+
+            # 8. Envoi des emails de notification après commit réussi
+            await SharingService._send_sharing_notifications(
+                db, gift, current_user, anciens_map, nouveaux_map
+            )
 
             await TraceService.record_trace(
                 db,
@@ -249,6 +266,38 @@ class SharingService:
         if not gift.partage:
             gift.gift.statut = GiftStatusEnum.PRIS
             await GiftService.change_status(db, current_user, gift_id, GiftStatus(status=GiftStatusEnum.PRIS))
+
+    @staticmethod
+    async def _send_sharing_notifications(
+            db: AsyncSession,
+            gift: Gift,
+            preneur: User,
+            anciens_map: dict,
+            nouveaux_map: dict
+    ):
+        """Envoie les emails de notification pour les changements de partage"""
+        from app.services.mailing.mail_service import MailService
+
+        # Participants ajoutés (présents dans nouveaux mais pas dans anciens)
+        for participant_id, nouveau_partage in nouveaux_map.items():
+            if participant_id not in anciens_map:
+                # Nouveau participant
+                await MailService.send_sharing_added(
+                    db, gift, nouveau_partage.participant, preneur, nouveau_partage.montant
+                )
+                logger.info(f"Email d'ajout de partage envoyé à {nouveau_partage.participant.email}")
+
+        # Participants supprimés (présents dans anciens mais pas dans nouveaux)
+        for participant_id, ancien_partage in anciens_map.items():
+            if participant_id not in nouveaux_map:
+                # Participant retiré
+                await MailService.send_sharing_removed(
+                    db, gift, ancien_partage.participant, preneur, ancien_partage.montant
+                )
+                logger.info(f"Email de suppression de partage envoyé à {ancien_partage.participant.email}")
+
+        # Note: Les participants dont seul le montant a changé ne reçoivent pas d'email
+        # car ce n'est qu'une modification de montant, pas un ajout/suppression
 
 
 
