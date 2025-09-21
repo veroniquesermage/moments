@@ -44,7 +44,7 @@ export class GroupService {
       return {success: true, data: groupeCreated};
     } catch (error) {
       console.error('[GroupService] Erreur lors de la création du groupe', error);
-      return {success: false, message: "❌ Code invalide ou groupe introuvable."};
+      return {success: false, message: "❌ Erreur lors de la création du groupe."};
     }
   }
 

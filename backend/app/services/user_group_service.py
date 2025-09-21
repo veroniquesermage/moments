@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.enum import RoleEnum
 from app.core.logger import logger
-from app.models import User, UserGroup
+from app.models import User, UserGroup, Group
 from app.schemas import UserDisplaySchema, ExportManagedAccountRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.auth.user_service import UserService
@@ -154,14 +154,40 @@ class UserGroupService:
         # Cas : l'utilisateur quitte le groupe
         if user_id_to_delete is None:
             await db.delete(user_group)
-            await db.commit()
-            await TraceService.record_trace(
-                db,
-                f"{current_user.prenom} {current_user.nom}",
-                "GROUP_LEFT",
-                f"{current_user.prenom} a quitté le groupe {group_id}",
-                {"group_id": group_id, "user_id": current_user.id},
+
+            # Vérifier s'il reste des membres dans le groupe
+            remaining_members_result = await db.execute(
+                select(UserGroup).where(UserGroup.groupe_id == group_id)
             )
+            remaining_members = remaining_members_result.scalars().all()
+
+            if not remaining_members:
+                # Plus aucun membre : supprimer le groupe
+                group_result = await db.execute(
+                    select(Group).where(Group.id == group_id)
+                )
+                group_to_delete = group_result.scalars().first()
+                if group_to_delete:
+                    await db.delete(group_to_delete)
+                    logger.info(f"Groupe {group_id} supprimé automatiquement (plus de membres)")
+
+                    await db.commit()
+                    await TraceService.record_trace(
+                        db,
+                        f"{current_user.prenom} {current_user.nom}",
+                        "GROUP_AUTO_DELETED",
+                        f"Groupe {group_id} supprimé automatiquement après départ du dernier membre",
+                        {"group_id": group_id, "user_id": current_user.id},
+                    )
+            else:
+                await db.commit()
+                await TraceService.record_trace(
+                    db,
+                    f"{current_user.prenom} {current_user.nom}",
+                    "GROUP_LEFT",
+                    f"{current_user.prenom} a quitté le groupe {group_id}",
+                    {"group_id": group_id, "user_id": current_user.id},
+                )
             return
 
         # Cas : tentative d’exclure quelqu’un → faut être admin
@@ -181,15 +207,40 @@ class UserGroupService:
             raise HTTPException(status_code=404, detail="Membre à exclure introuvable dans ce groupe.")
 
         await db.delete(to_exclude)
-        await db.commit()
 
-        await TraceService.record_trace(
-            db,
-            f"{current_user.prenom} {current_user.nom}",
-            "MEMBER_REMOVED",
-            f"Membre {user_id_to_delete} exclu du groupe {group_id}",
-            {"group_id": group_id, "user_id": current_user.id, "target_id": user_id_to_delete},
+        # Vérifier s'il reste des membres dans le groupe après exclusion
+        remaining_members_result = await db.execute(
+            select(UserGroup).where(UserGroup.groupe_id == group_id)
         )
+        remaining_members = remaining_members_result.scalars().all()
+
+        if not remaining_members:
+            # Plus aucun membre : supprimer le groupe
+            group_result = await db.execute(
+                select(Group).where(Group.id == group_id)
+            )
+            group_to_delete = group_result.scalars().first()
+            if group_to_delete:
+                await db.delete(group_to_delete)
+                logger.info(f"Groupe {group_id} supprimé automatiquement (plus de membres après exclusion)")
+
+                await db.commit()
+                await TraceService.record_trace(
+                    db,
+                    f"{current_user.prenom} {current_user.nom}",
+                    "GROUP_AUTO_DELETED",
+                    f"Groupe {group_id} supprimé automatiquement après exclusion du dernier membre",
+                    {"group_id": group_id, "user_id": current_user.id, "target_id": user_id_to_delete},
+                )
+        else:
+            await db.commit()
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "MEMBER_REMOVED",
+                f"Membre {user_id_to_delete} exclu du groupe {group_id}",
+                {"group_id": group_id, "user_id": current_user.id, "target_id": user_id_to_delete},
+            )
 
     @staticmethod
     async def update_role(db: AsyncSession, group_id: int, current_user: User, groupRoleUpdate: list[UserDisplaySchema]) -> list[UserDisplaySchema]:
@@ -225,8 +276,13 @@ class UserGroupService:
 
     @staticmethod
     async def delete_all_users_from_group(db: AsyncSession, group_id: int):
-        stmt = delete(UserGroup).where(UserGroup.groupe_id == group_id)
-        await db.execute(stmt)
+        try:
+            stmt = delete(UserGroup).where(UserGroup.groupe_id == group_id)
+            result = await db.execute(stmt)
+            logger.info(f"Suppression de {result.rowcount} utilisateurs du groupe {group_id}")
+        except Exception as e:
+            logger.error(f"Erreur lors de la suppression des utilisateurs du groupe {group_id}: {e}")
+            raise
 
     @staticmethod
     async def get_existing_users_in_group(db: AsyncSession, group_id: int, invite_request: InviteRequest) -> list[str]:
