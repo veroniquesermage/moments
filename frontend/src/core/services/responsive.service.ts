@@ -35,33 +35,33 @@ export class ResponsiveService {
     // Initialisation immédiate des valeurs selon la taille actuelle
     this.initializeBreakpoints();
 
-    // Détection mobile (< 768px)
+    // Observer mobile breakpoint
     this.breakpointObserver.observe(['(max-width: 767px)']).subscribe(result => {
-      console.log('[ResponsiveService] Mobile breakpoint:', result.matches);
-      this.isMobile.set(result.matches);
       if (result.matches) {
+        console.log('[ResponsiveService] Switching to MOBILE');
+        this.isMobile.set(true);
         this.isTablet.set(false);
         this.isDesktop.set(false);
       }
     });
 
-    // Détection tablet (768px - 1024px)
+    // Observer tablet breakpoint
     this.breakpointObserver.observe(['(min-width: 768px) and (max-width: 1024px)']).subscribe(result => {
-      console.log('[ResponsiveService] Tablet breakpoint:', result.matches);
-      this.isTablet.set(result.matches);
       if (result.matches) {
+        console.log('[ResponsiveService] Switching to TABLET');
         this.isMobile.set(false);
+        this.isTablet.set(true);
         this.isDesktop.set(false);
       }
     });
 
-    // Détection desktop (> 1024px)
+    // Observer desktop breakpoint
     this.breakpointObserver.observe(['(min-width: 1025px)']).subscribe(result => {
-      console.log('[ResponsiveService] Desktop breakpoint:', result.matches);
-      this.isDesktop.set(result.matches);
       if (result.matches) {
+        console.log('[ResponsiveService] Switching to DESKTOP');
         this.isMobile.set(false);
         this.isTablet.set(false);
+        this.isDesktop.set(true);
       }
     });
   }
