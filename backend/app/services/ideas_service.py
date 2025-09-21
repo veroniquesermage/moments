@@ -60,30 +60,40 @@ class GiftIdeasService:
                 detail="❌ L'utilisateur ne peut pas proposer une idée de cadeau pour lui-même."
             )
 
-        idea = GiftIdeas(
-            proposee_par_id=current_user.id,
-            visibilite=gift_idea.visibilite
-        )
+        try:
+            idea = GiftIdeas(
+                proposee_par_id=current_user.id,
+                visibilite=gift_idea.visibilite
+            )
 
-        db.add(idea)
-        await db.flush()
-        logger.debug(f"Idée de cadeau créée avec l'ID {idea.id}")
+            db.add(idea)
+            await db.flush()  # Nécessaire pour obtenir idea.id
+            logger.debug(f"Idée de cadeau créée avec l'ID {idea.id}")
 
-        gift_data = gift_idea.gift.model_dump()
-        gift = Gift(**gift_data, gift_idea_id=idea.id)
-        db.add(gift)
+            gift_data = gift_idea.gift.model_dump()
+            gift = Gift(**gift_data, gift_idea_id=idea.id)
+            db.add(gift)
 
-        await db.commit()
-        await db.refresh(idea)
-        await db.refresh(gift, attribute_names=["destinataire"])
+            # Commit atomique : idée + cadeau
+            await db.commit()
+            await db.refresh(idea)
+            await db.refresh(gift, attribute_names=["destinataire"])
 
-        await TraceService.record_trace(
-            db,
-            f"{current_user.prenom} {current_user.nom}",
-            "GIFT_IDEA_CREATED",
-            f"Idee de cadeau {idea.id} creee",
-            {"idea_id": idea.id, "gift_id": gift.id, "user_id": current_user.id},
-        )
+            await TraceService.record_trace(
+                db,
+                f"{current_user.prenom} {current_user.nom}",
+                "GIFT_IDEA_CREATED",
+                f"Idee de cadeau {idea.id} creee",
+                {"idea_id": idea.id, "gift_id": gift.id, "user_id": current_user.id},
+            )
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Erreur lors de la création de l'idée de cadeau: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Erreur lors de la création de l'idée de cadeau"
+            )
 
 
     @staticmethod
