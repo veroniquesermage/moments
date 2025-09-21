@@ -24,7 +24,7 @@
 
     &.success {
       h3, li {
-        color: var(--color-success, #00ff00);
+        color: var(--color-toast-success, #00ff00);
       }
     }
 
@@ -36,13 +36,13 @@
 
     &.warning {
       h3, li {
-        color: var(--color-warning, #ffaa00);
+        color: var(--color-highlight, #ffaa00);
       }
     }
 
     &.info {
       h3, p {
-        color: var(--color-accent);
+        color: var(--color-highlight);
       }
     }
   }
