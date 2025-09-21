@@ -163,9 +163,19 @@ export class WelcomeComponent implements OnInit {
       rememberMe: this.stayLoggedIn
     };
     const result = await this.auth.checkMail(credentials);
+
     if (result.success) {
       this.modalActions = [{ label: 'OK', eventName: 'CANCEL', style: 'primary' }];
-      this.message = '<strong>Un courrier électronique vient de vous être expédié !</strong> <br> Vous disposez de trente minutes pour cliquer sur le lien et parachever votre inscription.';
+      this.message = `
+        <div class="email-confirmation">
+          <p class="success-message">
+            ✉️ Un courrier électronique vient de vous être expédié !
+          </p>
+          <p class="instruction-message">
+            Vous disposez de <strong>trente minutes</strong> pour cliquer sur le lien et parachever votre inscription.
+          </p>
+        </div>
+      `;
       this.showConfirmModal = true;
     } else {
       this.errorService.showError(result.message);
