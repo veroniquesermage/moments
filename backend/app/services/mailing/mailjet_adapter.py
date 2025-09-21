@@ -249,7 +249,7 @@ class MailjetAdapter:
             preneur=preneur,
             cadeau=cadeau,
             montant=montant,
-            app_url=settings.app_url,
+            url=settings.google_redirect_uri,
             date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
         )
 
@@ -297,7 +297,7 @@ class MailjetAdapter:
             preneur=preneur,
             cadeau=cadeau,
             montant=montant,
-            app_url=settings.app_url,
+            url=settings.google_redirect_uri,
             date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
         )
 

@@ -72,7 +72,7 @@ export class PaginationComponent {
   @Output() pageChange = new EventEmitter<number>();
 
   private responsiveService = inject(ResponsiveService);
-  
+
   isMobile = this.responsiveService.isMobile;
 
   previousPage() {

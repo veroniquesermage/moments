@@ -247,18 +247,49 @@ class SharingService:
                     GiftShared.id == partage_id,
                     GiftShared.preneur_id == current_user.id
                 )
+            ).options(
+                selectinload(GiftShared.participant),
+                selectinload(GiftShared.cadeau)
             )
         )
 
         shared: GiftShared = query.scalars().first()
 
-        gift_id = shared.cadeau_id
-
         if not shared:
             raise HTTPException(status_code=404, detail="Partage introuvable ou vous n'avez pas les droits pour le supprimer.")
 
+        gift_id = shared.cadeau_id
+
+        # Sauvegarder les infos pour l'email avant suppression
+        participant_id = shared.participant_id
+        montant = shared.montant
+
+        # Récupérer le cadeau complet avec eager loading avant suppression
+        cadeau_result = await db.execute(
+            select(Gift)
+            .where(Gift.id == gift_id)
+            .options(
+                selectinload(Gift.destinataire),
+                selectinload(Gift.reserve_par)
+            )
+        )
+        cadeau = cadeau_result.scalars().first()
+
         await db.delete(shared)
         await db.commit()
+
+        # Envoyer l'email de notification après suppression réussie
+        participant_user = await db.get(User, participant_id)
+        if participant_user and cadeau:
+            from app.services.mailing.mail_service import MailService
+            try:
+                await MailService.send_sharing_removed(
+                    db, cadeau, participant_user, current_user, montant
+                )
+                logger.info(f"Email de suppression de partage envoyé à {participant_user.email}")
+            except Exception as e:
+                logger.error(f"Erreur lors de l'envoi de l'email de suppression de partage: {e}")
+                logger.exception(e)
 
         from app.services.gift_service import GiftService
         gift: GiftDetailResponse = await GiftService.get_gift(db, gift_id, group_id, current_user)
@@ -281,20 +312,24 @@ class SharingService:
         # Participants ajoutés (présents dans nouveaux mais pas dans anciens)
         for participant_id, nouveau_partage in nouveaux_map.items():
             if participant_id not in anciens_map:
-                # Nouveau participant
-                await MailService.send_sharing_added(
-                    db, gift, nouveau_partage.participant, preneur, nouveau_partage.montant
-                )
-                logger.info(f"Email d'ajout de partage envoyé à {nouveau_partage.participant.email}")
+                # Récupérer l'utilisateur complet depuis la base
+                participant_user = await db.get(User, participant_id)
+                if participant_user:
+                    await MailService.send_sharing_added(
+                        db, gift, participant_user, preneur, nouveau_partage.montant
+                    )
+                    logger.info(f"Email d'ajout de partage envoyé à {participant_user.email}")
 
         # Participants supprimés (présents dans anciens mais pas dans nouveaux)
         for participant_id, ancien_partage in anciens_map.items():
             if participant_id not in nouveaux_map:
-                # Participant retiré
-                await MailService.send_sharing_removed(
-                    db, gift, ancien_partage.participant, preneur, ancien_partage.montant
-                )
-                logger.info(f"Email de suppression de partage envoyé à {ancien_partage.participant.email}")
+                # Récupérer l'utilisateur complet depuis la base
+                participant_user = await db.get(User, participant_id)
+                if participant_user:
+                    await MailService.send_sharing_removed(
+                        db, gift, participant_user, preneur, ancien_partage.montant
+                    )
+                    logger.info(f"Email de suppression de partage envoyé à {participant_user.email}")
 
         # Note: Les participants dont seul le montant a changé ne reçoivent pas d'email
         # car ce n'est qu'une modification de montant, pas un ajout/suppression
