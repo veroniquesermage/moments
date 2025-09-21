@@ -17,7 +17,7 @@
     <div class="form-group">
       <label>Prix payé (€)</label>
       <p class="advice">Conseil d'usage : incluez les frais d'acheminement, et si ce présent fait l'objet d'un partage, précisez votre contribution personnelle</p>
-      <input name="prixReel" formControlName="prixReel" type="text" (input)="sanitizeDecimal($event, 'prixReel')">
+      <input name="prixReel" formControlName="prixReel" type="text" appNumericInput (input)="sanitizeDecimal($event, 'prixReel')">
     </div>
 
     <div class="form-group">

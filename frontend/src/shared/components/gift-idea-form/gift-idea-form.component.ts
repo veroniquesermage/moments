@@ -6,6 +6,8 @@ import {CommonModule} from '@angular/common';
 import {GiftIdeaFormData} from 'src/core/models/gift/idea-form-data.model';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
+import {NumericInputDirective} from '../../directives/numeric-input.directive';
+import {IntegerInputDirective} from '../../directives/integer-input.directive';
 
 @Component({
   selector: 'app-gift-idea-form',
@@ -14,7 +16,9 @@ import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    DisplayNamePipe
+    DisplayNamePipe,
+    NumericInputDirective,
+    IntegerInputDirective
   ],
   templateUrl: './gift-idea-form.component.html',
   styleUrl: './gift-idea-form.component.scss'

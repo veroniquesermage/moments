@@ -11,6 +11,7 @@ import {GiftPurchaseUpdate} from 'src/core/models/gift/gift-purchase-update.mode
 import {GiftDetailResponse} from 'src/core/models/gift/gift-detail-response.model';
 import {UserService} from 'src/core/services/user.service';
 import {UserTiersResponse} from 'src/core/models/user-tiers-response.model';
+import {NumericInputDirective} from 'src/shared/directives/numeric-input.directive';
 
 @Component({
   selector: 'app-gift-purchase',
@@ -20,7 +21,8 @@ import {UserTiersResponse} from 'src/core/models/user-tiers-response.model';
     ReactiveFormsModule,
     TerminalModalComponent,
     DisplayNamePipe,
-    CommonModule
+    CommonModule,
+    NumericInputDirective
   ],
   templateUrl: './gift-purchase.component.html',
   styleUrl: './gift-purchase.component.scss'

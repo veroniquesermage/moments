@@ -1,7 +1,7 @@
 <div class="form-container">
 
   <form data-allow-tiers [formGroup]="giftForm" (ngSubmit)="onSubmit()">
-    <label>Nom</label>
+    <label>Titre du cadeau</label>
     <input data-allow-tiers formControlName="nom" type="text"/>
     <label>Marque</label>
     <input data-allow-tiers formControlName="marque" type="text"/>
@@ -12,18 +12,20 @@
     <label>Url du cadeau</label>
     <input data-allow-tiers formControlName="url" type="text"/>
     <label>Quantité</label>
-    <input data-allow-tiers formControlName="quantite" type="text"/>
+    <input data-allow-tiers formControlName="quantite" type="text" appIntegerInput/>
     <label>Prix unitaire (€)</label>
     <input
       data-allow-tiers
       type="text"
       formControlName="prix"
+      appNumericInput
       (input)="sanitizeDecimal($event, 'prix')"/>
     <label>Frais de port (€)</label>
     <input
       data-allow-tiers
       type="text"
       formControlName="fraisPort"
+      appNumericInput
       (input)="sanitizeDecimal($event, 'fraisPort')"/>
 
     <label>Commentaire</label>
