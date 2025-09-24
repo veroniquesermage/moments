@@ -12,9 +12,9 @@ Thumbs.db
 *.log
 
 # Docker
-docker-compose.yml
+docker-compose.prod.yml
 .env
-.env.*
+.env.prod
 
 # Global cache
 *.pyc
@@ -29,13 +29,20 @@ venv/
 *.sql
 *.sql.gz
 
-#pgBouncer
-pgbouncer/userlist-prod.txt
-
-
 # claude code
-.claude/
-.claude-*/
-.claude-*/**
+claude/
+claude-*/
+claude-*/**
+CLAUDE.md
 
 README_deploy.md
+
+# pgbouncer
+pgbouncer/pgbouncer.ini.prod
+pgbouncer/userlist-prod.txt
+
+/docs
+backend/script/backup_before_reset.sh
+backend/script/backup_db.sh
+backend/script/reset_for_production.py
+backend/script/run_reset.sh

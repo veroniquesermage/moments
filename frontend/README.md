@@ -1,59 +1,81 @@
-# Liste2wishFront
+# 🎨 Moments Frontend - Angular Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.6.
+Frontend de l'application Moments, développé avec Angular 19 et TypeScript, offrant une interface moderne et réactive pour la gestion de cadeaux en groupe.
 
-## Development server
+## 🛠️ Technologies
 
-To start a local development server, run:
+- **Angular 19** - Framework SPA avec les dernières fonctionnalités
+- **TypeScript 5+** - Typage statique et features ES2022+
+- **SCSS** - Préprocesseur CSS avec architecture modulaire
+- **Angular Signals** - Gestion d'état
+- **Angular Router** - Navigation avec lazy loading
+- **Angular Forms** - Formulaires réactifs avec validation
+- **HttpClient** - Communication API avec interceptors
 
-```bash
-ng serve
-```
+## 🚀 Installation et Développement
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Prérequis
+- **Node.js 18+**
+- **npm** ou **yarn**
+- **Angular CLI** (optionnel mais recommandé)
 
-## Code scaffolding
+## 🏗️ Architecture
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Patterns architecturaux
 
-```bash
-ng generate component component-name
-```
+#### 🔄 Architecture basée sur les Services
+- **Services centralisés** : Chaque domaine métier a son service dédié
+- **Injection de dépendances** : Utilisation du système DI d'Angular
+- **Angular Signals** : Gestion d'état réactive
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+#### 🛣️ Routing et Navigation
+- **Lazy Loading** : Chargement différé des modules pour optimiser les performances
+- **Route Guards** : Protection des routes sensibles
+- **Route Parameters** : Gestion des paramètres dynamiques
 
-```bash
-ng generate --help
-```
+#### 📝 Formulaires et Validation
+- **Reactive Forms** : Formulaires pilotés par le modèle
+- **Validation custom** : Validateurs personnalisés pour les règles métier
+- **Error Handling** : Gestion centralisée des erreurs de validation
 
-## Building
+## 🎨 Interface Utilisateur
 
-To build the project run:
+### Thème et Design
+- **Thème rétro-terminal** : Design inspiré des terminaux vintage
+- **Responsive Design** : Adaptation mobile et desktop
+- **Accessibilité** : Respect des standards WCAG
 
-```bash
-ng build
-```
+## 📱 Fonctionnalités
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### ✨ Fonctionnalités principales
+- **Dashboard interactif** avec vue d'ensemble des cadeaux
+- **Gestion complète des listes** de souhaits
+- **Système de réservation** avec dates d'expiration
+- **Partage de cadeaux** entre membres
 
-## Running unit tests
+### 🚀 Optimisations
+- **Lazy Loading** : Chargement des modules à la demande
+- **OnPush Strategy** : Optimisation des cycles de détection
+- **TrackBy Functions** : Optimisation des listes *ngFor
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 🔒 Sécurité
 
-```bash
-ng test
-```
+### Authentification
+- **JWT Tokens** : Stockage sécurisé et rotation automatique
+- **Route Guards** : Protection des routes par authentification
+- **HTTP Interceptors** : Injection automatique des tokens
 
-## Running end-to-end tests
+### Validation et Sanitization
+- **Input Validation** : Validation côté client et serveur
+- **XSS Protection** : Sanitization automatique des inputs
 
-For end-to-end (e2e) testing, run:
+## 📚 Ressources
 
-```bash
-ng e2e
-```
+- [Angular Documentation](https://angular.io/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Angular Signals Guide](https://angular.io/guide/signals)
+- [Angular Material](https://material.angular.io/) (si utilisé)
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+*Interface moderne et performante pour une expérience utilisateur optimale en gestion de cadeaux* 🎁✨

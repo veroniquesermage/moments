@@ -27,11 +27,8 @@ env/
 *.db
 
 # ▶️ Variables d'environnement
-.env
-.env.prod
-
-*.iml
+# (déjà couvert par .env* ligne 18)
 
 # Logs éventuels
 *.log
-
+backup_db.sh
