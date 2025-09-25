@@ -4,5 +4,6 @@ export interface UserDisplay {
   prenom: string,
   surnom?: string,
   role?: string,
-  isCompteTiers: boolean
+  isCompteTiers: boolean,
+  isForgotten?: boolean
 }

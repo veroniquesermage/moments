@@ -4,12 +4,14 @@
       📃 Listes des autres membres
     </h1>
     <p class="emphase-douce">
-      Cliquez sur un membre pour consulter ses desiderata — parce que faire plaisir n'est pas toujours une improvisation.
+      Cliquez sur un membre pour consulter ses desiderata, parce que faire plaisir n'est pas toujours une improvisation.
     </p>
     <p>
       🧩 Vous noterez que certains comptes bénéficient de la tutelle bienveillante d'un autre membre.
       Ils sont peut-être trop jeunes, trop âgés, ou simplement trop sages pour s'embarrasser de nos artifices numériques.<br>
-      <em>Nous appelons cela des 🧩 comptes tiers.</em>
+      <em>Nous appelons cela des 🧩 comptes tiers.</em> <br> <br>
+      <em>À noter également :</em> un liseré coloré à côté d'un nom signale discrètement les membres qui risquent de se retrouver les mains vides,
+      veillez à ce que chacun ait sa part de bonheur.
     </p>
   </section>
 
@@ -23,6 +25,7 @@
       *ngFor="let user of members()"
       (click)="selectMember(user)"
       [class.selected]="user.id === selectedMember?.id"
+      [class.member-forgotten]="user.isForgotten"
     >
       <span *ngIf="user.isCompteTiers"
             aria-label="Compte tiers"
