@@ -2,13 +2,13 @@ from operator import and_
 from typing import Optional
 
 from fastapi import HTTPException
-from sqlalchemy import select, Sequence, delete
+from sqlalchemy import select, Sequence, delete, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.enum import RoleEnum
+from app.core.enum import RoleEnum, GiftStatusEnum
 from app.core.logger import logger
-from app.models import User, UserGroup, Group
+from app.models import User, UserGroup, Group, Gift
 from app.schemas import UserDisplaySchema, ExportManagedAccountRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.auth.user_service import UserService
@@ -22,26 +22,58 @@ class UserGroupService:
                                             current_user: User,
                                             group_id: int) -> list[UserDisplaySchema]:
 
+        # Requête pour récupérer les utilisateurs avec leur statut "oublié"
+        # Un membre est oublié si tous ses cadeaux sont DISPONIBLE ET il a au moins un cadeau
+        subquery = (
+            select(
+                Gift.destinataire_id,
+                func.count(Gift.id).label('total_gifts'),
+                func.count(case((Gift.statut == GiftStatusEnum.DISPONIBLE, Gift.id))).label('available_gifts')
+            )
+            .where(Gift.destinataire_id.in_(
+                select(UserGroup.utilisateur_id)
+                .where(UserGroup.groupe_id == group_id, UserGroup.utilisateur_id != current_user.id)
+            ))
+            .group_by(Gift.destinataire_id)
+        ).subquery()
+
         results = (await db.execute(
-            select(UserGroup)
+            select(
+                UserGroup,
+                subquery.c.total_gifts,
+                subquery.c.available_gifts
+            )
+            .select_from(
+                UserGroup.__table__.outerjoin(
+                    subquery, UserGroup.utilisateur_id == subquery.c.destinataire_id
+                )
+            )
             .where(UserGroup.groupe_id == group_id,
                    UserGroup.utilisateur_id != current_user.id)
             .options(
                 selectinload(UserGroup.utilisateur),
                 selectinload(UserGroup.groupe)
             )
-        )).scalars().all()
+        )).all()
 
-        user_display_schema = [
-            UserDisplaySchema(
-            id= result.utilisateur.id,
-            nom= result.utilisateur.nom,
-            prenom= result.utilisateur.prenom,
-            surnom= result.surnom if result.surnom else None,
-            role= result.role,
-            is_compte_tiers= result.utilisateur.is_compte_tiers
-            )
-            for result in results ]
+        user_display_schema = []
+        for result in results:
+            user_group = result[0]
+            total_gifts = result[1] or 0
+            available_gifts = result[2] or 0
+
+            # Un membre est oublié si : il a des cadeaux ET tous ses cadeaux sont disponibles
+            is_forgotten = total_gifts > 0 and available_gifts == total_gifts
+
+            user_display_schema.append(UserDisplaySchema(
+                id=user_group.utilisateur.id,
+                nom=user_group.utilisateur.nom,
+                prenom=user_group.utilisateur.prenom,
+                surnom=user_group.surnom if user_group.surnom else None,
+                role=user_group.role,
+                is_compte_tiers=user_group.utilisateur.is_compte_tiers,
+                is_forgotten=is_forgotten
+            ))
 
         return user_display_schema
 
@@ -50,25 +82,56 @@ class UserGroupService:
             db: AsyncSession,
             group_id: int) -> list[UserDisplaySchema]:
 
+        # Requête pour récupérer les utilisateurs avec leur statut "oublié"
+        # Un membre est oublié si tous ses cadeaux sont DISPONIBLE ET il a au moins un cadeau
+        subquery = (
+            select(
+                Gift.destinataire_id,
+                func.count(Gift.id).label('total_gifts'),
+                func.count(case((Gift.statut == GiftStatusEnum.DISPONIBLE, Gift.id))).label('available_gifts')
+            )
+            .where(Gift.destinataire_id.in_(
+                select(UserGroup.utilisateur_id).where(UserGroup.groupe_id == group_id)
+            ))
+            .group_by(Gift.destinataire_id)
+        ).subquery()
+
         results = (await db.execute(
-            select(UserGroup)
+            select(
+                UserGroup,
+                subquery.c.total_gifts,
+                subquery.c.available_gifts
+            )
+            .select_from(
+                UserGroup.__table__.outerjoin(
+                    subquery, UserGroup.utilisateur_id == subquery.c.destinataire_id
+                )
+            )
             .where(UserGroup.groupe_id == group_id)
             .options(
                 selectinload(UserGroup.utilisateur),
                 selectinload(UserGroup.groupe)
             )
-        )).scalars().all()
+        )).all()
 
-        user_display_schema = [
-            UserDisplaySchema(
-                id= result.utilisateur.id,
-                nom= result.utilisateur.nom,
-                prenom= result.utilisateur.prenom,
-                surnom= result.surnom if result.surnom else None,
-                role= result.role,
-                is_compte_tiers= result.utilisateur.is_compte_tiers
-            )
-            for result in results ]
+        user_display_schema = []
+        for result in results:
+            user_group = result[0]
+            total_gifts = result[1] or 0
+            available_gifts = result[2] or 0
+
+            # Un membre est oublié si : il a des cadeaux ET tous ses cadeaux sont disponibles
+            is_forgotten = total_gifts > 0 and available_gifts == total_gifts
+
+            user_display_schema.append(UserDisplaySchema(
+                id=user_group.utilisateur.id,
+                nom=user_group.utilisateur.nom,
+                prenom=user_group.utilisateur.prenom,
+                surnom=user_group.surnom if user_group.surnom else None,
+                role=user_group.role,
+                is_compte_tiers=user_group.utilisateur.is_compte_tiers,
+                is_forgotten=is_forgotten
+            ))
 
         return user_display_schema
 

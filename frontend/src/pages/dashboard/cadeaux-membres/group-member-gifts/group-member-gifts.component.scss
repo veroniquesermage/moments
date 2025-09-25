@@ -18,6 +18,14 @@
       font-weight: bold;
       border: 1px solid var(--color-border);
     }
+
+    &.member-forgotten {
+      border-left: 4px solid var(--color-highlight);
+
+      &:hover {
+        background: color-mix(in srgb, var(--color-highlight) 10%, transparent);
+      }
+    }
   }
 }
 
@@ -60,11 +68,11 @@
       background-color: var(--color-bg);
       padding: 0.5rem;
       border-radius: 4px;
-      
+
       &:hover {
         background-color: var(--color-row-hover-bg);
       }
-      
+
       &.gris:hover {
         background-color: var(--color-bg);
       }
@@ -76,7 +84,7 @@
       border: none;
       padding: 0.25rem 0;
       text-align: left;
-      
+
       &::before {
         content: attr(data-label) ": ";
         font-weight: bold;
@@ -96,7 +104,7 @@
       margin: 1rem 0;
       border: 2px solid var(--color-alt-border);
       border-radius: 4px;
-      
+
       &::before {
         content: none;
       }

@@ -4,8 +4,8 @@ from sqlalchemy import text
 
 from fastapi import HTTPException
 
-from app.core.enum import RoleEnum
-from app.models import User, Group, UserGroup
+from app.core.enum import RoleEnum, GiftStatusEnum
+from app.models import User, Group, UserGroup, Gift
 from app.schemas import UserDisplaySchema, ExportManagedAccountRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.user_group_service import UserGroupService
@@ -244,3 +244,84 @@ async def test_remove_tiers_from_group_success_and_errors(unit_db_session, mock_
     # Error: not in group
     with pytest.raises(HTTPException):
         await UserGroupService.remove_tiers_from_group(unit_db_session, parent, group.id, tiers.id)
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_forgotten_members_detection(unit_db_session):
+    """Test la détection des membres oubliés (tous leurs cadeaux sont DISPONIBLE)"""
+
+    # Créer des utilisateurs et un groupe
+    current_user = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Current", nom="User")
+    forgotten_user = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="Forgotten", nom="User")
+    not_forgotten_user = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="NotForgotten", nom="User")
+    no_gifts_user = User(email=f"{uuid4().hex[:8]}@ex.com", prenom="NoGifts", nom="User")
+    group = Group(nom_groupe="TestGroup", description="Test")
+
+    unit_db_session.add_all([current_user, forgotten_user, not_forgotten_user, no_gifts_user, group])
+    await unit_db_session.commit()
+    for o in (current_user, forgotten_user, not_forgotten_user, no_gifts_user, group):
+        await unit_db_session.refresh(o)
+
+    # Ajouter les utilisateurs au groupe
+    unit_db_session.add_all([
+        UserGroup(utilisateur_id=current_user.id, groupe_id=group.id, role=RoleEnum.ADMIN),
+        UserGroup(utilisateur_id=forgotten_user.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=not_forgotten_user.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+        UserGroup(utilisateur_id=no_gifts_user.id, groupe_id=group.id, role=RoleEnum.MEMBRE),
+    ])
+    await unit_db_session.commit()
+
+    # Créer des cadeaux
+    # forgotten_user : tous ses cadeaux sont DISPONIBLE -> oublié
+    gift1 = Gift(
+        destinataire_id=forgotten_user.id,
+        nom="Gift 1",
+        priorite=1,
+        statut=GiftStatusEnum.DISPONIBLE
+    )
+    gift2 = Gift(
+        destinataire_id=forgotten_user.id,
+        nom="Gift 2",
+        priorite=2,
+        statut=GiftStatusEnum.DISPONIBLE
+    )
+
+    # not_forgotten_user : au moins un cadeau réservé -> pas oublié
+    gift3 = Gift(
+        destinataire_id=not_forgotten_user.id,
+        nom="Gift 3",
+        priorite=1,
+        statut=GiftStatusEnum.DISPONIBLE
+    )
+    gift4 = Gift(
+        destinataire_id=not_forgotten_user.id,
+        nom="Gift 4",
+        priorite=2,
+        statut=GiftStatusEnum.RESERVE,
+        reserve_par_id=current_user.id  # Réservé par current_user
+    )
+
+    # no_gifts_user : aucun cadeau -> pas oublié
+
+    unit_db_session.add_all([gift1, gift2, gift3, gift4])
+    await unit_db_session.commit()
+
+    # Tester la méthode get_users_except_current_user
+    users = await UserGroupService.get_users_except_current_user(unit_db_session, current_user, group.id)
+
+    # Vérifier les résultats (current_user ne doit pas être dans les résultats)
+    users_by_id = {u.id: u for u in users}
+    assert current_user.id not in users_by_id, "current_user should not be in results"
+
+    # forgotten_user doit être marqué comme oublié (tous ses cadeaux sont DISPONIBLE)
+    forgotten = users_by_id[forgotten_user.id]
+    assert forgotten.is_forgotten is True, f"forgotten_user should be forgotten but is_forgotten={forgotten.is_forgotten}"
+
+    # not_forgotten_user ne doit pas être oublié (a un cadeau réservé)
+    not_forgotten = users_by_id[not_forgotten_user.id]
+    assert not_forgotten.is_forgotten is False, f"not_forgotten_user should not be forgotten but is_forgotten={not_forgotten.is_forgotten}"
+
+    # no_gifts_user ne doit pas être oublié (aucun cadeau)
+    no_gifts = users_by_id[no_gifts_user.id]
+    assert no_gifts.is_forgotten is False, f"no_gifts_user should not be forgotten but is_forgotten={no_gifts.is_forgotten}"
