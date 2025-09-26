@@ -9,7 +9,7 @@
   <button *ngIf="canReserve" (click)="reserveRequested.emit()">⏳ Réserver</button>
   <button *ngIf="canTake" (click)="takeRequested.emit()">🛒 Prendre</button>
   <button *ngIf="canCancelReservation" (click)="cancelReservationRequested.emit()">❌ Annuler la réservation</button>
-  <button *ngIf="canWithdraw" (click)="withdrawRequested.emit()">🔁 Retirer le cadeau</button>
+  <button *ngIf="canWithdraw" (click)="withdrawRequested.emit()">🔁 Rendre disponible</button>
 
   <button *ngIf="canManageDelivery" (click)="manageDeliveryRequested.emit()">🚚 Gérer la livraison</button>
   <button *ngIf="canManageInfo" (click)="managePurchaseInfoRequested.emit()">📝 Ajouter des informations</button>
