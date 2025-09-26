@@ -18,7 +18,8 @@
   </app-group-invite>
   <app-group-roles
     [members]="members()"
-    [groupId]="groupId">
+    [groupId]="groupId"
+    (membersUpdated)="reloadMembers()">
   </app-group-roles>
   <app-group-actions
     [groupId]="groupId"

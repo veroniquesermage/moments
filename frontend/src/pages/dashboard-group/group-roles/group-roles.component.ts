@@ -1,4 +1,4 @@
-import {Component, effect, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnInit} from '@angular/core';
+import {Component, effect, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnInit, ChangeDetectorRef} from '@angular/core';
 import {UserDisplay} from 'src/core/models/user-display.model';
 import {CommonModule} from '@angular/common';
 import {DisplayNamePipe} from 'src/core/pipes/display-name.pipe';
@@ -32,11 +32,13 @@ export class GroupRolesComponent implements OnInit, OnChanges {
   showMemberModal = false;
 
   constructor(private userGroupService: UserGroupService,
-              private errorService: ErrorService) {
+              private errorService: ErrorService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
     console.log('[GroupRolesComponent] OnInit - members:', this.members);
+    this.changes = [];
     this.initMembersEdition();
   }
 
@@ -55,17 +57,27 @@ export class GroupRolesComponent implements OnInit, OnChanges {
   }
 
   private buildRoleChanges(): void {
-     for (const edited of this.membersEdition) {
+    console.log('[GroupRoles] Building role changes...');
+    this.changes = [];
+    for (const edited of this.membersEdition) {
       const original = this.members.find(o => o.id === edited.id);
       if (original && original.role !== edited.role) {
         this.changes.push(edited);
       }
     }
+    console.log('[GroupRoles] Final changes:', this.changes);
+  }
+
+  onRoleChange(): void {
+    this.buildRoleChanges();
+    this.cdr.detectChanges();
   }
 
   confirmRole() {
-    this.buildRoleChanges()
-    this.showMemberModal = true;
+    this.buildRoleChanges();
+    if (this.changes.length > 0) {
+      this.showMemberModal = true;
+    }
   }
 
   cancel() {
@@ -76,8 +88,9 @@ export class GroupRolesComponent implements OnInit, OnChanges {
   async validation() {
     const result = await this.userGroupService.updateRoleUsers(this.groupId!, this.changes);
     if(result.success){
+      this.changes = [];
       this.membersUpdated.emit();
-      this.cancel()
+      this.showMemberModal = false;
     } else {
       this.errorService.showError(result.message);
     }

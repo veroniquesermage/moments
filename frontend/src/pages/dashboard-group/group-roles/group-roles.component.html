@@ -6,13 +6,13 @@
   <div class="members-grid">
     <div *ngFor="let member of membersEdition" class="member-cell">
       <span>{{ member | displayName }}</span>
-      <select [(ngModel)]="member.role">
+      <select [(ngModel)]="member.role" (ngModelChange)="onRoleChange()">
         <option *ngFor="let role of roles" [ngValue]="role">{{ role }}</option>
       </select>
     </div>
   </div>
 
-  <button *ngIf="members.length > 1" (click)="confirmRole()">✔️ Confirmer les nouveaux rôles</button>
+  <button *ngIf="members.length > 0 && changes.length > 0" (click)="confirmRole()">✔️ Confirmer les nouveaux rôles</button>
 </div>
 
 <ng-container  *ngIf="showMemberModal">
@@ -31,7 +31,7 @@
       </ol>
       <div class="modal-actions">
         <button (click)="cancel()">Fermer</button>
-        <button *ngIf="changes.length>0" (click)="validation()">✔️ Valider les nouveaux rôles</button>
+        <button (click)="validation()">✔️ Valider les nouveaux rôles</button>
       </div>
     </div>
   </div>
