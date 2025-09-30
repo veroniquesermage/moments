@@ -17,6 +17,9 @@ export class PendingInvitationsComponent {
   invitations: InvitationResponse[] = [];
   isLoading = false;
   showModal = false;
+  showConfirmModal = false;
+  confirmMessage = '';
+  confirmAction: (() => Promise<void>) | null = null;
 
   constructor(
     private groupService: GroupService,
@@ -67,5 +70,47 @@ export class PendingInvitationsComponent {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  deleteInvitation(invitationId: number, email: string) {
+    this.confirmMessage = `Êtes-vous sûr de vouloir supprimer l'invitation pour <strong>${email}</strong> ?`;
+    this.confirmAction = async () => {
+      try {
+        const result = await this.groupService.deleteInvitation(this.groupId, invitationId);
+        if (result.success) {
+          await this.loadInvitations();
+        } else {
+          this.errorService.showError(result.message || "❌ Erreur lors de la suppression");
+        }
+      } catch (error) {
+        this.errorService.showError("❌ Erreur lors de la suppression de l'invitation");
+      }
+    };
+    this.showConfirmModal = true;
+  }
+
+  resendInvitation(invitationId: number, email: string) {
+    this.confirmMessage = `Voulez-vous vraiment relancer l'invitation pour <strong>${email}</strong> ?`;
+    this.confirmAction = async () => {
+      try {
+        const result = await this.groupService.resendInvitation(this.groupId, invitationId);
+        if (result.success) {
+          await this.loadInvitations();
+        } else {
+          this.errorService.showError(result.message || "❌ Erreur lors de la relance");
+        }
+      } catch (error) {
+        this.errorService.showError("❌ Erreur lors de la relance de l'invitation");
+      }
+    };
+    this.showConfirmModal = true;
+  }
+
+  async handleConfirmAction(eventName: string) {
+    if (eventName === 'CONFIRM' && this.confirmAction) {
+      await this.confirmAction();
+    }
+    this.showConfirmModal = false;
+    this.confirmAction = null;
   }
 }

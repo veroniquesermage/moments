@@ -129,3 +129,68 @@ class InvitationService:
         invitation = result.scalar_one_or_none()
 
         return invitation.groupe if invitation else None
+
+    @staticmethod
+    async def delete_invitation(
+        db: AsyncSession,
+        invitation_id: int,
+        current_user: User,
+        group_id: int
+    ) -> bool:
+        """
+        Supprime une invitation si l'utilisateur est admin du groupe.
+        """
+        # Vérifier que l'invitation existe et appartient au groupe
+        result = await db.execute(
+            select(Invitation)
+            .where(and_(
+                Invitation.id == invitation_id,
+                Invitation.groupe_id == group_id
+            ))
+        )
+        invitation = result.scalar_one_or_none()
+
+        if not invitation:
+            return False
+
+        await db.delete(invitation)
+        await db.commit()
+        return True
+
+    @staticmethod
+    async def resend_invitation(
+        db: AsyncSession,
+        invitation_id: int,
+        current_user: User,
+        group_id: int
+    ) -> Invitation | None:
+        """
+        Renouvelle une invitation en générant un nouveau token et une nouvelle date d'expiration.
+        """
+        from app.utils.email_validator import generate_invitation_token, calculate_expiration_date
+        from app.utils.date_helper import now_paris
+
+        # Récupérer l'invitation avec le groupe
+        result = await db.execute(
+            select(Invitation)
+            .options(selectinload(Invitation.groupe))
+            .where(and_(
+                Invitation.id == invitation_id,
+                Invitation.groupe_id == group_id
+            ))
+        )
+        invitation = result.scalar_one_or_none()
+
+        if not invitation:
+            return None
+
+        # Générer un nouveau token et une nouvelle date d'expiration
+        invitation.token = generate_invitation_token()
+        invitation.date_expiration = calculate_expiration_date().replace(tzinfo=None)
+        invitation.date_envoi = now_paris().replace(tzinfo=None)
+        invitation.utilise = False
+
+        await db.commit()
+        await db.refresh(invitation)
+
+        return invitation

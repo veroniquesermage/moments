@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -79,3 +79,57 @@ async def get_pending_invitations(
     # Vérifier que l'utilisateur est admin du groupe avant de retourner les invitations
     await GroupService.get_group_if_admin(current_user, db, groupId)
     return await InvitationService.get_pending_invitations(db, groupId)
+
+
+@router.delete("/{groupId}/invitations/{invitationId}", status_code=204)
+async def delete_invitation(
+        groupId: int,
+        invitationId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+):
+    # Vérifier que l'utilisateur est admin du groupe
+    await GroupService.get_group_if_admin(current_user, db, groupId)
+
+    success = await InvitationService.delete_invitation(db, invitationId, current_user, groupId)
+    if not success:
+        raise HTTPException(status_code=404, detail="Invitation non trouvée")
+
+
+@router.post("/{groupId}/invitations/{invitationId}/resend", status_code=200)
+async def resend_invitation(
+        groupId: int,
+        invitationId: int,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user_from_cookie)
+):
+    # Vérifier que l'utilisateur est admin du groupe
+    await GroupService.get_group_if_admin(current_user, db, groupId)
+
+    invitation = await InvitationService.resend_invitation(db, invitationId, current_user, groupId)
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation non trouvée")
+
+    # Envoyer le nouveau mail d'invitation
+    from app.services.mailing.mail_service import MailService
+    from app.services.mailing.mailjet_adapter import MailjetAdapter
+
+    group = await GroupService.get_group(db, groupId)
+    invitation_data = {
+        'email': invitation.email,
+        'token': invitation.token,
+        'groupe_id': invitation.groupe_id,
+        'envoye_par_id': invitation.envoye_par_id,
+        'date_envoi': invitation.date_envoi,
+        'date_expiration': invitation.date_expiration,
+        'utilise': invitation.utilise
+    }
+
+    try:
+        response = MailjetAdapter.send_invites_with_tokens([invitation_data], group, current_user)
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Erreur lors de l'envoi du mail")
+
+        return {"message": "Invitation renvoyée avec succès"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Erreur lors de l'envoi du mail")

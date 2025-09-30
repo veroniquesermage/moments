@@ -39,10 +39,35 @@
             <span class="sender">📤 Envoyé par {{ invitation.envoye_par_nom }}</span>
             <span class="date">📅 {{ formatDate(invitation.date_envoi) }}</span>
           </div>
+          <div class="invitation-actions">
+            <button
+              class="terminal-button secondary small"
+              (click)="resendInvitation(invitation.id, invitation.email)"
+              title="Relancer l'invitation">
+              🔄 Relancer
+            </button>
+            <button
+              class="terminal-button danger small"
+              (click)="deleteInvitation(invitation.id, invitation.email)"
+              title="Supprimer l'invitation">
+              🗑️ Supprimer
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</app-terminal-modal>
+
+<!-- Modale de confirmation -->
+<app-terminal-modal
+  *ngIf="showConfirmModal"
+  [message]="confirmMessage"
+  [actions]="[
+    { label: 'Confirmer', eventName: 'CONFIRM', style: 'danger' },
+    { label: 'Annuler', eventName: 'CANCEL', style: 'secondary' }
+  ]"
+  (actionClicked)="handleConfirmAction($event)">
 </app-terminal-modal>
 
 <!-- Modale d'erreur -->

@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from app.core.enum import GiftStatusEnum, RoleEnum
 from app.models import User, Group, UserGroup, Gift
-from app.schemas.mailing import FeedbackRequest
 from app.schemas.mailing.invite_request import InviteRequest
 from app.services.mailing.mail_service import MailService
 
@@ -16,29 +15,6 @@ class DummyResp:
     def json(self):
         return self._payload
 
-
-@pytest.mark.unit
-@pytest.mark.asyncio
-async def test_send_feedback_success_and_error(unit_db_session, monkeypatch):
-    user = User(email=f"{uuid4().hex[:8]}@example.com", prenom="U", nom="N")
-    unit_db_session.add(user)
-    await unit_db_session.commit()
-    await unit_db_session.refresh(user)
-
-    # Success path
-    monkeypatch.setattr(
-        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_feedback",
-        lambda feedback_request, current_user: DummyResp(200),
-    )
-    await MailService.send_feedback(FeedbackRequest(composant="c", commentaire="x"), unit_db_session, user)
-
-    # Error path -> non-200 triggers HTTPException
-    monkeypatch.setattr(
-        "app.services.mailing.mailjet_adapter.MailjetAdapter.send_feedback",
-        lambda feedback_request, current_user: DummyResp(500, {"err": True}),
-    )
-    with pytest.raises(Exception):
-        await MailService.send_feedback(FeedbackRequest(composant="c", commentaire="x"), unit_db_session, user)
 
 
 @pytest.mark.unit

@@ -126,6 +126,32 @@ export class GroupService {
     }
   }
 
+  async deleteInvitation(groupId: number, invitationId: number): Promise<ApiResponse<any>> {
+    const groupIdEnc = encodeURIComponent(groupId);
+    const invitationIdEnc = encodeURIComponent(invitationId);
+    const url = `${this.apiUrl}/${groupIdEnc}/invitations/${invitationIdEnc}`;
+    try {
+      await firstValueFrom(this.http.delete(url));
+      return {success: true, data: null};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la suppression de l\'invitation', error);
+      return {success: false, message: "❌ Impossible de supprimer l'invitation."};
+    }
+  }
+
+  async resendInvitation(groupId: number, invitationId: number): Promise<ApiResponse<any>> {
+    const groupIdEnc = encodeURIComponent(groupId);
+    const invitationIdEnc = encodeURIComponent(invitationId);
+    const url = `${this.apiUrl}/${groupIdEnc}/invitations/${invitationIdEnc}/resend`;
+    try {
+      const result = await firstValueFrom(this.http.post(url, {}));
+      return {success: true, data: result};
+    } catch (error) {
+      console.error('[GroupService] Erreur lors de la relance de l\'invitation', error);
+      return {success: false, message: "❌ Impossible de relancer l'invitation."};
+    }
+  }
+
   loadGroupesIfEmpty(): Promise<Result<GroupResume[]>> {
     if (this.groupes().length > 0) {
       return Promise.resolve({success: true, data: this.groupes()});

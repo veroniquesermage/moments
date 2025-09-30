@@ -48,11 +48,16 @@ class MailjetAdapter:
             # Créer l'URL avec le token au lieu du code
             invite_url = f"{settings.invitation_link.replace('inviteCode=', 'inviteToken=')}{invitation_data['token']}"
 
+            # Formater la date d'expiration en français
+            date_expiration = invitation_data['date_expiration']
+            date_expiration_formatee = date_expiration.strftime("%d/%m/%Y à %H:%M")
+
             # Rendu avec les vraies données
             html_rendered = template.render(
                 groupe=group,
                 user=user,
-                url_avec_code=invite_url
+                url_avec_code=invite_url,
+                date_expiration_formatee=date_expiration_formatee
             )
 
             message = {

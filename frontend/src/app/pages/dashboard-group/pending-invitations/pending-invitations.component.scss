@@ -84,6 +84,31 @@
             gap: 0.25rem;
           }
         }
+
+        .invitation-actions {
+          display: flex;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+          justify-content: flex-end;
+
+          .terminal-button.small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            min-width: auto;
+
+            &:hover {
+              transform: none; // Éviter le hover effect trop visible
+            }
+          }
+
+          @media (max-width: 480px) {
+            justify-content: center;
+
+            .terminal-button.small {
+              flex: 1;
+            }
+          }
+        }
       }
     }
   }
