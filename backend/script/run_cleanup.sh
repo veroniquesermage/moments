@@ -1,6 +1,13 @@
 #!/bin/bash
 cd /app
 
+# Charger les variables d'environnement si disponibles
+if [ -f /app/.env.prod ]; then
+    export $(grep -v '^#' /app/.env.prod | xargs)
+elif [ -f /app/.env ]; then
+    export $(grep -v '^#' /app/.env | xargs)
+fi
+
 # Nettoyage de la base de données
 /usr/local/bin/python /app/script/cleanup_bdd.py >> /app/logs/cleanup.log 2>&1
 
