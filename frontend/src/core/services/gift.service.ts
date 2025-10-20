@@ -36,7 +36,7 @@ export class GiftService {
   }
 
   async fetchGifts(
-    userId?: number, 
+    userId?: number,
     page: number = 1,
     customLimit?: number
   ): Promise<ApiResponse<PaginatedResponse<GiftResponse>>> {
@@ -44,7 +44,7 @@ export class GiftService {
     this.isLoading.set(true);
 
     const limit = customLimit || this.responsiveService.getPageSizeForContext('user-gifts');
-    
+
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());

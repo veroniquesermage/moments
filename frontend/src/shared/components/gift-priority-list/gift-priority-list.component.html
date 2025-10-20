@@ -1,3 +1,9 @@
+<!-- Alerte de validation en haut, visible immédiatement après modification -->
+<div *ngIf="hasOrderChanged" class="sebou-alert" role="alert" aria-live="polite">
+  <span class="intro">⚠️ Vos priorités ont été modifiées.</span>
+  <button data-allow-tiers (click)="recPriorities()">✓ Valider les priorités</button>
+</div>
+
 <table class="gift-table">
   <thead>
   <tr>
@@ -50,9 +56,10 @@
   </tr>
   </tbody>
 </table>
-
-<button data-allow-tiers *ngIf="hasOrderChanged" (click)="recPriorities()"> Valider les priorités</button>
-
+<div *ngIf="hasOrderChanged" class="sebou-alert" role="alert" aria-live="polite">
+  <span class="intro">⚠️ Vos priorités ont été modifiées.</span>
+  <button data-allow-tiers (click)="recPriorities()">✓ Valider les priorités</button>
+</div>
 <app-terminal-modal
   *ngIf="errorService.errorMessage()"
   [message]="errorService.errorMessage()!"

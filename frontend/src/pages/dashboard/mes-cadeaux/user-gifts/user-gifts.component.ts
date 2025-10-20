@@ -4,20 +4,16 @@ import {GiftService} from 'src/core/services/gift.service';
 import {Router} from '@angular/router';
 import {GiftPriorityListComponent} from 'src/shared/components/gift-priority-list/gift-priority-list.component';
 import {GiftResponse} from 'src/core/models/gift/gift-response.model';
-import {PaginationComponent} from 'src/shared/components/pagination/pagination.component';
-import {PaginationInfo} from 'src/core/models/common/pagination.model';
 
 @Component({
   selector: 'app-user-gifts',
-  imports: [CommonModule, GiftPriorityListComponent,PaginationComponent],
+  imports: [CommonModule, GiftPriorityListComponent],
   standalone: true,
   templateUrl: './user-gifts.component.html',
   styleUrl: './user-gifts.component.scss'
 })
 export class UserGiftsComponent implements OnInit{
 
-  currentPage = signal(1);
-  paginationInfo = signal<PaginationInfo | null>(null);
   gifts = signal<GiftResponse[]>([]);
 
   constructor(public giftService: GiftService,
@@ -25,23 +21,29 @@ export class UserGiftsComponent implements OnInit{
   }
 
   async ngOnInit(): Promise<void> {
-    await this.loadGifts(1);
+    await this.loadGifts();
   }
 
-  async loadGifts(page: number): Promise<void> {
-    const result = await this.giftService.fetchGifts(undefined, page);
+  async loadGifts(): Promise<void> {
+    // Charger tous les cadeaux en utilisant la limite maximale du backend (100)
+    const MAX_LIMIT = 100;
+    const allGifts: GiftResponse[] = [];
+    let currentPage = 1;
+    let hasMorePages = true;
 
-    if (result.success && result.data) {
-      this.currentPage.set(page);
-      this.paginationInfo.set(result.data.pagination);
-      this.gifts.set(result.data.items);
+    while (hasMorePages) {
+      const result = await this.giftService.fetchGifts(undefined, currentPage, MAX_LIMIT);
+
+      if (result.success && result.data) {
+        allGifts.push(...result.data.items);
+        hasMorePages = result.data.pagination.has_next;
+        currentPage++;
+      } else {
+        hasMorePages = false;
+      }
     }
-  }
 
-  async onPageChange(page: number): Promise<void> {
-    await this.loadGifts(page);
-    // Scroll to top pour une meilleure UX
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.gifts.set(allGifts);
   }
 
   goToAjout(): void {

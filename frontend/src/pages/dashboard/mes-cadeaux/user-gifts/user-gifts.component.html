@@ -27,13 +27,6 @@
     (rowClicked)="onGiftClicked($event)"
   />
 
-  <!-- Pagination -->
-  <app-pagination
-    [paginationInfo]="paginationInfo()!"
-    (pageChange)="onPageChange($event)"
-    *ngIf="paginationInfo()">
-  </app-pagination>
-
   <!-- Message si aucun cadeau -->
   <div *ngIf="!giftService.isLoading() && gifts().length === 0" class="no-gifts">
     <p>Votre liste semble remarquablement vide.</p>
