@@ -1,0 +1,40 @@
+{
+  "name": "Moments - Gestion de Cadeaux",
+  "short_name": "Moments PWA",
+  "description": "Application de gestion de listes de cadeaux et partage entre groupes",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "theme_color": "#00ff00",
+  "background_color": "#000000",
+  "orientation": "any",
+  "categories": ["lifestyle", "social", "shopping"],
+  "lang": "fr",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

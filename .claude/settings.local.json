@@ -7,7 +7,9 @@
       "Read(/C:\\Dev\\projects\\moments\\frontend/**)",
       "Read(/C:\\Dev\\projects\\moments\\frontend/**)",
       "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)",
-      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)"
+      "Read(/C:\\Dev\\projects\\moments\\frontend\\src\\shared\\components\\gift-priority-list/**)",
+      "Bash(ng add:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

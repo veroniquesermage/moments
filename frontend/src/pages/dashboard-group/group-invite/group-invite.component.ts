@@ -9,7 +9,7 @@ import {TerminalModalComponent} from 'src/shared/components/terminal-modal/termi
 import {InvitationRecapModalComponent} from 'src/shared/components/invitation-recap-modal/invitation-recap-modal.component';
 import {GroupService} from 'src/core/services/group.service';
 import {ToastrService} from 'src/core/services/toastr.service';
-import {PendingInvitationsComponent} from 'src/app/pages/dashboard-group/pending-invitations/pending-invitations.component';
+import {PendingInvitationsComponent} from 'src/pages/dashboard-group/pending-invitations/pending-invitations.component';
 import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Component({
