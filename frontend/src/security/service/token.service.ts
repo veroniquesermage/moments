@@ -1,11 +1,13 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {jwtDecode} from 'jwt-decode';
 import {AccessTokenPayload} from 'src/security/model/access-token-payload.model';
+import {PersistenceService} from 'src/core/services/persistence.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenService {
+  private persistenceService = inject(PersistenceService);
 
   getAccessToken(): string | null {
     const match = document.cookie.match(/(?:^|; )access_token=([^;]*)/);
@@ -33,8 +35,8 @@ export class TokenService {
   }
 
   hasRememberMe(): boolean {
-    const payload = this.decodeAccessToken();
-    return payload?.remember_me ?? false;
+    // Lire depuis localStorage au lieu du JWT (plus fiable car survit à l'expiration du token)
+    return this.persistenceService.getUserPreference<boolean>('rememberMe') ?? false;
   }
 
   clear(): void {

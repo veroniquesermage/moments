@@ -56,6 +56,9 @@ export class AuthService {
    * Lance la redirection vers Google avec PKCE
    */
   async login(): Promise<void> {
+    // Sauvegarder rememberMe IMMÉDIATEMENT avant la redirection Google
+    this.persistenceService.saveUserPreference('rememberMe', this.rememberMe());
+
     const state = Math.random().toString(36).substring(2);
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
@@ -112,12 +115,16 @@ export class AuthService {
             prenom: data.profile.prenom
           })
           this.rememberMe.set(false);
+          this.persistenceService.saveUserPreference('rememberMe', false);
           void this.router.navigate(['/auth/initialiser'], {
             queryParams: { context: 'google' }
           });
         } else if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
+
+          // Sauvegarder rememberMe en localStorage
+          this.persistenceService.saveUserPreference('rememberMe', this.rememberMe());
 
           // Sauvegarder le profil si rememberMe est activé
           if (this.rememberMe()) {
@@ -245,6 +252,9 @@ export class AuthService {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
 
+          // Sauvegarder rememberMe en localStorage
+          this.persistenceService.saveUserPreference('rememberMe', this.rememberMe());
+
           // Sauvegarder le profil si rememberMe est activé
           if (this.rememberMe()) {
             this.persistenceService.saveUserPreference('profile', data.profile);
@@ -355,6 +365,9 @@ export class AuthService {
         if (data?.profile) {
           this.profile.set(data.profile);
           this.isLoggedIn.set(true);
+
+          // Sauvegarder rememberMe en localStorage (false pour reset password)
+          this.persistenceService.saveUserPreference('rememberMe', false);
         }
       })
       .catch(err => console.error('[Backend] Erreur :', err));

@@ -97,7 +97,7 @@ class AuthService:
             httponly=False,
             secure=settings.is_prod,
             samesite="lax",
-            max_age=60
+            max_age=60 * 30  # 30 minutes (aligné avec la durée du JWT)
         )
 
         return response
