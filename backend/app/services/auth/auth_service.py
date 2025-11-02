@@ -26,15 +26,16 @@ from app.services.mailing.mail_service import MailService
 from app.services.token_service import TokenService
 from app.utils.date_helper import now_paris, is_expired
 from app.utils.password_utils import PasswordUtils
+from app.utils.user_agent_helper import extract_device_info
 
 
 class AuthService:
 
     @staticmethod
-    async def authenticate_google_user(request: GoogleAuthRequest, db: AsyncSession) -> JSONResponse:
+    async def authenticate_google_user(google_request: GoogleAuthRequest, request: Request, db: AsyncSession) -> JSONResponse:
         token_data = await exchange_code_for_tokens(
-            code=request.code,
-            code_verifier=request.code_verifier
+            code=google_request.code,
+            code_verifier=google_request.code_verifier
         )
 
         payload = await verify_google_id_token(token_data["id_token"])
@@ -47,10 +48,14 @@ class AuthService:
             google_id=payload["sub"]
         )
 
-        return await AuthService.create_tokens(db, user, request.remember_me, is_new_user)
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, user, google_request.remember_me, is_new_user, device_info)
 
     @staticmethod
-    async def create_tokens(db: AsyncSession, user: UserSchema, remember_me: bool, is_new_user=False) -> JSONResponse:
+    async def create_tokens(db: AsyncSession, user: UserSchema, remember_me: bool, is_new_user=False, device_info: str = None) -> JSONResponse:
 
         jti = str(uuid4())
         refresh_payload = {
@@ -59,7 +64,7 @@ class AuthService:
             "remember_me": remember_me
         }
 
-        refresh_token_stored: RefreshToken = await TokenService.store_refresh_token(db, user.id, jti)
+        refresh_token_stored: RefreshToken = await TokenService.store_refresh_token(db, user.id, jti, device_info)
         refresh_token = TokenService.create_refresh_token(refresh_payload, refresh_token_stored.expires_at)
 
         access_token_duration = now_paris() + timedelta(minutes=30)
@@ -116,11 +121,34 @@ class AuthService:
 
         if await TokenService.is_refresh_token_valid(db, jti, user_id):
             user = await UserService.get_user_by_id(db, int(user_id))
-            await TokenService.revoke_refresh_token(db, jti, user_id)
 
-            return await AuthService.create_tokens(
-                db, UserSchema.from_user(user), remember_me
+            # CHANGEMENT : Au lieu de révoquer, on met à jour last_used_at
+            await TokenService.update_last_used_at(db, jti, user_id)
+
+            # Créer seulement un nouveau access_token (pas de nouveau refresh_token)
+            access_token_duration = now_paris() + timedelta(minutes=30)
+            access_payload = {
+                "sub": str(user.id),
+                "exp": access_token_duration,
+            }
+
+            access_token = create_access_token(data=access_payload, expires_at=access_token_duration)
+
+            # Créer la réponse avec le profil utilisateur
+            content = jsonable_encoder(AuthResponse(profile=UserSchema.from_user(user), is_new_user=False))
+            response = JSONResponse(content=content)
+
+            # Mettre à jour uniquement le cookie access_token
+            response.set_cookie(
+                key="access_token",
+                value=access_token,
+                httponly=False,
+                secure=settings.is_prod,
+                samesite="lax",
+                max_age=60 * 30  # 30 minutes
             )
+
+            return response
         else:
             logger.info(f"Refresh invalide pour le jti {jti} et l'utilisateur {user_id}")
             raise HTTPException(status_code=401, detail="Refresh token invalide.")
@@ -163,9 +191,9 @@ class AuthService:
             await MailService.send_validation_email(db, login_request.email, token)
 
     @staticmethod
-    async def authenticate_credentials_user(request: RegisterRequest, db: AsyncSession) -> JSONResponse:
+    async def authenticate_credentials_user(register_request: RegisterRequest, request: Request, db: AsyncSession) -> JSONResponse:
         try:
-            token_data = TokenService.decode_signup_token(request.token)
+            token_data = TokenService.decode_signup_token(register_request.token)
         except Exception:
             raise HTTPException(status_code=401, detail="Token invalide.")
 
@@ -180,32 +208,41 @@ class AuthService:
         user = await UserService.create_user(
             db=db,
             email=email,
-            prenom=request.prenom,
-            nom=request.nom,
+            prenom=register_request.prenom,
+            nom=register_request.nom,
             password=password
         )
 
-        return await AuthService.create_tokens(db, user, remember_me, True)
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, user, remember_me, True, device_info)
 
     @staticmethod
-    async def login_with_credentials( request: LoginRequest, db: AsyncSession) -> JSONResponse:
+    async def login_with_credentials(login_request: LoginRequest, request: Request, db: AsyncSession) -> JSONResponse:
 
-        if await LoginAttemptService.is_blocked(db, request.email):
+        if await LoginAttemptService.is_blocked(db, login_request.email):
             raise HTTPException(status_code=403, detail="Compte bloqué.")
 
-        user = await AuthService.check_user(db, request.email)
+        user = await AuthService.check_user(db, login_request.email)
 
         if user.password is None:
             raise HTTPException(status_code=409, detail="Cet adresse mail est bien en base mais avec un autre type de connexion.")
 
-        matching_password: bool = PasswordUtils.verify_password(request.password, user.password)
+        matching_password: bool = PasswordUtils.verify_password(login_request.password, user.password)
 
         if not matching_password:
-            await LoginAttemptService.increment_attempt(db, request.email)
+            await LoginAttemptService.increment_attempt(db, login_request.email)
             raise HTTPException(status_code=401, detail="Mauvais mot de passe.")
 
-        await LoginAttemptService.reset_attempts(db, request.email)
-        return await AuthService.create_tokens(db, UserSchema.from_user(user), request.remember_me, False)
+        await LoginAttemptService.reset_attempts(db, login_request.email)
+
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, UserSchema.from_user(user), login_request.remember_me, False, device_info)
 
     @staticmethod
     async def change_password(db: AsyncSession, current_user: User, request: ChangePassword):
@@ -243,17 +280,21 @@ class AuthService:
         return token_data['sub']
 
     @staticmethod
-    async def reset_password( db: AsyncSession, request: ResetPasswordPayload) -> JSONResponse:
+    async def reset_password(db: AsyncSession, reset_request: ResetPasswordPayload, request: Request) -> JSONResponse:
 
         try:
-            token_data = TokenService.decode_password_token(request.token)
+            token_data = TokenService.decode_password_token(reset_request.token)
         except Exception:
             raise HTTPException(status_code=401, detail="Token invalide.")
 
-        new_password = PasswordUtils.hash_password(request.new_password)
+        new_password = PasswordUtils.hash_password(reset_request.new_password)
         user: UserSchema = await UserService.reset_password(db, token_data['sub'], new_password)
 
-        return await AuthService.create_tokens(db, user, False, False)
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, user, False, False, device_info)
 
     @staticmethod
     async def check_user(db: AsyncSession, mail: str) -> User:
@@ -265,7 +306,7 @@ class AuthService:
         return user
 
     @staticmethod
-    async def switch_to_tiers(db: AsyncSession, user_tiers_id: int, current_user: User, group_id: int) -> JSONResponse:
+    async def switch_to_tiers(db: AsyncSession, user_tiers_id: int, current_user: User, group_id: int, request: Request) -> JSONResponse:
         user_tiers: User = await UserService.get_user_by_id(db, user_tiers_id)
 
         if not user_tiers.gere_par == current_user.id :
@@ -275,17 +316,25 @@ class AuthService:
         if not user_group:
             raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
 
-        return await AuthService.create_tokens(db, UserSchema.from_user(user_tiers), False, False)
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, UserSchema.from_user(user_tiers), False, False, device_info)
 
     @staticmethod
-    async def switch_to_parent(db: AsyncSession, current_user: User, group_id: int) -> JSONResponse:
+    async def switch_to_parent(db: AsyncSession, current_user: User, group_id: int, request: Request) -> JSONResponse:
         user_parent: User = await UserService.get_user_by_id(db, current_user.gere_par)
 
         user_group = await UserGroupService.get_user_group(db, user_parent.id, group_id)
         if not user_group:
             raise HTTPException(status_code=401, detail="Ce compte tiers n'appartient pas au groupe courant.")
 
-        return await AuthService.create_tokens(db, UserSchema.from_user(user_parent), False, False)
+        # Extraire device_info depuis User-Agent
+        user_agent = request.headers.get("user-agent")
+        device_info = extract_device_info(user_agent)
+
+        return await AuthService.create_tokens(db, UserSchema.from_user(user_parent), False, False, device_info)
 
 
 

@@ -13,37 +13,46 @@ export class StartupService {
   ) {}
 
   async handleAppStartup(): Promise<void> {
-
     console.log('✅ StartupService exécuté');
+
     const isExpired = this.tokenService.isTokenExpired();
     const rememberMe = this.tokenService.hasRememberMe();
 
+    // Cas 1 : Token valide → récupérer le user
     if (!isExpired) {
-      // Récupérer le profil utilisateur si le token est valide
-      await this.authService.getCurrentUser();
-      if (this.router.url === '/') {
-        await this.redirectToCorrectPage();
+      try {
+        await this.authService.getCurrentUser();
+        if (this.router.url === '/') {
+          await this.redirectToCorrectPage();
+        }
+      } catch (error) {
+        // Le token était peut-être invalide malgré tout
+        this.handleAuthFailure();
       }
       return;
     }
 
+    // Cas 2 : Token expiré + Remember Me → refresh
     if (rememberMe) {
       try {
         await firstValueFrom(this.authService.refreshToken());
         await this.authService.getCurrentUser();
         await this.redirectToCorrectPage();
-
       } catch (error) {
-        this.tokenService.clear();
-        if (!this.isCurrentRoutePublic()) {
-          this.router.navigate(['/']);
-        }
+        console.error('Refresh failed at startup:', error);
+        this.handleAuthFailure();
       }
-    } else {
-      this.tokenService.clear();
-      if (!this.isCurrentRoutePublic()) {
-        this.router.navigate(['/']);
-      }
+      return;
+    }
+
+    // Cas 3 : Token expiré + pas de Remember Me → logout
+    this.handleAuthFailure();
+  }
+
+  private handleAuthFailure(): void {
+    this.tokenService.clear();
+    if (!this.isCurrentRoutePublic()) {
+      this.router.navigate(['/']);
     }
   }
 
@@ -51,13 +60,11 @@ export class StartupService {
     const publicRoutes = [
       '/auth/initialiser',
       '/auth/reset-password',
-      '/groupe/onboarding/rejoindre'  // Allow access to invitation join page
-      // ajoute ici d'autres routes publiques si besoin
+      '/groupe/onboarding/rejoindre'
     ];
 
     const currentPath = window.location.pathname;
     return publicRoutes.some(route => currentPath.startsWith(route));
-
   }
 
   private async redirectToCorrectPage(): Promise<void> {

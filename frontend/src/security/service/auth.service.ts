@@ -56,9 +56,6 @@ export class AuthService {
    * Lance la redirection vers Google avec PKCE
    */
   async login(): Promise<void> {
-    // Sauvegarder rememberMe IMMÉDIATEMENT avant la redirection Google
-    this.persistenceService.saveUserPreference('rememberMe', this.rememberMe());
-
     const state = Math.random().toString(36).substring(2);
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);

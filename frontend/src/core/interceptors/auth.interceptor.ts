@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {catchError, Observable, switchMap, throwError} from 'rxjs';
+import {catchError, Observable, switchMap, throwError, BehaviorSubject, filter, take} from 'rxjs';
 import {Router} from '@angular/router';
 import {AuthService} from 'src/security/service/auth.service';
 import {TokenService} from 'src/security/service/token.service';
@@ -8,6 +8,11 @@ import {GroupContextService} from 'src/core/services/group-context.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private refreshAttempts = 0;
+  private readonly MAX_REFRESH_ATTEMPTS = 1;
+
   constructor(
     private tokenService: TokenService,
     private authService: AuthService,
@@ -26,6 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
       '/auth/google',
       '/auth/register-credentials',
       '/auth/logout',
+      '/auth/refresh',  // ← CRITIQUE : évite la boucle infinie !
       '/auth/request-password-reset',
       '/auth/verify-reset-token',
       '/auth/check-email',
@@ -56,24 +62,64 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError(err => {
         if (err.status === 401) {
-          // 1) appeler refreshToken() pour que le serveur mette à jour le cookie
-          return this.authService.refreshToken().pipe(
-            // 2) une fois terminé, on clone et rejoue la requête originale
-            switchMap(() => {
-              const retryReq = authReq.clone();
-              return next.handle(retryReq);
-            }),
-            // 3) si le refresh échoue, on logout
-            catchError(innerErr => {
-              this.tokenService.clear();
-              void this.router.navigate(['/']);
-              return throwError(() => innerErr);
-            })
-          );
+          return this.handle401Error(authReq, next);
         }
-        // pas de 401 ou pas de remember-me → on ré-émet l’erreur
+        // pas de 401 → on ré-émet l'erreur
         return throwError(() => err);
       })
     );
+  }
+
+  private handle401Error(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    // PROTECTION 1 : Race condition - Si un refresh est déjà en cours, attendre qu'il se termine
+    if (this.isRefreshing) {
+      return this.refreshTokenSubject.pipe(
+        filter(success => success === true),
+        take(1),
+        switchMap(() => next.handle(req)),
+        catchError(err => {
+          // Si même après le refresh ça échoue, logout
+          this.logout();
+          return throwError(() => err);
+        })
+      );
+    }
+
+    // PROTECTION 2 : Limite de tentatives pour éviter la boucle infinie
+    if (this.refreshAttempts >= this.MAX_REFRESH_ATTEMPTS) {
+      console.warn('[AuthInterceptor] Max refresh attempts reached, forcing logout');
+      this.logout();
+      return throwError(() => new Error('Max refresh attempts reached'));
+    }
+
+    // Lancer le refresh
+    this.isRefreshing = true;
+    this.refreshAttempts++;
+    this.refreshTokenSubject.next(false);
+
+    return this.authService.refreshToken().pipe(
+      switchMap(() => {
+        // Refresh réussi - reset des compteurs
+        this.isRefreshing = false;
+        this.refreshAttempts = 0;  // ← IMPORTANT : reset on success
+        this.refreshTokenSubject.next(true);
+
+        return next.handle(req);
+      }),
+      catchError(refreshErr => {
+        // Refresh échoué définitivement
+        console.error('[AuthInterceptor] Refresh failed:', refreshErr);
+        this.isRefreshing = false;
+        this.refreshTokenSubject.next(false);
+        this.logout();
+        return throwError(() => refreshErr);
+      })
+    );
+  }
+
+  private logout(): void {
+    this.refreshAttempts = 0;
+    this.tokenService.clear();
+    void this.authService.logout();
   }
 }

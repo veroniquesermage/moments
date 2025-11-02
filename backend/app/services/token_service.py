@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from jose import jwt
 from jose.exceptions import JWTError
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -32,13 +32,34 @@ class TokenService:
     async def store_refresh_token(
             db: AsyncSession,
             user_id: int,
-            jti: str
+            jti: str,
+            device_info: str = None
     ) -> RefreshToken:
 
-        logger.info(f"Enregistrement refresh token pour l'utilisateur {user_id}")
+        logger.info(f"Enregistrement refresh token pour l'utilisateur {user_id} (device: {device_info})")
 
-        # Supprime les anciens refresh tokens de l'utilisateur pour éviter l'accumulation
-        await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))
+        # CHANGEMENT MAJEUR : Ne plus supprimer tous les tokens, mais gérer le multi-sessions
+        # Vérifier le nombre de sessions actives
+        active_sessions_count = await db.scalar(
+            select(func.count())
+            .select_from(RefreshToken)
+            .where(RefreshToken.user_id == user_id, RefreshToken.is_active == True)
+        )
+
+        MAX_SESSIONS = 5  # Limite à 5 sessions simultanées
+
+        if active_sessions_count >= MAX_SESSIONS:
+            # Supprimer la session la plus ancienne (last_used_at le plus vieux)
+            oldest_session_result = await db.execute(
+                select(RefreshToken)
+                .where(RefreshToken.user_id == user_id, RefreshToken.is_active == True)
+                .order_by(RefreshToken.last_used_at.asc())
+                .limit(1)
+            )
+            oldest_session = oldest_session_result.scalars().first()
+            if oldest_session:
+                logger.info(f"Limite de sessions atteinte pour user {user_id}, suppression de la plus ancienne (jti={oldest_session.jti})")
+                await db.delete(oldest_session)
 
         expires_at: datetime = (
             datetime.now(TokenService.TZ) + timedelta(days=30)
@@ -49,6 +70,8 @@ class TokenService:
             user_id=user_id,
             jti=jti,
             expires_at=expires_at,
+            device_info=device_info,
+            last_used_at=datetime.now(TokenService.TZ)
         )
 
         db.add(refresh_token)
@@ -80,6 +103,31 @@ class TokenService:
             return False
 
         return True
+
+    @staticmethod
+    async def update_last_used_at(
+            db: AsyncSession,
+            jti: str,
+            user_id: int) -> None:
+        """
+        Met à jour le last_used_at du refresh token pour le multi-sessions.
+        Permet de tracker l'activité et supprimer les sessions inactives.
+        """
+        result = await db.execute(
+            select(RefreshToken)
+            .where(RefreshToken.user_id == user_id,
+                   RefreshToken.jti == jti,
+                   RefreshToken.is_active == True)
+        )
+
+        token: RefreshToken = result.scalars().first()
+
+        if token:
+            token.last_used_at = datetime.now(TokenService.TZ)
+            await db.commit()
+            logger.info(f"Mise à jour last_used_at pour user {user_id}, jti={jti}")
+        else:
+            logger.warning(f"Token introuvable pour update last_used_at: user {user_id}, jti={jti}")
 
     @staticmethod
     async def revoke_refresh_token(

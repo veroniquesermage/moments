@@ -18,25 +18,28 @@ router = APIRouter(prefix="/api/auth", tags=["Authentification"])
 
 @router.post("/google", status_code=200)
 async def authenticate_with_google(
-    request: GoogleAuthRequest,
+    google_request: GoogleAuthRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
     logger.info("Authentification via Google demandée")
-    return await AuthService.authenticate_google_user(request, db)
+    return await AuthService.authenticate_google_user(google_request, request, db)
 
 @router.post("/credentials", status_code=200)
 async def login_with_credentials(
-        request: LoginRequest,
+        login_request: LoginRequest,
+        request: Request,
         db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
-    return await AuthService.login_with_credentials(request, db)
+    return await AuthService.login_with_credentials(login_request, request, db)
 
 @router.post("/register-credentials", status_code=200)
 async def authenticate_with_credentials(
-        request: RegisterRequest,
+        register_request: RegisterRequest,
+        request: Request,
         db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
-    return await AuthService.authenticate_credentials_user(request, db)
+    return await AuthService.authenticate_credentials_user(register_request, request, db)
 
 @router.post("/refresh", status_code=200)
 async def refresh_token(
@@ -91,26 +94,29 @@ async def change_password(
 
 @router.patch("/reset-password", status_code=200)
 async def reset_password(
-        request: ResetPasswordPayload,
+        reset_request: ResetPasswordPayload,
+        request: Request,
         db: AsyncSession = Depends(get_db)
 ) -> JSONResponse:
-    return await AuthService.reset_password(db, request)
+    return await AuthService.reset_password(db, reset_request, request)
 
 @router.post("/switch-to-parent", status_code=200)
 async def switch_to_parent(
+        request: Request,
         groupId: int = Depends(get_current_group_id),
         current_user: User = get_current_user_from_cookie_with_tiers() ,
         db: AsyncSession = Depends(get_db)
 ):
-    return await AuthService.switch_to_parent(db, current_user, groupId)
+    return await AuthService.switch_to_parent(db, current_user, groupId, request)
 
 @router.post("/switch-to-tiers/{userTiersId}", status_code=200)
 async def switch_to_tiers(
         userTiersId: int,
+        request: Request,
         groupId: int = Depends(get_current_group_id),
         current_user: User = Depends(get_current_user_from_cookie),
         db: AsyncSession = Depends(get_db)
 ):
-    return await AuthService.switch_to_tiers(db, userTiersId, current_user, groupId)
+    return await AuthService.switch_to_tiers(db, userTiersId, current_user, groupId, request)
 
 

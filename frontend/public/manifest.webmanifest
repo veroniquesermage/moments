@@ -1,6 +1,6 @@
 {
-  "name": "Moments - Gestion de Cadeaux",
-  "short_name": "Moments PWA",
+  "name": "(Moments) - Gestion de Cadeaux",
+  "short_name": "(Moments)",
   "description": "Application de gestion de listes de cadeaux et partage entre groupes",
   "display": "standalone",
   "scope": "./",

@@ -12,3 +12,5 @@ class RefreshToken(Base):
     expires_at = Column(DateTime(timezone=True), nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), default=now_paris())
+    device_info = Column(String(255), nullable=True)  # Ex: "Chrome/Windows", "Safari/iOS"
+    last_used_at = Column(DateTime(timezone=True), default=now_paris(), nullable=False)
