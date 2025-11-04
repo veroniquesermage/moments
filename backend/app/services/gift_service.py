@@ -51,13 +51,13 @@ class GiftService:
     ) -> PaginatedResponse[GiftResponse]:
         """
         Récupère les cadeaux d'un utilisateur avec pagination
-        
+
         Args:
             db: Session de base de données
             effective_user_id: ID de l'utilisateur
             page: Numéro de page (défaut: 1)
             limit: Nombre d'éléments par page (défaut: 20)
-            
+
         Returns:
             Réponse paginée contenant les cadeaux
         """
@@ -67,15 +67,15 @@ class GiftService:
             span.set_attribute("user.id", effective_user_id)
             span.set_attribute("pagination.page_requested", page)
             span.set_attribute("pagination.limit_requested", limit)
-            
+
             # Validation des paramètres de pagination
             page, limit = PaginationHelper.validate_pagination_params(page, limit)
-            
+
             span.set_attribute("pagination.page_validated", page)
             span.set_attribute("pagination.limit_validated", limit)
-            
+
             logger.info(f"Récupération paginée des cadeaux de l'utilisateur {effective_user_id} - Page {page}, Limit {limit}")
-            
+
             # Construire la requête de base
             with tracer.start_as_current_span("build_base_query") as query_span:
                 base_query = (
@@ -90,22 +90,22 @@ class GiftService:
                 query_span.set_attribute("query.has_eager_loading", True)
                 query_span.set_attribute("query.filter_by_user", True)
                 query_span.set_attribute("query.exclude_gift_ideas", True)
-            
+
             # Paginer la requête
             items, pagination_info = await PaginationHelper.paginate_query(
                 db, base_query, page, limit
             )
-            
+
             # Convertir en modèles de réponse
             with tracer.start_as_current_span("model_validation") as validation_span:
                 gift_responses = [GiftResponse.model_validate(gift) for gift in items]
                 validation_span.set_attribute("models.count", len(gift_responses))
-            
+
             # Ajouter les métriques finales au span principal
             span.set_attribute("result.items_count", len(gift_responses))
             span.set_attribute("result.total_count", pagination_info.total_count)
             span.set_attribute("result.total_pages", pagination_info.total_pages)
-            
+
             return PaginatedResponse(
                 items=gift_responses,
                 pagination=pagination_info
@@ -136,21 +136,21 @@ class GiftService:
     ) -> PaginatedResponse[GiftPublicResponse]:
         """
         Récupère les cadeaux visibles d'un membre avec pagination
-        
+
         Args:
             db: Session de base de données
             user_id: ID de l'utilisateur membre
             page: Numéro de page (défaut: 1)
             limit: Nombre d'éléments par page (défaut: 20)
-            
+
         Returns:
             Réponse paginée contenant les cadeaux publics
         """
         # Validation des paramètres de pagination
         page, limit = PaginationHelper.validate_pagination_params(page, limit)
-        
+
         logger.info(f"Récupération paginée des cadeaux visibles pour l'utilisateur {user_id} - Page {page}, Limit {limit}")
-        
+
         # Construire la requête de base
         base_query = (
             select(Gift)
@@ -169,18 +169,18 @@ class GiftService:
             )
             .order_by(Gift.priorite)
         )
-        
+
         # Paginer la requête
         items, pagination_info = await PaginationHelper.paginate_query(
             db, base_query, page, limit
         )
-        
+
         logger.debug(
             f"Récupération paginée des cadeaux visibles pour l'utilisateur {user_id} - {len(items)} cadeaux trouvés sur {pagination_info.total_count} au total")
-        
+
         # Convertir en modèles de réponse
         gift_responses = [GiftPublicResponse.model_validate(gift) for gift in items]
-        
+
         return PaginatedResponse(
             items=gift_responses,
             pagination=pagination_info
@@ -256,7 +256,7 @@ class GiftService:
             raise HTTPException(status_code=404, detail="Cadeau introuvable.")
 
         if updates.destinataire_id != current_user.id and (
-            not existing.gift_idea or 
+            not existing.gift_idea or
             existing.gift_idea.proposee_par_id != current_user.id
         ):
             raise HTTPException(
@@ -401,8 +401,13 @@ class GiftService:
 
         logger.info(f"Suppression du cadeau à l'id {gift_id}")
 
+        # Charger le cadeau avec ses relations (preneur et partages)
         result: Gift | None = (await db.execute(
             select(Gift).where(Gift.id == gift_id)
+            .options(
+                selectinload(Gift.reserve_par),  # Charger le preneur
+                selectinload(Gift.partages)      # Charger les partages
+            )
         )).scalars().first()
 
         if result is None:
@@ -413,8 +418,37 @@ class GiftService:
                 f"Lutilisateur {current_user.id} tente de supprimer un cadeau qui appartien à l'utilisateur {result.destinataire_id}")
             raise HTTPException(status_code=403, detail="Vous ne pouvez supprimer que vos propres cadeaux.")
 
+        # Récupérer les données avant suppression (important: récupérer les valeurs avant delete)
+        gift_deleted = result  # Garder une référence au cadeau
+        gift_nom: str = str(result.nom)  # Nom pour les participants
+        preneur = result.reserve_par
+        gift_statut = result.statut
+
+        # Récupérer les participants du partage avec leurs emails
+        participant_ids = [p.participant_id for p in result.partages] if result.partages else []
+        participants = []
+        if participant_ids:
+            participants_result = await db.execute(
+                select(User).where(User.id.in_(participant_ids))
+            )
+            participants = list(participants_result.scalars().all())
+
+        logger.debug(f"Cadeau {gift_id} (statut: {gift_statut}) - Preneur: {preneur.email if preneur else 'Aucun'}, "
+                    f"Participants: {[p.email for p in participants]}")
+
+        # Supprimer le cadeau
         await db.delete(result)
         await db.commit()
+
+        # Envoyer les emails d'alerte selon le statut
+        # Si le cadeau était pris ou réservé, envoyer un email au preneur
+        if preneur and gift_statut in [GiftStatusEnum.PARTAGE, GiftStatusEnum.PRIS, GiftStatusEnum.RESERVE]:
+            await MailService.send_alert_deletion(gift_deleted, preneur, current_user, db)
+
+        # Si le cadeau était partagé, envoyer des emails aux participants
+        if gift_statut == GiftStatusEnum.PARTAGE and participants:
+            for participant in participants:
+                await MailService.send_alert_deletion_participant(gift_nom, participant, current_user, db)
 
         await TraceService.record_trace(
             db,
@@ -508,22 +542,22 @@ class GiftService:
     ) -> PaginatedResponse[GiftFollowedByAccount]:
         """
         Récupère les cadeaux suivis et partagés par compte avec pagination
-        
+
         Args:
             db: Session de base de données
             current_user: Utilisateur actuel
             group_id: ID du groupe
             page: Numéro de page (défaut: 1)
             limit: Nombre d'éléments par page (défaut: 20)
-            
+
         Returns:
             Réponse paginée contenant les cadeaux par compte
         """
         # Validation des paramètres de pagination
         page, limit = PaginationHelper.validate_pagination_params(page, limit)
-        
+
         logger.info(f"Récupération paginée des cadeaux suivis pour l'utilisateur {current_user.id} dans le groupe {group_id} - Page {page}, Limit {limit}")
-        
+
         # Récupérer tous les cadeaux (suivis + partagés)
         try:
             logger.info(f"Récupération des cadeaux suivis pour utilisateur {current_user.id}")
@@ -543,15 +577,15 @@ class GiftService:
 
         all_gifts = gifts_followed + gifts_shared
         grouped = GiftService._group_gifts_by_account(all_gifts)
-        
+
         # Pagination manuelle sur les résultats groupés
         total_count = len(grouped)
         total_pages = (total_count + limit - 1) // limit if limit > 0 else 0
         start_index = (page - 1) * limit
         end_index = start_index + limit
-        
+
         paginated_items = grouped[start_index:end_index]
-        
+
         # Créer les informations de pagination
         from app.schemas.common.pagination import PaginationInfo
         pagination_info = PaginationInfo(
@@ -562,9 +596,9 @@ class GiftService:
             has_next=page < total_pages,
             has_previous=page > 1
         )
-        
+
         logger.debug(f"Récupération paginée des cadeaux suivis - {len(paginated_items)} comptes trouvés sur {total_count} au total")
-        
+
         return PaginatedResponse(
             items=paginated_items,
             pagination=pagination_info

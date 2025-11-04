@@ -265,3 +265,63 @@ class MailService:
         except Exception as e:
             logger.error(f"📨 Erreur d'envoi du mail de partage retiré")
             logger.exception(e)
+
+    @staticmethod
+    async def send_alert_deletion(
+            gift_deleted: Gift,
+            reserve_par: User,
+            deleted_by: User,
+            db: AsyncSession
+    ):
+
+        try:
+            response = await MailjetAdapter.send_alert_deletion(gift_deleted, reserve_par, deleted_by)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{deleted_by.prenom} {deleted_by.nom}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail suite à suppression d'un cadeau",
+                    {"cadeau_id": gift_deleted.id, "mail_to": reserve_par.email}
+                )
+            else:
+                await TraceService.record_trace(
+                    db,
+                    f"{deleted_by.prenom} {deleted_by.nom}",
+                    "GIFT_DELETION_EMAIL_SENT",
+                    f"Email de suppression envoyé à {reserve_par.prenom}",
+                    {"cadeau_id": gift_deleted.id, "reserve_par_id": reserve_par.id}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur d'envoi du mail de suppression de cadeau")
+            logger.exception(e)
+
+    @staticmethod
+    async def send_alert_deletion_participant(
+            gift_nom: str,
+            participant: User,
+            deleted_by: User,
+            db: AsyncSession
+    ):
+        """Envoie un email d'alerte à un participant d'un partage quand le cadeau est supprimé"""
+        try:
+            response = await MailjetAdapter.send_alert_deletion_participant(gift_nom, participant, deleted_by)
+            if response.status_code != 200:
+                await TraceService.record_trace(
+                    db,
+                    f"{deleted_by.prenom} {deleted_by.nom}",
+                    "ERROR",
+                    f"Erreur lors de l'envoi d'un mail de suppression à un participant",
+                    {"gift_nom": gift_nom, "participant_email": participant.email}
+                )
+            else:
+                await TraceService.record_trace(
+                    db,
+                    f"{deleted_by.prenom} {deleted_by.nom}",
+                    "GIFT_DELETION_PARTICIPANT_EMAIL_SENT",
+                    f"Email de suppression envoyé au participant {participant.prenom}",
+                    {"gift_nom": gift_nom, "participant_id": participant.id}
+                )
+        except Exception as e:
+            logger.error(f"📨 Erreur d'envoi du mail de suppression à un participant")
+            logger.exception(e)

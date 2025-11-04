@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>(Moments) Un cadeau que vous aviez pris ou réservé a été supprimé</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #222;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .cta {
+            display: inline-block;
+            margin: 1rem 0;
+            padding: 0.75rem 1.5rem;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎁 Changement de programme</h1>
+
+    <p>
+        Bonjour {{reserve_par.prenom}},<br /><br />
+        <strong>{{deleted_by.prenom}}</strong> a supprimé le cadeau <strong>"{{gift.nom}}"</strong>
+        que vous aviez {{statut}}. Nous vous informons de cette suppression pour que vous puissiez
+        ajuster vos plans en conséquence.
+    </p>
+
+    <p>
+        Si vous aviez déjà commencé les démarches pour l'achat de ce cadeau, pensez à vérifier
+        s'il existe d'autres idées de cadeaux pour cette personne.
+    </p>
+
+    <p>
+        <a class="cta" href="{{url}}">Voir les autres cadeaux sur (Moments)</a>
+    </p>
+
+    <div class="footer">
+        — L'équipe (Moments)<br />
+        <em>Parce que les plus beaux moments méritent une parenthèse 🌟</em><br />
+        <small>Email envoyé le {{date_envoi}}</small>
+    </div>
+</div>
+</body>
+</html>

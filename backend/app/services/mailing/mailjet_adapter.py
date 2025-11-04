@@ -330,6 +330,101 @@ class MailjetAdapter:
         return response
 
     @staticmethod
+    async def send_alert_deletion(
+            gift_deleted: str,
+            reserve_par: User,
+            deleted_by: User
+    ):
+        """Envoie un email d'alerte quand un cadeau pris/réservé est supprimé"""
+        sender_email = settings.mj_sender_email
+
+        # Lecture du template
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "alert_deletion.html"
+        template_str = template_path.read_text(encoding="utf-8")
+        template = Template(template_str)
+
+        statut: str = "réservé" if gift_deleted.statut == GiftStatusEnum.RESERVE else "pris"
+
+        # Rendu avec les données
+        html_rendered = template.render(
+            gift=gift_deleted,
+            statut=statut,
+            reserve_par=reserve_par,
+            deleted_by=deleted_by,
+            url=settings.google_redirect_uri,
+            date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": reserve_par.email,
+                        }
+                    ],
+                    "Subject": "(Moments) Un cadeau que vous aviez pris a été supprimé",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+        logger.info(f"📧 Email suppression cadeau envoyé à {reserve_par.email}, status: {response.status_code}")
+        return response
+
+    @staticmethod
+    async def send_alert_deletion_participant(
+            gift_nom: str,
+            participant: User,
+            deleted_by: User
+    ):
+        """Envoie un email d'alerte à un participant quand un cadeau partagé est supprimé"""
+        sender_email = settings.mj_sender_email
+
+        # Lecture du template
+        template_path = Path(__file__).resolve().parents[2] / "templates" / "mails" / "alert_deletion_participant.html"
+        template_str = template_path.read_text(encoding="utf-8")
+        template = Template(template_str)
+
+        # Rendu avec les données
+        html_rendered = template.render(
+            gift_nom=gift_nom,
+            participant=participant,
+            deleted_by=deleted_by,
+            url=settings.google_redirect_uri,
+            date_envoi=now_paris().strftime("%d/%m/%Y à %H:%M")
+        )
+
+        mailjet = MailjetAdapter._get_mailjet_client()
+        data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": sender_email,
+                        "Name": "Moments-ep"
+                    },
+                    "To": [
+                        {
+                            "Email": participant.email,
+                        }
+                    ],
+                    "Subject": "(Moments) Un cadeau auquel vous participiez a été supprimé",
+                    "HTMLPart": html_rendered
+                }
+            ]
+        }
+
+        response = mailjet.send.create(data=data)
+        logger.info(f"📧 Email suppression cadeau partagé envoyé à {participant.email}, status: {response.status_code}")
+        return response
+
+    @staticmethod
     def _get_mailjet_client():
         api_key = settings.mj_apikey_public
         api_secret = settings.mj_apikey_private

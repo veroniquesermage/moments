@@ -605,3 +605,114 @@ def test_define_user_role_cases():
     # SPECTATEUR
     stranger = User(id=4, email="s@t", prenom="S")
     assert GiftService.define_user_role(stranger, gift, partages) == RoleUtilisateur.SPECTATEUR
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_delete_gift_with_shared_participants(unit_db_session, mock_trace_service, mock_mail_service):
+    """Test: suppression d'un cadeau partagé avec participants - doit supprimer les partages en cascade"""
+    # Arrange - Créer destinataire, preneur et participants
+    dest = User(email=f"dest{uuid4().hex[:8]}@ex.com", prenom="Dest", nom="User", google_id=f"dest{uuid4().hex[:8]}")
+    taker = User(email=f"taker{uuid4().hex[:8]}@ex.com", prenom="Taker", nom="User", google_id=f"taker{uuid4().hex[:8]}")
+    participant1 = User(email=f"part1{uuid4().hex[:8]}@ex.com", prenom="Part1", nom="User", google_id=f"part1{uuid4().hex[:8]}")
+    participant2 = User(email=f"part2{uuid4().hex[:8]}@ex.com", prenom="Part2", nom="User", google_id=f"part2{uuid4().hex[:8]}")
+
+    unit_db_session.add_all([dest, taker, participant1, participant2])
+    await unit_db_session.commit()
+    for u in (dest, taker, participant1, participant2):
+        await unit_db_session.refresh(u)
+
+    # Créer un cadeau pris par taker avec statut PARTAGE
+    gift = Gift(
+        destinataire_id=dest.id,
+        nom="Cadeau Partagé",
+        priorite=1,
+        statut=GiftStatusEnum.PARTAGE,
+        reserve_par_id=taker.id
+    )
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    # Créer des partages
+    from app.models.gift_shared import GiftShared
+    share1 = GiftShared(preneur_id=taker.id, cadeau_id=gift.id, participant_id=participant1.id, montant=25.0, rembourse=False)
+    share2 = GiftShared(preneur_id=taker.id, cadeau_id=gift.id, participant_id=participant2.id, montant=30.0, rembourse=False)
+    unit_db_session.add_all([share1, share2])
+    await unit_db_session.commit()
+
+    # Act - Supprimer le cadeau
+    await GiftService.delete_gift(unit_db_session, gift.id, dest)
+
+    # Assert - Vérifier que le cadeau et les partages ont été supprimés
+    from sqlalchemy import select
+
+    # Vérifier que le cadeau n'existe plus
+    result_gift = (await unit_db_session.execute(select(Gift).where(Gift.id == gift.id))).scalars().first()
+    assert result_gift is None
+
+    # Vérifier que les partages ont été supprimés
+    result_shares = (await unit_db_session.execute(
+        select(GiftShared).where(GiftShared.cadeau_id == gift.id)
+    )).scalars().all()
+    assert len(result_shares) == 0
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_delete_gift_with_reserve_par(unit_db_session, mock_trace_service, mock_mail_service):
+    """Test: suppression d'un cadeau réservé - doit envoyer un email au preneur"""
+    # Arrange
+    dest = User(email=f"dest{uuid4().hex[:8]}@ex.com", prenom="Dest", nom="User", google_id=f"dest{uuid4().hex[:8]}")
+    taker = User(email=f"taker{uuid4().hex[:8]}@ex.com", prenom="Taker", nom="User", google_id=f"taker{uuid4().hex[:8]}")
+
+    unit_db_session.add_all([dest, taker])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(dest)
+    await unit_db_session.refresh(taker)
+
+    # Créer un cadeau réservé par taker
+    gift = Gift(
+        destinataire_id=dest.id,
+        nom="Cadeau Réservé",
+        priorite=1,
+        statut=GiftStatusEnum.RESERVE,
+        reserve_par_id=taker.id
+    )
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    # Act - Supprimer le cadeau
+    await GiftService.delete_gift(unit_db_session, gift.id, dest)
+
+    # Assert - Vérifier que le cadeau a été supprimé
+    from sqlalchemy import select
+    result_gift = (await unit_db_session.execute(select(Gift).where(Gift.id == gift.id))).scalars().first()
+    assert result_gift is None
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_delete_gift_unauthorized(unit_db_session, mock_trace_service):
+    """Test: tentative de suppression d'un cadeau d'un autre utilisateur - doit échouer"""
+    # Arrange
+    dest = User(email=f"dest{uuid4().hex[:8]}@ex.com", prenom="Dest", nom="User", google_id=f"dest{uuid4().hex[:8]}")
+    other = User(email=f"other{uuid4().hex[:8]}@ex.com", prenom="Other", nom="User", google_id=f"other{uuid4().hex[:8]}")
+
+    unit_db_session.add_all([dest, other])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(dest)
+    await unit_db_session.refresh(other)
+
+    gift = Gift(destinataire_id=dest.id, nom="Cadeau Dest", priorite=1, statut=GiftStatusEnum.DISPONIBLE)
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    # Act & Assert - Tentative de suppression par un autre utilisateur
+    with pytest.raises(HTTPException) as exc_info:
+        await GiftService.delete_gift(unit_db_session, gift.id, other)
+
+    assert exc_info.value.status_code == 403
+    assert "Vous ne pouvez supprimer que vos propres cadeaux" in str(exc_info.value.detail)

@@ -31,7 +31,7 @@ class Gift(Base):
 
     gift_delivery = relationship("GiftDelivery", back_populates="gift", uselist=False, cascade="all, delete-orphan")
     gift_purchase_info = relationship("GiftPurchaseInfo", back_populates="gift", uselist=False, cascade="all, delete-orphan")
-    partages = relationship("GiftShared", back_populates="cadeau")
+    partages = relationship("GiftShared", back_populates="cadeau", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_gift_utilisateur", "destinataire_id"),
