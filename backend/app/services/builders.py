@@ -3,12 +3,19 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import UserGroup, Gift, GiftIdeas, GiftShared, GiftPurchaseInfo
+from app.models import UserGroup, Gift, GiftIdeas, GiftShared, GiftPurchaseInfo, User
 from app.schemas import UserDisplaySchema, UserTiersResponse
 from app.schemas.gift import GiftPublicResponse, GiftIdeasSchema, GiftSharedSchema
 
+EXTERNAL_GROUP_MEMBER_NAME = "Un membre d'un autre groupe"
 
-async def build_user_display(user_id: int, group_id: int, db: AsyncSession) -> UserDisplaySchema:
+async def build_user_display(
+    user_id: int,
+    group_id: int,
+    db: AsyncSession,
+    strict: bool = True,
+    mask_identity_outside_group: bool = False
+) -> UserDisplaySchema:
     result = await db.execute(
         select(UserGroup)
         .where(
@@ -20,16 +27,40 @@ async def build_user_display(user_id: int, group_id: int, db: AsyncSession) -> U
 
     user_group = result.scalars().first()
 
-    if not user_group:
-        raise HTTPException(status_code=404, detail="Utilisateur non trouvé dans le groupe.")
+    if user_group:
+        return UserDisplaySchema(
+            id=user_group.utilisateur.id,
+            nom=user_group.utilisateur.nom,
+            prenom=user_group.utilisateur.prenom,
+            surnom=user_group.surnom if user_group.surnom else None,
+            role= user_group.role,
+            is_compte_tiers= user_group.utilisateur.is_compte_tiers
+        )
+
+    if strict:
+        raise HTTPException(status_code=404, detail='Utilisateur non trouve dans le groupe.')
+
+    user = await db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail='Utilisateur introuvable.')
+
+    if mask_identity_outside_group:
+        return UserDisplaySchema(
+            id=user.id,
+            nom=None,
+            prenom=EXTERNAL_GROUP_MEMBER_NAME,
+            surnom=None,
+            role=None,
+            is_compte_tiers=user.is_compte_tiers
+        )
 
     return UserDisplaySchema(
-        id=user_group.utilisateur.id,
-        nom=user_group.utilisateur.nom,
-        prenom=user_group.utilisateur.prenom,
-        surnom=user_group.surnom if user_group.surnom else None,
-        role= user_group.role,
-        is_compte_tiers= user_group.utilisateur.is_compte_tiers
+        id=user.id,
+        nom=user.nom,
+        prenom=user.prenom,
+        surnom=None,
+        role=None,
+        is_compte_tiers=user.is_compte_tiers
     )
 
 
@@ -80,7 +111,13 @@ async def build_gift_public_response(gift: Gift, group_id: int, db: AsyncSession
         commentaire=gift.commentaire,
         priorite=gift.priorite,
         statut=gift.statut,
-        reserve_par=await build_user_display(gift.reserve_par_id, group_id, db) if gift.reserve_par_id else None,
+        reserve_par=await build_user_display(
+            gift.reserve_par_id,
+            group_id,
+            db,
+            strict=False,
+            mask_identity_outside_group=True
+        ) if gift.reserve_par_id else None,
         date_reservation=gift.date_reservation,
         expiration_reservation=gift.expiration_reservation,
         gift_idea=await build_gift_idea_schema(gift.gift_idea, group_id, db) if gift.gift_idea else None

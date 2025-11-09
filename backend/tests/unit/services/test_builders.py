@@ -10,6 +10,7 @@ from app.services.builders import (
     build_gift_public_response,
     build_gift_idea_schema,
     build_gift_shared_schema,
+    EXTERNAL_GROUP_MEMBER_NAME
 )
 
 
@@ -50,6 +51,44 @@ async def test_build_user_display_not_in_group_raises(unit_db_session):
 
 @pytest.mark.unit
 @pytest.mark.asyncio
+async def test_build_user_display_non_strict_returns_user(unit_db_session):
+    user = User(email="u3@example.com", prenom="U3", nom="Test")
+    group = Group(nom_groupe="G3", description="")
+    unit_db_session.add_all([user, group])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(user)
+    await unit_db_session.refresh(group)
+
+    display = await build_user_display(user.id, group.id, unit_db_session, strict=False)
+    assert display.id == user.id
+    assert display.role is None
+    assert display.prenom == "U3"
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_build_user_display_mask_identity(unit_db_session):
+    user = User(email="u4@example.com", prenom="U4", nom="Test")
+    group = Group(nom_groupe="G4", description="")
+    unit_db_session.add_all([user, group])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(user)
+    await unit_db_session.refresh(group)
+
+    display = await build_user_display(
+        user.id,
+        group.id,
+        unit_db_session,
+        strict=False,
+        mask_identity_outside_group=True
+    )
+    assert display.prenom == EXTERNAL_GROUP_MEMBER_NAME
+    assert display.nom is None
+    assert display.role is None
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
 async def test_build_gift_public_response_basic(unit_db_session):
     # Arrange: users and group
     dest = User(email="dest@example.com", prenom="Dest", nom="One")
@@ -83,6 +122,41 @@ async def test_build_gift_public_response_basic(unit_db_session):
     assert resp.nom == "Livre"
     assert resp.statut == GiftStatusEnum.DISPONIBLE
     assert resp.reserve_par is None
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_build_gift_public_response_reserver_outside_group(unit_db_session):
+    dest = User(email="dest2@example.com", prenom="Dest2", nom="One")
+    reserver = User(email="res@example.com", prenom="Res", nom="Erver")
+    group = Group(nom_groupe="Gifts2", description=None)
+    unit_db_session.add_all([dest, reserver, group])
+    await unit_db_session.commit()
+    await unit_db_session.refresh(dest)
+    await unit_db_session.refresh(reserver)
+    await unit_db_session.refresh(group)
+
+    unit_db_session.add(UserGroup(utilisateur_id=dest.id, groupe_id=group.id, role=RoleEnum.MEMBRE))
+    await unit_db_session.commit()
+
+    gift = Gift(
+        destinataire_id=dest.id,
+        nom="Livre 2",
+        description="Roman",
+        priorite=1,
+        statut=GiftStatusEnum.RESERVE,
+        prix=25.0,
+        reserve_par_id=reserver.id,
+    )
+    unit_db_session.add(gift)
+    await unit_db_session.commit()
+    await unit_db_session.refresh(gift)
+
+    resp = await build_gift_public_response(gift, group.id, unit_db_session)
+
+    assert resp.reserve_par is not None
+    assert resp.reserve_par.id == reserver.id
+    assert resp.reserve_par.prenom == EXTERNAL_GROUP_MEMBER_NAME
 
 
 @pytest.mark.unit
@@ -145,4 +219,3 @@ async def test_build_gift_idea_and_shared_schema(unit_db_session):
     assert shared_schema.id == shared.id
     assert shared_schema.preneur.id == preneur.id
     assert shared_schema.participant.id == participant.id
-

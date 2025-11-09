@@ -5,8 +5,15 @@
   <hr class="block-separator"/>
 
   <p *ngIf="giftDetailResponse.gift.statut !== GiftStatus.DISPONIBLE">
-    <span class="key-label">{{ getLabelPreneur(giftDetailResponse.gift.statut) }}  :
-    </span> <span class="value-text">{{ giftDetailResponse.gift.reservePar | displayName }}</span>
+    <span class="key-label">{{ getLabelPreneur(giftDetailResponse.gift.statut) }}  
+    </span>
+    <span class="value-text">
+      {{
+        giftDetailResponse.gift.reservePar?.role
+          ? (giftDetailResponse.gift.reservePar | displayName)
+          : 'un membre d\'un autre groupe'
+      }}
+    </span>
   </p>
   <p *ngIf="giftDetailResponse.gift.statut == GiftStatus.RESERVE">
     <span class="key-label">Date d'expiration de la réservation  : </span>
@@ -50,4 +57,3 @@
   </ng-container>
 
 </div>
-

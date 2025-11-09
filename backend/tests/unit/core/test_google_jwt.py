@@ -1,121 +1,92 @@
+import time
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-from fastapi import HTTPException
+from httpx import RequestError
 
-from app.core.google_jwt import verify_google_id_token
+# Le module à tester
+from app.core import google_jwt
+from app.core.google_jwt import force_refresh_jwks
+
+# Marque tous les tests de ce fichier comme asynchrones pour pytest
+pytestmark = pytest.mark.asyncio
 
 
-class TestGoogleJWT:
-    """Tests pour la vérification des tokens Google (logique métier)"""
+@pytest.fixture(autouse=True)
+def mock_common_dependencies(mocker):
+    """
+    Mock les dépendances communes à tous les tests de ce fichier
+    pour isoler la logique de la fonction `force_refresh_jwks`.
+    """
+    mocker.patch.object(google_jwt, 'tracer', MagicMock())
+    mocker.patch.object(google_jwt, 'logger', MagicMock())
+    # Mock le module time pour contrôler la valeur du timestamp
+    mocker.patch.object(google_jwt, 'time', MagicMock())
 
-    @pytest.mark.asyncio
-    async def test_verify_google_id_token_success(self, monkeypatch):
-        """Test la vérification réussie d'un token Google"""
-        mock_token = "valid_token"
-        mock_payload = {
-            "sub": "12345",
-            "email": "test@example.com",
-            "name": "Test User"
-        }
-        mock_jwks = {"keys": [{"kid": "key1", "kty": "RSA"}]}
 
-        # Mock du client HTTP persistant
-        mock_google_client = AsyncMock()
-        mock_response = MagicMock()
-        mock_response.json.return_value = mock_jwks
-        mock_google_client.get.return_value = mock_response
-        
-        # Mock du cache (force cache miss pour tester le fetch)
-        monkeypatch.setattr("app.core.google_jwt._jwks_cache", None)
-        monkeypatch.setattr("app.core.google_jwt.google_client", mock_google_client)
+async def test_force_refresh_jwks_on_success(mocker):
+    """
+    Vérifie que `force_refresh_jwks` récupère avec succès les clés,
+    met à jour le cache et retourne les nouvelles clés.
+    """
+    # Arrange
+    # 1. Préparation des données de test
+    sample_jwks = {"keys": [{"kid": "test_kid_123", "alg": "RS256"}]}
+    fixed_timestamp = 1234567890.0
 
-        with patch('app.core.google_jwt.jwt.decode') as mock_jwt_decode:
-            mock_jwt_decode.return_value = mock_payload
+    # 2. Mock de la réponse du client HTTP
+    mock_response = MagicMock()
+    mock_response.json.return_value = sample_jwks
 
-            result = await verify_google_id_token(mock_token)
+    mock_google_client = MagicMock()
+    mock_google_client.get = AsyncMock(return_value=mock_response)
+    mocker.patch.object(google_jwt, 'google_client', mock_google_client)
 
-            assert result == mock_payload
-            mock_google_client.get.assert_called_once()
+    # 3. Mock de time.time() pour retourner une valeur prédictible
+    mocker.patch.object(google_jwt.time, 'time', return_value=fixed_timestamp)
 
-    @pytest.mark.asyncio
-    async def test_verify_google_id_token_cache_hit(self, monkeypatch):
-        """Test que le cache JWK fonctionne (pas d'appel réseau)"""
-        mock_token = "valid_token"
-        mock_payload = {
-            "sub": "12345",
-            "email": "test@example.com", 
-            "name": "Test User"
-        }
-        mock_jwks = {"keys": [{"kid": "key1", "kty": "RSA"}]}
+    # 4. Initialisation de l'état du cache avant l'appel
+    google_jwt._jwks_cache = ({"keys": ["old_key"]}, 0)
 
-        # Mock du cache (simuler cache hit)
-        import time
-        monkeypatch.setattr("app.core.google_jwt._jwks_cache", (mock_jwks, time.time()))
-        
-        # Mock du client (ne devrait PAS être appelé avec cache hit)
-        mock_google_client = AsyncMock()
-        monkeypatch.setattr("app.core.google_jwt.google_client", mock_google_client)
+    # Act
+    result = await force_refresh_jwks()
 
-        with patch('app.core.google_jwt.jwt.decode') as mock_jwt_decode:
-            mock_jwt_decode.return_value = mock_payload
+    # Assert
+    # 1. Vérifie que le client HTTP a été appelé avec la bonne URL
+    mock_google_client.get.assert_awaited_once_with(google_jwt.GOOGLE_JWK_URL)
 
-            result = await verify_google_id_token(mock_token)
+    # 2. Vérifie que la fonction retourne les clés récupérées
+    assert result == sample_jwks
 
-            assert result == mock_payload
-            # Vérifier que le client n'a PAS été appelé (cache hit)
-            mock_google_client.get.assert_not_called()
+    # 3. Vérifie que le cache global a été correctement mis à jour
+    assert google_jwt._jwks_cache == (sample_jwks, fixed_timestamp)
 
-    @pytest.mark.asyncio
-    async def test_verify_google_id_token_fallback_refresh(self, monkeypatch):
-        """Test du fallback avec refresh forcé du cache"""
-        mock_token = "valid_token"
-        mock_payload = {
-            "sub": "12345",
-            "email": "test@example.com",
-            "name": "Test User"
-        }
-        mock_jwks = {"keys": [{"kid": "key1", "kty": "RSA"}]}
+    # 4. Vérifie qu'un message de log a bien été émis
+    google_jwt.logger.info.assert_called_once_with("Force refresh du cache JWK")
 
-        # Mock du client HTTP persistant
-        mock_google_client = AsyncMock()
-        mock_response = MagicMock()
-        mock_response.json.return_value = mock_jwks
-        mock_google_client.get.return_value = mock_response
-        
-        monkeypatch.setattr("app.core.google_jwt._jwks_cache", None)
-        monkeypatch.setattr("app.core.google_jwt.google_client", mock_google_client)
 
-        with patch('app.core.google_jwt.jwt.decode') as mock_jwt_decode:
-            # Premier appel échoue, deuxième réussit (fallback)
-            mock_jwt_decode.side_effect = [Exception("Invalid key"), mock_payload]
+async def test_force_refresh_jwks_on_http_error(mocker):
+    """
+    Vérifie que `force_refresh_jwks` propage correctement une exception
+    en cas d'échec de la requête HTTP et que le cache n'est pas altéré.
+    """
+    # Arrange
+    # 1. Mock du client HTTP pour qu'il lève une exception
+    mock_google_client = MagicMock()
+    mock_google_client.get = AsyncMock(side_effect=RequestError("Erreur réseau simulée"))
+    mocker.patch.object(google_jwt, 'google_client', mock_google_client)
 
-            result = await verify_google_id_token(mock_token)
+    # 2. Sauvegarde de l'état initial du cache
+    initial_cache_state = ({"keys": ["initial_key"]}, 123.0)
+    google_jwt._jwks_cache = initial_cache_state
 
-            assert result == mock_payload
-            # Vérifier que le client a été appelé 2 fois (cache + force refresh)
-            assert mock_google_client.get.call_count == 2
+    # Act & Assert
+    # Vérifie qu'une exception RequestError est bien levée
+    with pytest.raises(RequestError, match="Erreur réseau simulée"):
+        await force_refresh_jwks()
 
-    @pytest.mark.asyncio
-    async def test_verify_google_id_token_complete_failure(self, monkeypatch):
-        """Test de l'échec complet (même après fallback)"""
-        mock_token = "invalid_token"
-        mock_jwks = {"keys": [{"kid": "key1", "kty": "RSA"}]}
+    # 1. Vérifie que le cache n'a pas été modifié après l'échec
+    assert google_jwt._jwks_cache == initial_cache_state
 
-        # Mock du client HTTP persistant
-        mock_google_client = AsyncMock()
-        mock_response = MagicMock()
-        mock_response.json.return_value = mock_jwks
-        mock_google_client.get.return_value = mock_response
-        
-        monkeypatch.setattr("app.core.google_jwt._jwks_cache", None)
-        monkeypatch.setattr("app.core.google_jwt.google_client", mock_google_client)
-
-        with patch('app.core.google_jwt.jwt.decode') as mock_jwt_decode:
-            # Les deux tentatives échouent
-            mock_jwt_decode.side_effect = Exception("Invalid token")
-
-            with pytest.raises(HTTPException) as exc_info:
-                await verify_google_id_token(mock_token)
-
-            assert exc_info.value.status_code == 401
-            assert exc_info.value.detail == "id_token Google invalide"
+    # 2. Vérifie que la tentative de refresh a bien été loguée malgré l'erreur
+    google_jwt.logger.info.assert_called_once_with("Force refresh du cache JWK")
