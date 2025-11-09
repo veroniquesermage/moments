@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.responses import JSONResponse
 # --- OpenTelemetry (provider+exporter) ---
 from opentelemetry import trace
@@ -68,14 +69,32 @@ async def db_rollback_middleware(request: Request, call_next):
         await gen.aclose()
 
 # 6) Handlers d’exceptions (inchangé)
+@app.exception_handler(HTTPException)
+async def http_error_handler(request: Request, exc: HTTPException):
+    if exc.status_code >= 400:
+        logger.error(
+            "HTTPException %s %s -> %s (%s)",
+            request.method,
+            request.url.path,
+            exc.status_code,
+            exc.detail,
+        )
+    return await http_exception_handler(request, exc)
+
+# Handler générique pour les exceptions non gérées
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    return JSONResponse(status_code=500, content={"detail": "Erreur interne du serveur."})
+
 @app.exception_handler(IntegrityError)
 async def integrity_error_handler(request: Request, exc: IntegrityError):
-    logger.info(f"IntegrityError = {exc}")
+    logger.exception("IntegrityError on %s %s", request.method, request.url.path)
     return JSONResponse(status_code=400, content={"detail": "Conflit en base de données : contrainte violée."})
 
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
-    logger.info(f"SQLAlchemyError = {exc}")
+    logger.exception("SQLAlchemyError on %s %s", request.method, request.url.path)
     return JSONResponse(status_code=500, content={"detail": "Erreur interne de la base de données."})
 
 # 7) Routes
